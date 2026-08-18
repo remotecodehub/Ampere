@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/web/">
+    <Project Path="src/web/Ampere/Ampere.csproj" />
+  </Folder>
+</Solution>
