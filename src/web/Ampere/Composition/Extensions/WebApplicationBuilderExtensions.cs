@@ -32,6 +32,10 @@ public static class WebApplicationBuilderExtensions
         /// <remarks>The last line must call build and call the partial run extension method.</remarks>
         public async Task RunAmpereAsync<T>() where T : Microsoft.AspNetCore.Components.IComponent
         {
+            if (builder.Environment.IsDevelopment() && (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true"))
+            {
+                builder.Configuration.AddUserSecrets<Program>();
+            }
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
             builder.Services.AddControllers();
@@ -40,7 +44,12 @@ public static class WebApplicationBuilderExtensions
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 
             builder.Services.AddDbContext<AmpereDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("Identity")));
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("Ampere"),
+                    sqlOpt =>
+                    {
+                        sqlOpt.CommandTimeout(90);  
+                    }));
 
             builder.Services.AddIdentityCore<User>(options =>
             {
