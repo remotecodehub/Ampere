@@ -78,6 +78,11 @@
             Represents an Ampere application role.
             </summary>
         </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.Role.Id">
+            <summary>
+            Gets or sets the identity identifier.
+            </summary>
+        </member>
         <member name="P:Ampere.Infrastructure.Identity.Models.Role.IsDeleted">
             <summary>
             Gets or sets whether the role is deleted.
@@ -116,6 +121,11 @@
         <member name="M:Ampere.Infrastructure.Identity.Models.User.#ctor(System.String)">
             <summary>
             Represents an Ampere application user.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.Id">
+            <summary>
+            Gets or sets the identity identifier.
             </summary>
         </member>
         <member name="P:Ampere.Infrastructure.Identity.Models.User.DisplayName">
@@ -398,61 +408,89 @@
             Gets or sets whether TLS is enabled.
             </summary>
         </member>
-        <member name="T:Ampere.Infrastructure.MQTT.Services.MqttBrokerService">
-            <summary>
-            Concrete implementation of the broker service using
-            MQTTnet. This type remains in Infrastructure and does
-            not leak MQTTnet types to Application.
-            </summary>
-            <remarks>Constructs the broker service.</remarks>
+        <member name="T:Ampere.Infrastructure.MQTT.Services.MqttBrokerHostedService">
+            <summary>Starts the broker when configured for startup.</summary>
+            <param name="scopeFactory">The service scope factory.</param>
         </member>
-        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.#ctor(System.IServiceProvider,Ampere.Infrastructure.Persistence.AmpereDbContext)">
-            <summary>
-            Concrete implementation of the broker service using
-            MQTTnet. This type remains in Infrastructure and does
-            not leak MQTTnet types to Application.
-            </summary>
-            <remarks>Constructs the broker service.</remarks>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerHostedService.#ctor(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory)">
+            <summary>Starts the broker when configured for startup.</summary>
+            <param name="scopeFactory">The service scope factory.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerHostedService.StartAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerHostedService.StopAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Infrastructure.MQTT.Services.MqttBrokerRuntime">
+            <summary>Owns the process-wide MQTT broker runtime.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.MQTT.Services.MqttBrokerRuntime.Server">
+            <summary>Gets the active MQTT server.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.MQTT.Services.MqttBrokerRuntime.StartedAt">
+            <summary>Gets the broker start timestamp.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.MQTT.Services.MqttBrokerRuntime.Messages">
+            <summary>Gets the live message channel.</summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerRuntime.Publish(Ampere.Application.MQTT.Responses.MqttTopicMessageResponse)">
+            <summary>Publishes a message to live subscribers.</summary>
+            <param name="message">The message.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerRuntime.DisposeAsync">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Infrastructure.MQTT.Services.MqttBrokerService">
+            <summary>Runs the local MQTT broker.</summary>
+            <param name="repository">The configuration repository.</param>
+            <param name="runtime">The shared broker runtime.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.#ctor(Ampere.Application.Common.Abstractions.IRepository{Ampere.Infrastructure.MQTT.Models.MqttBrokerConfigurationEntity},Ampere.Infrastructure.MQTT.Services.MqttBrokerRuntime)">
+            <summary>Runs the local MQTT broker.</summary>
+            <param name="repository">The configuration repository.</param>
+            <param name="runtime">The shared broker runtime.</param>
         </member>
         <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.StartAsync(System.Threading.CancellationToken)">
-            <inheritdoc/>
+            <inheritdoc />
         </member>
         <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.StopAsync(System.Threading.CancellationToken)">
-            <inheritdoc/>
+            <inheritdoc />
         </member>
         <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.RestartAsync(System.Threading.CancellationToken)">
-            <inheritdoc/>
+            <inheritdoc />
         </member>
         <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.GetStatusAsync(System.Threading.CancellationToken)">
-            <inheritdoc/>
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.GetClientsAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.PublishAsync(System.String,System.Byte[],System.Threading.CancellationToken)">
-            <inheritdoc/>
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.DisposeAsync">
-            <inheritdoc/>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.WatchMessagesAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Infrastructure.MQTT.Services.MqttConfigurationService">
-            <summary>
-            Persists and retrieves MQTT broker configuration using
-            the application database.
-            </summary>
+            <summary>Persists MQTT broker configuration.</summary>
+            <param name="repository">The configuration repository.</param>
         </member>
-        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttConfigurationService.#ctor(Ampere.Infrastructure.Persistence.AmpereDbContext)">
-            <summary>
-            Persists and retrieves MQTT broker configuration using
-            the application database.
-            </summary>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttConfigurationService.#ctor(Ampere.Application.Common.Abstractions.IRepository{Ampere.Infrastructure.MQTT.Models.MqttBrokerConfigurationEntity})">
+            <summary>Persists MQTT broker configuration.</summary>
+            <param name="repository">The configuration repository.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttConfigurationService.GetConfigurationAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttConfigurationService.SaveConfigurationAsync(Ampere.Application.MQTT.Requests.ConfigureBrokerRequest,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Infrastructure.Persistence.AmpereDbContext">
-            <summary>
-            Represents the Ampere database context.
-            </summary>
+            <summary>Represents the Ampere database context.</summary>
         </member>
         <member name="M:Ampere.Infrastructure.Persistence.AmpereDbContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{Ampere.Infrastructure.Persistence.AmpereDbContext})">
-            <summary>
-            Represents the Ampere database context.
-            </summary>
+            <summary>Represents the Ampere database context.</summary>
         </member>
         <member name="M:Ampere.Infrastructure.Persistence.AmpereDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
@@ -470,9 +508,10 @@
             <inheritdoc />
         </member>
         <member name="P:Ampere.Infrastructure.Persistence.AmpereDbContext.MqttBrokerConfigurations">
-            <summary>
-            Gets persisted MQTT broker configurations.
-            </summary>
+            <summary>Gets broker configurations.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Persistence.AmpereDbContext.MqttTopics">
+            <summary>Gets configured MQTT topics.</summary>
         </member>
         <member name="T:Ampere.Infrastructure.Persistence.Configurations.MqttBrokerConfigurationConfiguration">
             <summary>
@@ -487,52 +526,35 @@
             The entity type builder.
             </param>
         </member>
-        <member name="T:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1">
+        <member name="T:Ampere.Infrastructure.Persistence.Configurations.MqttTopicConfiguration">
+            <summary>Configures persisted MQTT topics.</summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Configurations.MqttTopicConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{Ampere.Domain.MQTT.Entities.MqttTopic})">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`2">
             <summary>
-            Executes marked requests in a database transaction.
+            Executes transactional Mediator requests atomically.
             </summary>
-            <typeparam name="TContext">
-            The Mediator pipeline context type.
-            </typeparam>
+            <typeparam name="TMessage">The message type.</typeparam>
+            <typeparam name="TResponse">The response type.</typeparam>
         </member>
-        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.#ctor(Ampere.Application.Common.Abstractions.IUnitOfWork)">
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`2.#ctor(Ampere.Application.Common.Abstractions.IUnitOfWork)">
             <summary>
-            Executes marked requests in a database transaction.
+            Executes transactional Mediator requests atomically.
             </summary>
-            <typeparam name="TContext">
-            The Mediator pipeline context type.
-            </typeparam>
+            <typeparam name="TMessage">The message type.</typeparam>
+            <typeparam name="TResponse">The response type.</typeparam>
         </member>
-        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.ShouldExecute(`0,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.BeforeExecute(`0,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.Execute(`0,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.AfterExecute(`0,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.OnException(System.Exception,`0)">
-            <inheritdoc />
-        </member>
-        <member name="T:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddlewareExtensions">
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`2.Handle(`0,Mediator.MessageHandlerDelegate{`0,`1},System.Threading.CancellationToken)">
             <summary>
-            Configures transactional Mediator pipelines.
+            Executes the request inside a database transaction
+            when the message is transactional.
             </summary>
-        </member>
-        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddlewareExtensions.UseTransaction``1(Mediator.Net.Pipeline.IPipeConfigurator{``0})">
-            <summary>
-            Adds the transaction middleware.
-            </summary>
-            <typeparam name="TContext">
-            The Mediator pipeline context type.
-            </typeparam>
-            <param name="configurator">
-            The pipeline configurator.
-            </param>
+            <param name="message">The message.</param>
+            <param name="next">The next pipeline stage.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>The handler response.</returns>
         </member>
         <member name="M:Ampere.Infrastructure.Setup.Services.SystemSetupService.GetSetupStatusAsync(System.Threading.CancellationToken)">
             <summary>

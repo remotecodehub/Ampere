@@ -1,9 +1,13 @@
+using Ampere.Application.Common.Abstractions;
+using Ampere.Application.Common.Responses;
 using Ampere.Application.MQTT.Requests;
 using Ampere.Application.MQTT.Responses;
-using Mediator.Net.Contracts;
 
 namespace Ampere.Application.MQTT.Commands;
 
-/// <summary>Command to persist and apply a broker configuration.</summary>
-/// <param name="Request">The configuration request.</param>
-public sealed record ConfigureBrokerCommand(ConfigureBrokerRequest Request) : IRequest;
+/// <summary>Persists and applies broker configuration.</summary>
+/// <param name="Request">The broker configuration.</param>
+public sealed record ConfigureBrokerCommand(
+    ConfigureBrokerRequest Request)
+    : ITransactionalRequest<
+        Response<BrokerConfigurationResponse>>;

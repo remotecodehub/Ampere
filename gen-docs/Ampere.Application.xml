@@ -131,8 +131,14 @@
         </member>
         <member name="T:Ampere.Application.Common.Abstractions.ITransactionalRequest">
             <summary>
-            Marks a Mediator request as transactional.
+            Marks a message as requiring a transaction.
             </summary>
+        </member>
+        <member name="T:Ampere.Application.Common.Abstractions.ITransactionalRequest`1">
+            <summary>
+            Marks a request as requiring a transaction.
+            </summary>
+            <typeparam name="TResponse">The response type.</typeparam>
         </member>
         <member name="T:Ampere.Application.Common.Abstractions.IUnitOfWork">
             <summary>
@@ -201,110 +207,72 @@
         <member name="F:Ampere.Application.Common.Contracts.JwtTokenTypes.Refresh">
             <summary>Gets the token type for refresh tokens.</summary>
         </member>
-        <member name="T:Ampere.Application.Common.Pipeline.Validation.IMessageValidator">
-            <summary>Validates application messages before they enter the request pipeline.</summary>
+        <member name="T:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`2">
+            <summary>
+            Validates Mediator messages with FluentValidation.
+            </summary>
+            <typeparam name="TMessage">The message type.</typeparam>
+            <typeparam name="TResponse">The response type.</typeparam>
         </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.IMessageValidator.ValidateAsync(System.Object,System.Threading.CancellationToken)">
-            <summary>Validates a message using its registered validator.</summary>
-            <param name="message">The message to validate.</param>
-            <param name="cancellationToken">The token used to cancel validation.</param>
-            <returns>A task that completes when validation succeeds.</returns>
-            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="message"/> is <see langword="null"/>.</exception>
-            <exception cref="T:FluentValidation.ValidationException">Thrown when a registered validator reports validation errors.</exception>
+        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`2.#ctor(System.Collections.Generic.IEnumerable{FluentValidation.IValidator{`0}})">
+            <summary>
+            Validates Mediator messages with FluentValidation.
+            </summary>
+            <typeparam name="TMessage">The message type.</typeparam>
+            <typeparam name="TResponse">The response type.</typeparam>
         </member>
-        <member name="T:Ampere.Application.Common.Pipeline.Validation.FluentMessageValidator">
-            <summary>Resolves and executes FluentValidation validators for application messages.</summary>
-            <param name="serviceProvider">The service provider used to resolve message validators.</param>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.FluentMessageValidator.#ctor(System.IServiceProvider)">
-            <summary>Resolves and executes FluentValidation validators for application messages.</summary>
-            <param name="serviceProvider">The service provider used to resolve message validators.</param>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.FluentMessageValidator.ValidateAsync(System.Object,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="T:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`1">
-            <summary>Adds message validation to a Mediator.Net pipeline.</summary>
-            <typeparam name="TContext">The pipeline context type.</typeparam>
-            <param name="validator">The message validator used by the pipeline.</param>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`1.#ctor(Ampere.Application.Common.Pipeline.Validation.IMessageValidator)">
-            <summary>Adds message validation to a Mediator.Net pipeline.</summary>
-            <typeparam name="TContext">The pipeline context type.</typeparam>
-            <param name="validator">The message validator used by the pipeline.</param>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`1.ShouldExecute(`0,System.Threading.CancellationToken)">
-            <summary>Determines whether validation should execute for the current context.</summary>
-            <param name="context">The pipeline context.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns><see langword="true"/> for every message.</returns>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`1.BeforeExecute(`0,System.Threading.CancellationToken)">
-            <summary>Validates the message before the handler executes.</summary>
-            <param name="context">The pipeline context containing the message.</param>
-            <param name="cancellationToken">The token used to cancel validation.</param>
-            <returns>A task that completes when validation succeeds.</returns>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`1.Execute(`0,System.Threading.CancellationToken)">
-            <summary>Executes the middleware's main stage.</summary>
-            <param name="context">The pipeline context.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>A completed task.</returns>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`1.AfterExecute(`0,System.Threading.CancellationToken)">
-            <summary>Executes the middleware's post-handler stage.</summary>
-            <param name="context">The pipeline context.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>A completed task.</returns>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`1.OnException(System.Exception,`0)">
-            <summary>Handles exceptions raised by the pipeline without transforming them.</summary>
-            <param name="ex">The exception raised by the pipeline.</param>
-            <param name="context">The pipeline context.</param>
-            <returns>Re Throws the exception.</returns>
-        </member>
-        <member name="T:Ampere.Application.Common.Pipeline.Validation.ValidationMiddlewareExtensions">
-            <summary>Provides extension methods for adding validation to Mediator.Net pipelines.</summary>
-        </member>
-        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddlewareExtensions.UseValidation``1(Mediator.Net.Pipeline.IPipeConfigurator{``0})">
-            <summary>Adds the validation middleware to a Mediator.Net pipeline.</summary>
-            <typeparam name="TContext">The pipeline context type.</typeparam>
-            <param name="configurator">The pipeline configurator.</param>
+        <member name="M:Ampere.Application.Common.Pipeline.Validation.ValidationMiddleware`2.Handle(`0,Mediator.MessageHandlerDelegate{`0,`1},System.Threading.CancellationToken)">
+            <summary>
+            Validates the message before execution.
+            </summary>
+            <param name="message">The message.</param>
+            <param name="next">The next pipeline stage.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>The handler response.</returns>
         </member>
         <member name="T:Ampere.Application.Common.Responses.Response`1">
-            <summary>Represents a generic application response with success state, optional data, and errors.</summary>
+            <summary>Represents an application response.</summary>
             <typeparam name="T">The response data type.</typeparam>
-            <param name="Succeeded">Indicates whether the operation succeeded.</param>
-            <param name="Data">The operation result when successful; otherwise <see langword="null"/>.</param>
-            <param name="Errors">The errors returned by the operation.</param>
+            <param name="Succeeded">Whether the operation succeeded.</param>
+            <param name="Data">The operation data.</param>
+            <param name="Errors">The operation errors.</param>
         </member>
         <member name="M:Ampere.Application.Common.Responses.Response`1.#ctor(System.Boolean,`0,System.Collections.Generic.IReadOnlyCollection{System.String})">
-            <summary>Represents a generic application response with success state, optional data, and errors.</summary>
+            <summary>Represents an application response.</summary>
             <typeparam name="T">The response data type.</typeparam>
-            <param name="Succeeded">Indicates whether the operation succeeded.</param>
-            <param name="Data">The operation result when successful; otherwise <see langword="null"/>.</param>
-            <param name="Errors">The errors returned by the operation.</param>
+            <param name="Succeeded">Whether the operation succeeded.</param>
+            <param name="Data">The operation data.</param>
+            <param name="Errors">The operation errors.</param>
         </member>
         <member name="P:Ampere.Application.Common.Responses.Response`1.Succeeded">
-            <summary>Indicates whether the operation succeeded.</summary>
+            <summary>Whether the operation succeeded.</summary>
         </member>
         <member name="P:Ampere.Application.Common.Responses.Response`1.Data">
-            <summary>The operation result when successful; otherwise <see langword="null"/>.</summary>
+            <summary>The operation data.</summary>
         </member>
         <member name="P:Ampere.Application.Common.Responses.Response`1.Errors">
-            <summary>The errors returned by the operation.</summary>
+            <summary>The operation errors.</summary>
         </member>
         <member name="T:Ampere.Application.Common.Responses.Response">
-            <summary>Factory class for creating <see cref="T:Ampere.Application.Common.Responses.Response`1"/> instances.</summary>
+            <summary>Creates application responses.</summary>
         </member>
         <member name="M:Ampere.Application.Common.Responses.Response.Success``1(``0)">
-            <summary>Creates a successful response containing the supplied data.</summary>
+            <summary>Creates a successful response.</summary>
+            <typeparam name="T">The response type.</typeparam>
+            <param name="data">The response data.</param>
+            <returns>A successful response.</returns>
         </member>
         <member name="M:Ampere.Application.Common.Responses.Response.Failure``1(System.Collections.Generic.IEnumerable{System.String})">
-            <summary>Creates a failed response containing the supplied errors.</summary>
+            <summary>Creates a failed response.</summary>
+            <typeparam name="T">The response type.</typeparam>
+            <param name="errors">The error messages.</param>
+            <returns>A failed response.</returns>
         </member>
         <member name="M:Ampere.Application.Common.Responses.Response.Failure``1(System.String[])">
-            <summary>Creates a failed response containing the supplied errors.</summary>
+            <summary>Creates a failed response.</summary>
+            <typeparam name="T">The response type.</typeparam>
+            <param name="errors">The error messages.</param>
+            <returns>A failed response.</returns>
         </member>
         <member name="T:Ampere.Application.Identity.Abstractions.IIdentityEmailSender">
             <summary>Sends email messages required by identity workflows.</summary>
@@ -449,267 +417,252 @@
             <param name="expiresAt">The time after which the revocation may be discarded.</param>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.RegisterCommand">
-            <summary>Requests registration of a new user.</summary>
-            <param name="Email">The user's email address.</param>
-            <param name="Password">The user's password.</param>
+            <summary>Requests registration of a user.</summary>
+            <param name="Email">The user email.</param>
+            <param name="Password">The user password.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.RegisterCommand.#ctor(System.String,System.String)">
-            <summary>Requests registration of a new user.</summary>
-            <param name="Email">The user's email address.</param>
-            <param name="Password">The user's password.</param>
+            <summary>Requests registration of a user.</summary>
+            <param name="Email">The user email.</param>
+            <param name="Password">The user password.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.RegisterCommand.Email">
-            <summary>The user's email address.</summary>
+            <summary>The user email.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.RegisterCommand.Password">
-            <summary>The user's password.</summary>
+            <summary>The user password.</summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.LoginCommand">
-            <summary>Requests authentication using a password and optional second factor.</summary>
-            <param name="Email">The user's email address.</param>
-            <param name="Password">The user's password.</param>
-            <param name="TwoFactorCode">The authenticator code, when required.</param>
-            <param name="TwoFactorRecoveryCode">The recovery code, when used instead of an authenticator code.</param>
+            <summary>Requests user authentication.</summary>
+            <param name="Email">The user email.</param>
+            <param name="Password">The password.</param>
+            <param name="TwoFactorCode">The 2FA code.</param>
+            <param name="TwoFactorRecoveryCode">
+            The 2FA recovery code.
+            </param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.LoginCommand.#ctor(System.String,System.String,System.String,System.String)">
-            <summary>Requests authentication using a password and optional second factor.</summary>
-            <param name="Email">The user's email address.</param>
-            <param name="Password">The user's password.</param>
-            <param name="TwoFactorCode">The authenticator code, when required.</param>
-            <param name="TwoFactorRecoveryCode">The recovery code, when used instead of an authenticator code.</param>
+            <summary>Requests user authentication.</summary>
+            <param name="Email">The user email.</param>
+            <param name="Password">The password.</param>
+            <param name="TwoFactorCode">The 2FA code.</param>
+            <param name="TwoFactorRecoveryCode">
+            The 2FA recovery code.
+            </param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.LoginCommand.Email">
-            <summary>The user's email address.</summary>
+            <summary>The user email.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.LoginCommand.Password">
-            <summary>The user's password.</summary>
+            <summary>The password.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.LoginCommand.TwoFactorCode">
-            <summary>The authenticator code, when required.</summary>
+            <summary>The 2FA code.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.LoginCommand.TwoFactorRecoveryCode">
-            <summary>The recovery code, when used instead of an authenticator code.</summary>
+            <summary>
+            The 2FA recovery code.
+            </summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.RefreshTokenCommand">
-            <summary>Requests exchange of a refresh token.</summary>
-            <param name="RefreshToken">The refresh token to exchange.</param>
+            <summary>Requests a refresh token exchange.</summary>
+            <param name="RefreshToken">The refresh token.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.RefreshTokenCommand.#ctor(System.String)">
-            <summary>Requests exchange of a refresh token.</summary>
-            <param name="RefreshToken">The refresh token to exchange.</param>
+            <summary>Requests a refresh token exchange.</summary>
+            <param name="RefreshToken">The refresh token.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.RefreshTokenCommand.RefreshToken">
-            <summary>The refresh token to exchange.</summary>
+            <summary>The refresh token.</summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.RevokeTokenCommand">
-            <summary>Requests revocation of an access token.</summary>
-            <param name="AccessToken">The access token to revoke.</param>
+            <summary>Requests access token revocation.</summary>
+            <param name="AccessToken">The access token.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.RevokeTokenCommand.#ctor(System.String)">
-            <summary>Requests revocation of an access token.</summary>
-            <param name="AccessToken">The access token to revoke.</param>
+            <summary>Requests access token revocation.</summary>
+            <param name="AccessToken">The access token.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.RevokeTokenCommand.AccessToken">
-            <summary>The access token to revoke.</summary>
+            <summary>The access token.</summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.ConfirmEmailCommand">
-            <summary>Requests confirmation of a user's email address.</summary>
+            <summary>Requests email confirmation.</summary>
             <param name="UserId">The user identifier.</param>
-            <param name="Code">The confirmation token.</param>
-            <param name="ChangedEmail">The replacement email address when confirming an email change.</param>
+            <param name="Code">The confirmation code.</param>
+            <param name="ChangedEmail">The changed email.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.ConfirmEmailCommand.#ctor(System.String,System.String,System.String)">
-            <summary>Requests confirmation of a user's email address.</summary>
+            <summary>Requests email confirmation.</summary>
             <param name="UserId">The user identifier.</param>
-            <param name="Code">The confirmation token.</param>
-            <param name="ChangedEmail">The replacement email address when confirming an email change.</param>
+            <param name="Code">The confirmation code.</param>
+            <param name="ChangedEmail">The changed email.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfirmEmailCommand.UserId">
             <summary>The user identifier.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfirmEmailCommand.Code">
-            <summary>The confirmation token.</summary>
+            <summary>The confirmation code.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfirmEmailCommand.ChangedEmail">
-            <summary>The replacement email address when confirming an email change.</summary>
+            <summary>The changed email.</summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand">
-            <summary>Requests that an email confirmation link be sent again.</summary>
-            <param name="Email">The user's email address.</param>
+            <summary>Requests confirmation email resend.</summary>
+            <param name="Email">The user email.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand.#ctor(System.String)">
-            <summary>Requests that an email confirmation link be sent again.</summary>
-            <param name="Email">The user's email address.</param>
+            <summary>Requests confirmation email resend.</summary>
+            <param name="Email">The user email.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand.Email">
-            <summary>The user's email address.</summary>
+            <summary>The user email.</summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.ForgotPasswordCommand">
-            <summary>Starts password recovery for an email address.</summary>
-            <param name="Email">The email address to recover.</param>
+            <summary>Starts password recovery.</summary>
+            <param name="Email">The user email.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.ForgotPasswordCommand.#ctor(System.String)">
-            <summary>Starts password recovery for an email address.</summary>
-            <param name="Email">The email address to recover.</param>
+            <summary>Starts password recovery.</summary>
+            <param name="Email">The user email.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ForgotPasswordCommand.Email">
-            <summary>The email address to recover.</summary>
+            <summary>The user email.</summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.ResetPasswordCommand">
             <summary>Requests a password reset.</summary>
-            <param name="Email">The user's email address.</param>
-            <param name="ResetCode">The password reset token.</param>
-            <param name="NewPassword">The replacement password.</param>
+            <param name="Email">The user email.</param>
+            <param name="ResetCode">The reset code.</param>
+            <param name="NewPassword">The new password.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.ResetPasswordCommand.#ctor(System.String,System.String,System.String)">
             <summary>Requests a password reset.</summary>
-            <param name="Email">The user's email address.</param>
-            <param name="ResetCode">The password reset token.</param>
-            <param name="NewPassword">The replacement password.</param>
+            <param name="Email">The user email.</param>
+            <param name="ResetCode">The reset code.</param>
+            <param name="NewPassword">The new password.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ResetPasswordCommand.Email">
-            <summary>The user's email address.</summary>
+            <summary>The user email.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ResetPasswordCommand.ResetCode">
-            <summary>The password reset token.</summary>
+            <summary>The reset code.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ResetPasswordCommand.NewPassword">
-            <summary>The replacement password.</summary>
+            <summary>The new password.</summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand">
-            <summary>Requests an update to identity information.</summary>
+            <summary>Requests identity information update.</summary>
             <param name="UserId">The user identifier.</param>
-            <param name="NewEmail">The replacement email address, or <see langword="null"/> to keep the current address.</param>
-            <param name="NewPassword">The replacement password, or <see langword="null"/> to keep the current password.</param>
-            <param name="OldPassword">The current password used to authorize the change.</param>
+            <param name="NewEmail">The new email.</param>
+            <param name="NewPassword">The new password.</param>
+            <param name="OldPassword">The current password.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand.#ctor(System.String,System.String,System.String,System.String)">
-            <summary>Requests an update to identity information.</summary>
+            <summary>Requests identity information update.</summary>
             <param name="UserId">The user identifier.</param>
-            <param name="NewEmail">The replacement email address, or <see langword="null"/> to keep the current address.</param>
-            <param name="NewPassword">The replacement password, or <see langword="null"/> to keep the current password.</param>
-            <param name="OldPassword">The current password used to authorize the change.</param>
+            <param name="NewEmail">The new email.</param>
+            <param name="NewPassword">The new password.</param>
+            <param name="OldPassword">The current password.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand.UserId">
             <summary>The user identifier.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand.NewEmail">
-            <summary>The replacement email address, or <see langword="null"/> to keep the current address.</summary>
+            <summary>The new email.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand.NewPassword">
-            <summary>The replacement password, or <see langword="null"/> to keep the current password.</summary>
+            <summary>The new password.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand.OldPassword">
-            <summary>The current password used to authorize the change.</summary>
+            <summary>The current password.</summary>
         </member>
         <member name="T:Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand">
-            <summary>Requests a change to authenticator-based two-factor authentication.</summary>
+            <summary>Requests 2FA configuration.</summary>
             <param name="UserId">The user identifier.</param>
-            <param name="Enable">Whether to enable or disable two-factor authentication.</param>
-            <param name="TwoFactorCode">The authenticator code used when enabling two-factor authentication.</param>
-            <param name="ResetRecoveryCodes">Whether recovery codes should be regenerated.</param>
-            <param name="ResetSharedKey">Whether the authenticator shared key should be regenerated.</param>
-            <param name="ForgetMachine">Whether the remembered machine state should be cleared.</param>
+            <param name="Enable">Whether 2FA is enabled.</param>
+            <param name="TwoFactorCode">The authenticator code.</param>
+            <param name="ResetRecoveryCodes">Whether codes reset.</param>
+            <param name="ResetSharedKey">Whether the key resets.</param>
+            <param name="ForgetMachine">Whether machine state resets.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.#ctor(System.String,System.Nullable{System.Boolean},System.String,System.Boolean,System.Boolean,System.Boolean)">
-            <summary>Requests a change to authenticator-based two-factor authentication.</summary>
+            <summary>Requests 2FA configuration.</summary>
             <param name="UserId">The user identifier.</param>
-            <param name="Enable">Whether to enable or disable two-factor authentication.</param>
-            <param name="TwoFactorCode">The authenticator code used when enabling two-factor authentication.</param>
-            <param name="ResetRecoveryCodes">Whether recovery codes should be regenerated.</param>
-            <param name="ResetSharedKey">Whether the authenticator shared key should be regenerated.</param>
-            <param name="ForgetMachine">Whether the remembered machine state should be cleared.</param>
+            <param name="Enable">Whether 2FA is enabled.</param>
+            <param name="TwoFactorCode">The authenticator code.</param>
+            <param name="ResetRecoveryCodes">Whether codes reset.</param>
+            <param name="ResetSharedKey">Whether the key resets.</param>
+            <param name="ForgetMachine">Whether machine state resets.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.UserId">
             <summary>The user identifier.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.Enable">
-            <summary>Whether to enable or disable two-factor authentication.</summary>
+            <summary>Whether 2FA is enabled.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.TwoFactorCode">
-            <summary>The authenticator code used when enabling two-factor authentication.</summary>
+            <summary>The authenticator code.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.ResetRecoveryCodes">
-            <summary>Whether recovery codes should be regenerated.</summary>
+            <summary>Whether codes reset.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.ResetSharedKey">
-            <summary>Whether the authenticator shared key should be regenerated.</summary>
+            <summary>Whether the key resets.</summary>
         </member>
         <member name="P:Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.ForgetMachine">
-            <summary>Whether the remembered machine state should be cleared.</summary>
+            <summary>Whether machine state resets.</summary>
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.RegisterCommand},System.Threading.CancellationToken)">
-            <summary>Executes the registration request.</summary>
-            <param name="context">The message context containing the registration request.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The registration result.</returns>
+        <member name="T:Ampere.Application.Identity.Handlers.IdentityHandlers">
+            <summary>Handles identity messages.</summary>
+            <param name="identityService">
+            The identity service.
+            </param>
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.LoginCommand},System.Threading.CancellationToken)">
-            <summary>Executes the login request and converts authentication failure to an application response.</summary>
-            <param name="context">The message context containing the login request.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The authentication response containing tokens when successful.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.#ctor(Ampere.Application.Identity.Abstractions.IIdentityService)">
+            <summary>Handles identity messages.</summary>
+            <param name="identityService">
+            The identity service.
+            </param>
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.RefreshTokenCommand},System.Threading.CancellationToken)">
-            <summary>Executes a refresh-token exchange.</summary>
-            <param name="context">The message context containing the refresh token.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The refreshed token response.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.RegisterCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.RevokeTokenCommand},System.Threading.CancellationToken)">
-            <summary>Executes token revocation.</summary>
-            <param name="context">The message context containing the access token.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>A response indicating whether revocation succeeded.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.LoginCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.ConfirmEmailCommand},System.Threading.CancellationToken)">
-            <summary>Executes email confirmation.</summary>
-            <param name="context">The message context containing the confirmation request.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>A response indicating whether confirmation succeeded.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.RefreshTokenCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand},System.Threading.CancellationToken)">
-            <summary>Executes a confirmation-email resend request.</summary>
-            <param name="context">The message context containing the email address.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The resend result.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.RevokeTokenCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.ForgotPasswordCommand},System.Threading.CancellationToken)">
-            <summary>Executes a password-recovery request.</summary>
-            <param name="context">The message context containing the email address.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The recovery result.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.ConfirmEmailCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.ResetPasswordCommand},System.Threading.CancellationToken)">
-            <summary>Executes a password reset.</summary>
-            <param name="context">The message context containing the reset request.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The reset result.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Queries.GetIdentityInfoQuery},System.Threading.CancellationToken)">
-            <summary>Executes an identity information query.</summary>
-            <param name="context">The message context containing the user identifier.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The identity information response.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.ForgotPasswordCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand},System.Threading.CancellationToken)">
-            <summary>Executes an identity information update.</summary>
-            <param name="context">The message context containing the update request.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The update result.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.ResetPasswordCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand},System.Threading.CancellationToken)">
-            <summary>Executes two-factor configuration.</summary>
-            <param name="context">The message context containing the configuration request.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The resulting two-factor configuration.</returns>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Queries.GetIdentityInfoQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Application.Identity.Handlers.IdentityHandlers.Handle(Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Application.Identity.Queries.GetIdentityInfoQuery">
-            <summary>Requests basic identity information for a user.</summary>
+            <summary>Requests identity information.</summary>
             <param name="UserId">The user identifier.</param>
         </member>
         <member name="M:Ampere.Application.Identity.Queries.GetIdentityInfoQuery.#ctor(System.String)">
-            <summary>Requests basic identity information for a user.</summary>
+            <summary>Requests identity information.</summary>
             <param name="UserId">The user identifier.</param>
         </member>
         <member name="P:Ampere.Application.Identity.Queries.GetIdentityInfoQuery.UserId">
@@ -1011,29 +964,40 @@
             <summary>Initializes first-time setup validation rules.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Abstractions.IMqttBrokerService">
-            <summary>
-            Abstraction for controlling the MQTT broker lifecycle and
-            operations without referencing MQTTnet types.
-            </summary>
+            <summary>Controls the local MQTT broker runtime.</summary>
         </member>
         <member name="M:Ampere.Application.MQTT.Abstractions.IMqttBrokerService.StartAsync(System.Threading.CancellationToken)">
-            <summary>Starts the MQTT broker using the current
-            persisted configuration.</summary>
-            <param name="cancellationToken">Cancellation token.</param>
+            <summary>Starts the configured broker.</summary>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
         <member name="M:Ampere.Application.MQTT.Abstractions.IMqttBrokerService.StopAsync(System.Threading.CancellationToken)">
-            <summary>Stops the MQTT broker.</summary>
+            <summary>Stops the broker.</summary>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
         <member name="M:Ampere.Application.MQTT.Abstractions.IMqttBrokerService.RestartAsync(System.Threading.CancellationToken)">
-            <summary>Restarts the MQTT broker.</summary>
+            <summary>Restarts the broker.</summary>
+            <param name="cancellationToken">The cancellation token.</param>
         </member>
         <member name="M:Ampere.Application.MQTT.Abstractions.IMqttBrokerService.GetStatusAsync(System.Threading.CancellationToken)">
-            <summary>Gets information about the current broker
-            status and runtime details.</summary>
+            <summary>Gets broker runtime status.</summary>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>The broker status.</returns>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Abstractions.IMqttBrokerService.GetClientsAsync(System.Threading.CancellationToken)">
+            <summary>Gets connected MQTT clients.</summary>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>The connected clients.</returns>
         </member>
         <member name="M:Ampere.Application.MQTT.Abstractions.IMqttBrokerService.PublishAsync(System.String,System.Byte[],System.Threading.CancellationToken)">
-            <summary>Publishes a message to the broker.
-            </summary>
+            <summary>Publishes a message to the broker.</summary>
+            <param name="topic">The topic name.</param>
+            <param name="payload">The message payload.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Abstractions.IMqttBrokerService.WatchMessagesAsync(System.Threading.CancellationToken)">
+            <summary>Streams messages received by the broker.</summary>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>The live message stream.</returns>
         </member>
         <member name="T:Ampere.Application.MQTT.Abstractions.IMqttConfigurationService">
             <summary>
@@ -1050,15 +1014,26 @@
             the stored representation.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Commands.ConfigureBrokerCommand">
-            <summary>Command to persist and apply a broker configuration.</summary>
-            <param name="Request">The configuration request.</param>
+            <summary>Persists and applies broker configuration.</summary>
+            <param name="Request">The broker configuration.</param>
         </member>
         <member name="M:Ampere.Application.MQTT.Commands.ConfigureBrokerCommand.#ctor(Ampere.Application.MQTT.Requests.ConfigureBrokerRequest)">
-            <summary>Command to persist and apply a broker configuration.</summary>
-            <param name="Request">The configuration request.</param>
+            <summary>Persists and applies broker configuration.</summary>
+            <param name="Request">The broker configuration.</param>
         </member>
         <member name="P:Ampere.Application.MQTT.Commands.ConfigureBrokerCommand.Request">
-            <summary>The configuration request.</summary>
+            <summary>The broker configuration.</summary>
+        </member>
+        <member name="T:Ampere.Application.MQTT.Commands.CreateTopicCommand">
+            <summary>Creates a configured MQTT topic.</summary>
+            <param name="Request">The topic request.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Commands.CreateTopicCommand.#ctor(Ampere.Application.MQTT.Requests.CreateTopicRequest)">
+            <summary>Creates a configured MQTT topic.</summary>
+            <param name="Request">The topic request.</param>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Commands.CreateTopicCommand.Request">
+            <summary>The topic request.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Commands.PublishMessageCommand">
             <summary>Publishes a message to a broker topic.</summary>
@@ -1072,63 +1047,145 @@
             <summary>The publish request.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Commands.StartBrokerCommand">
-            <summary>Command to start the broker.</summary>
-        </member>
-        <member name="M:Ampere.Application.MQTT.Commands.StartBrokerCommand.#ctor">
-            <summary>Command to start the broker.</summary>
+            <summary>Starts the MQTT broker.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Commands.StopBrokerCommand">
-            <summary>Command to stop the broker.</summary>
-        </member>
-        <member name="M:Ampere.Application.MQTT.Commands.StopBrokerCommand.#ctor">
-            <summary>Command to stop the broker.</summary>
+            <summary>Stops the MQTT broker.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Handlers.ConfigureBrokerCommandHandler">
-            <summary>Handles broker configuration persistence and
-            applies it to the runtime broker service.</summary>
+            <summary>Handles broker configuration changes.</summary>
+            <param name="configurationService">
+            The configuration service.
+            </param>
+            <param name="brokerService">The broker service.</param>
         </member>
         <member name="M:Ampere.Application.MQTT.Handlers.ConfigureBrokerCommandHandler.#ctor(Ampere.Application.MQTT.Abstractions.IMqttConfigurationService,Ampere.Application.MQTT.Abstractions.IMqttBrokerService)">
-            <summary>Handles broker configuration persistence and
-            applies it to the runtime broker service.</summary>
+            <summary>Handles broker configuration changes.</summary>
+            <param name="configurationService">
+            The configuration service.
+            </param>
+            <param name="brokerService">The broker service.</param>
         </member>
-        <member name="M:Ampere.Application.MQTT.Handlers.ConfigureBrokerCommandHandler.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.MQTT.Commands.ConfigureBrokerCommand},System.Threading.CancellationToken)">
-            <inheritdoc/>
+        <member name="M:Ampere.Application.MQTT.Handlers.ConfigureBrokerCommandHandler.Handle(Ampere.Application.MQTT.Commands.ConfigureBrokerCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Application.MQTT.Handlers.CreateTopicCommandHandler">
+            <summary>Creates configured MQTT topics.</summary>
+            <param name="repository">The topic repository.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.CreateTopicCommandHandler.#ctor(Ampere.Application.Common.Abstractions.IRepository{Ampere.Domain.MQTT.Entities.MqttTopic})">
+            <summary>Creates configured MQTT topics.</summary>
+            <param name="repository">The topic repository.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.CreateTopicCommandHandler.Handle(Ampere.Application.MQTT.Commands.CreateTopicCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Application.MQTT.Handlers.GetBrokerConfigurationQueryHandler">
-            <summary>Handles retrieval of the persisted broker configuration.</summary>
+            <summary>Gets persisted broker configuration.</summary>
+            <param name="configurationService">
+            The configuration service.
+            </param>
         </member>
         <member name="M:Ampere.Application.MQTT.Handlers.GetBrokerConfigurationQueryHandler.#ctor(Ampere.Application.MQTT.Abstractions.IMqttConfigurationService)">
-            <summary>Handles retrieval of the persisted broker configuration.</summary>
+            <summary>Gets persisted broker configuration.</summary>
+            <param name="configurationService">
+            The configuration service.
+            </param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.GetBrokerConfigurationQueryHandler.Handle(Ampere.Application.MQTT.Queries.GetBrokerConfigurationQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Application.MQTT.Handlers.GetBrokerStatusQueryHandler">
+            <summary>Gets broker runtime status.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.GetBrokerStatusQueryHandler.#ctor(Ampere.Application.MQTT.Abstractions.IMqttBrokerService)">
+            <summary>Gets broker runtime status.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.GetBrokerStatusQueryHandler.Handle(Ampere.Application.MQTT.Queries.GetBrokerStatusQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Application.MQTT.Handlers.GetConnectedClientsQueryHandler">
+            <summary>Gets connected MQTT clients.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.GetConnectedClientsQueryHandler.#ctor(Ampere.Application.MQTT.Abstractions.IMqttBrokerService)">
+            <summary>Gets connected MQTT clients.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.GetConnectedClientsQueryHandler.Handle(Ampere.Application.MQTT.Queries.GetConnectedClientsQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Application.MQTT.Handlers.GetTopicsQueryHandler">
+            <summary>Gets configured MQTT topics.</summary>
+            <param name="repository">The topic repository.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.GetTopicsQueryHandler.#ctor(Ampere.Application.Common.Abstractions.IRepository{Ampere.Domain.MQTT.Entities.MqttTopic})">
+            <summary>Gets configured MQTT topics.</summary>
+            <param name="repository">The topic repository.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.GetTopicsQueryHandler.Handle(Ampere.Application.MQTT.Queries.GetTopicsQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Application.MQTT.Handlers.PublishMessageCommandHandler">
-            <summary>Publishes a message through the MQTT broker service.</summary>
+            <summary>Publishes a message through MQTT.</summary>
+            <param name="brokerService">The broker service.</param>
         </member>
         <member name="M:Ampere.Application.MQTT.Handlers.PublishMessageCommandHandler.#ctor(Ampere.Application.MQTT.Abstractions.IMqttBrokerService)">
-            <summary>Publishes a message through the MQTT broker service.</summary>
+            <summary>Publishes a message through MQTT.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.PublishMessageCommandHandler.Handle(Ampere.Application.MQTT.Commands.PublishMessageCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Application.MQTT.Handlers.StartBrokerCommandHandler">
-            <summary>Starts the broker using the configured service.</summary>
+            <summary>Starts the MQTT broker.</summary>
+            <param name="brokerService">The broker service.</param>
         </member>
         <member name="M:Ampere.Application.MQTT.Handlers.StartBrokerCommandHandler.#ctor(Ampere.Application.MQTT.Abstractions.IMqttBrokerService)">
-            <summary>Starts the broker using the configured service.</summary>
+            <summary>Starts the MQTT broker.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.StartBrokerCommandHandler.Handle(Ampere.Application.MQTT.Commands.StartBrokerCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Application.MQTT.Handlers.StopBrokerCommandHandler">
-            <summary>Stops the broker using the configured service.</summary>
+            <summary>Stops the MQTT broker.</summary>
+            <param name="brokerService">The broker service.</param>
         </member>
         <member name="M:Ampere.Application.MQTT.Handlers.StopBrokerCommandHandler.#ctor(Ampere.Application.MQTT.Abstractions.IMqttBrokerService)">
-            <summary>Stops the broker using the configured service.</summary>
+            <summary>Stops the MQTT broker.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.StopBrokerCommandHandler.Handle(Ampere.Application.MQTT.Commands.StopBrokerCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Application.MQTT.Handlers.WatchTopicsQueryHandler">
+            <summary>Streams MQTT messages.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.WatchTopicsQueryHandler.#ctor(Ampere.Application.MQTT.Abstractions.IMqttBrokerService)">
+            <summary>Streams MQTT messages.</summary>
+            <param name="brokerService">The broker service.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Handlers.WatchTopicsQueryHandler.Handle(Ampere.Application.MQTT.Queries.WatchTopicsQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Application.MQTT.Queries.GetBrokerConfigurationQuery">
-            <summary>Query for the last saved broker configuration.</summary>
-        </member>
-        <member name="M:Ampere.Application.MQTT.Queries.GetBrokerConfigurationQuery.#ctor">
-            <summary>Query for the last saved broker configuration.</summary>
+            <summary>Gets persisted broker configuration.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Queries.GetBrokerStatusQuery">
-            <summary>Query to obtain current broker runtime status.</summary>
+            <summary>Gets broker runtime status.</summary>
         </member>
-        <member name="M:Ampere.Application.MQTT.Queries.GetBrokerStatusQuery.#ctor">
-            <summary>Query to obtain current broker runtime status.</summary>
+        <member name="T:Ampere.Application.MQTT.Queries.GetConnectedClientsQuery">
+            <summary>Requests the currently connected clients.</summary>
+        </member>
+        <member name="T:Ampere.Application.MQTT.Queries.GetTopicsQuery">
+            <summary>Gets configured MQTT topics.</summary>
+        </member>
+        <member name="T:Ampere.Application.MQTT.Queries.WatchTopicsQuery">
+            <summary>Streams messages published to the broker.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Requests.ConfigureBrokerRequest">
             <summary>
@@ -1141,6 +1198,22 @@
             Represents the HTTP/application payload to configure
             the MQTT broker persistently.
             </summary>
+        </member>
+        <member name="T:Ampere.Application.MQTT.Requests.CreateTopicRequest">
+            <summary>Defines a topic to persist.</summary>
+            <param name="Name">The MQTT topic name.</param>
+            <param name="Description">The topic description.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Requests.CreateTopicRequest.#ctor(System.String,System.String)">
+            <summary>Defines a topic to persist.</summary>
+            <param name="Name">The MQTT topic name.</param>
+            <param name="Description">The topic description.</param>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Requests.CreateTopicRequest.Name">
+            <summary>The MQTT topic name.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Requests.CreateTopicRequest.Description">
+            <summary>The topic description.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Requests.PublishMessageRequest">
             <summary>
@@ -1171,6 +1244,84 @@
             <summary>
             Basic runtime status for the MQTT broker.
             </summary>
+        </member>
+        <member name="T:Ampere.Application.MQTT.Responses.MqttClientResponse">
+            <summary>Describes a connected MQTT client.</summary>
+            <param name="ClientId">The MQTT client identifier.</param>
+            <param name="UserName">The authenticated user name.</param>
+            <param name="ConnectedAt">The connection timestamp.</param>
+            <param name="Endpoint">The remote endpoint.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Responses.MqttClientResponse.#ctor(System.String,System.String,System.Nullable{System.DateTimeOffset},System.String)">
+            <summary>Describes a connected MQTT client.</summary>
+            <param name="ClientId">The MQTT client identifier.</param>
+            <param name="UserName">The authenticated user name.</param>
+            <param name="ConnectedAt">The connection timestamp.</param>
+            <param name="Endpoint">The remote endpoint.</param>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttClientResponse.ClientId">
+            <summary>The MQTT client identifier.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttClientResponse.UserName">
+            <summary>The authenticated user name.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttClientResponse.ConnectedAt">
+            <summary>The connection timestamp.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttClientResponse.Endpoint">
+            <summary>The remote endpoint.</summary>
+        </member>
+        <member name="T:Ampere.Application.MQTT.Responses.MqttTopicMessageResponse">
+            <summary>Represents a live MQTT message.</summary>
+            <param name="Topic">The topic name.</param>
+            <param name="Payload">The UTF-8 payload.</param>
+            <param name="ClientId">The publishing client.</param>
+            <param name="ReceivedAt">The reception timestamp.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Responses.MqttTopicMessageResponse.#ctor(System.String,System.String,System.String,System.DateTimeOffset)">
+            <summary>Represents a live MQTT message.</summary>
+            <param name="Topic">The topic name.</param>
+            <param name="Payload">The UTF-8 payload.</param>
+            <param name="ClientId">The publishing client.</param>
+            <param name="ReceivedAt">The reception timestamp.</param>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttTopicMessageResponse.Topic">
+            <summary>The topic name.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttTopicMessageResponse.Payload">
+            <summary>The UTF-8 payload.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttTopicMessageResponse.ClientId">
+            <summary>The publishing client.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttTopicMessageResponse.ReceivedAt">
+            <summary>The reception timestamp.</summary>
+        </member>
+        <member name="T:Ampere.Application.MQTT.Responses.MqttTopicResponse">
+            <summary>Describes a configured MQTT topic.</summary>
+            <param name="Id">The topic identifier.</param>
+            <param name="Name">The MQTT topic name.</param>
+            <param name="Description">The description.</param>
+            <param name="Enabled">Whether the topic is enabled.</param>
+        </member>
+        <member name="M:Ampere.Application.MQTT.Responses.MqttTopicResponse.#ctor(System.String,System.String,System.String,System.Boolean)">
+            <summary>Describes a configured MQTT topic.</summary>
+            <param name="Id">The topic identifier.</param>
+            <param name="Name">The MQTT topic name.</param>
+            <param name="Description">The description.</param>
+            <param name="Enabled">Whether the topic is enabled.</param>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttTopicResponse.Id">
+            <summary>The topic identifier.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttTopicResponse.Name">
+            <summary>The MQTT topic name.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttTopicResponse.Description">
+            <summary>The description.</summary>
+        </member>
+        <member name="P:Ampere.Application.MQTT.Responses.MqttTopicResponse.Enabled">
+            <summary>Whether the topic is enabled.</summary>
         </member>
         <member name="T:Ampere.Application.MQTT.Results.BrokerConfigurationResult">
             <summary>
@@ -1205,43 +1356,37 @@
             <returns>The setup status.</returns>
         </member>
         <member name="T:Ampere.Application.Setup.Commands.InitializeSetupCommand">
-            <summary>Requests creation of the initial administrator account.</summary>
-            <param name="Email">The administrator email address.</param>
+            <summary>Requests initial administrator creation.</summary>
+            <param name="Email">The administrator email.</param>
             <param name="Password">The administrator password.</param>
         </member>
         <member name="M:Ampere.Application.Setup.Commands.InitializeSetupCommand.#ctor(System.String,System.String)">
-            <summary>Requests creation of the initial administrator account.</summary>
-            <param name="Email">The administrator email address.</param>
+            <summary>Requests initial administrator creation.</summary>
+            <param name="Email">The administrator email.</param>
             <param name="Password">The administrator password.</param>
         </member>
         <member name="P:Ampere.Application.Setup.Commands.InitializeSetupCommand.Email">
-            <summary>The administrator email address.</summary>
+            <summary>The administrator email.</summary>
         </member>
         <member name="P:Ampere.Application.Setup.Commands.InitializeSetupCommand.Password">
             <summary>The administrator password.</summary>
         </member>
         <member name="T:Ampere.Application.Setup.Handlers.SystemHandlers">
-            <summary>Handles the identity requests.</summary>
-            <param name="service">The system setup service that performs setup.</param>
+            <summary>Handles setup messages.</summary>
+            <param name="service">The setup service.</param>
         </member>
         <member name="M:Ampere.Application.Setup.Handlers.SystemHandlers.#ctor(Ampere.Application.Setup.Abstractions.ISystemSetupService)">
-            <summary>Handles the identity requests.</summary>
-            <param name="service">The system setup service that performs setup.</param>
+            <summary>Handles setup messages.</summary>
+            <param name="service">The setup service.</param>
         </member>
-        <member name="M:Ampere.Application.Setup.Handlers.SystemHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Setup.Queries.GetSetupStatusQuery},System.Threading.CancellationToken)">
-            <summary>Reads the current setup status.</summary>
-            <param name="context">The message context containing the query.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The current setup status.</returns>
+        <member name="M:Ampere.Application.Setup.Handlers.SystemHandlers.Handle(Ampere.Application.Setup.Queries.GetSetupStatusQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
-        <member name="M:Ampere.Application.Setup.Handlers.SystemHandlers.Handle(Mediator.Net.Context.IReceiveContext{Ampere.Application.Setup.Commands.InitializeSetupCommand},System.Threading.CancellationToken)">
-            <summary>Executes first-time setup initialization.</summary>
-            <param name="context">The message context containing setup credentials.</param>
-            <param name="cancellationToken">The token used to cancel the operation.</param>
-            <returns>The setup result.</returns>
+        <member name="M:Ampere.Application.Setup.Handlers.SystemHandlers.Handle(Ampere.Application.Setup.Commands.InitializeSetupCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Ampere.Application.Setup.Queries.GetSetupStatusQuery">
-            <summary>Requests the current first-time setup status.</summary>
+            <summary>Requests the current setup status.</summary>
         </member>
         <member name="T:Ampere.Application.Setup.Requests.InitializeSetupRequest">
             <summary>Represents the first-time setup administrator credentials.</summary>

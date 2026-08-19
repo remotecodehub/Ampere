@@ -12,12 +12,9 @@ using Ampere.Infrastructure.MQTT.Services;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
-using Ampere.Infrastructure.Persistence;
-using Ampere.Infrastructure.Persistence.Middlewares;
+using Ampere.Infrastructure.Persistence; 
 using Ampere.Infrastructure.Setup.Services;
-using FluentValidation;
-using Mediator.Net;
-using Mediator.Net.MicrosoftDependencyInjection;
+using FluentValidation; 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -89,8 +86,6 @@ public static class WebApplicationBuilderExtensions
 
             builder.Services.AddScoped<IIdentityService,
                 IdentityService>();
-            builder.Services.AddScoped<IMessageValidator,
-                FluentMessageValidator>();
             builder.Services.AddSingleton<IRevokedTokenStore,
                 RevokedTokenStore>();
             builder.Services.AddScoped<IJwtTokenService,
@@ -196,28 +191,8 @@ public static class WebApplicationBuilderExtensions
                         IdentityClaimTypes.Permission,
                         UserPermission));
 
-            builder.Services.AddSingleton<IMqttBrokerService,
-                MqttBrokerService>();
-            builder.Services.AddScoped<IMqttConfigurationService,
-                MqttConfigurationService>();
-
-            MediatorBuilder mediatorBuilder =
-                new MediatorBuilder();
-            mediatorBuilder
-                .RegisterHandlers(
-                    typeof(IdentityHandlers).Assembly)
-                .ConfigureCommandReceivePipe(pipe =>
-                {
-                    pipe.UseValidation();
-                    pipe.UseTransaction();
-                })
-                .ConfigureRequestPipe(pipe =>
-                {
-                    pipe.UseValidation();
-                });
-
-            builder.Services.RegisterMediator(
-                mediatorBuilder);
+            builder.Services.AddSingleton<IMqttBrokerService, MqttBrokerService>();
+            builder.Services.AddScoped<IMqttConfigurationService, MqttConfigurationService>();
 
             await builder.Build().RunAmpereAsync<T>();
         }

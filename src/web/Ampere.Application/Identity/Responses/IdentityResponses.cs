@@ -1,5 +1,3 @@
-using Mediator.Net.Contracts;
-
 namespace Ampere.Application.Identity.Responses;
 
 
@@ -17,7 +15,7 @@ public sealed record TokenResponse(
 /// <summary>Represents the result of an identity operation that does not return data.</summary>
 /// <param name="Succeeded">Indicates whether the operation succeeded.</param>
 /// <param name="Errors">The errors returned by the operation.</param>
-public sealed record IdentityResultResponse(bool Succeeded, IReadOnlyCollection<string> Errors) : IResponse
+public sealed record IdentityResultResponse(bool Succeeded, IReadOnlyCollection<string> Errors) 
 {
     /// <summary>Creates a successful identity result.</summary>
     /// <returns>A successful result without errors.</returns>

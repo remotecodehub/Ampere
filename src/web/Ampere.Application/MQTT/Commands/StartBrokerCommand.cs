@@ -1,6 +1,8 @@
-using Mediator.Net.Contracts;
+using Ampere.Application.MQTT.Responses;
+using Mediator;
 
 namespace Ampere.Application.MQTT.Commands;
 
-/// <summary>Command to start the broker.</summary>
-public sealed record StartBrokerCommand() : IRequest;
+/// <summary>Starts the MQTT broker.</summary>
+public sealed record StartBrokerCommand
+    : IRequest<BrokerStatusResponse>;

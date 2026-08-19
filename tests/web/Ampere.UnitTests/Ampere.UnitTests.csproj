@@ -1,25 +1,62 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <CoverletOutput>
+      $(MSBuildProjectDirectory)/TestResults/
+    </CoverletOutput>
+    <Include>
+      [Ampere.Application]Ampere.Application.MQTT.*;
+      [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.*;
+      [Ampere.Infrastructure]Ampere.Infrastructure.Identity.*
+    </Include>
+    <Threshold>80</Threshold>
+    <ThresholdType>line,branch</ThresholdType>
+    <ThresholdStat>Total</ThresholdStat>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.4" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="coverlet.collector"
+      Version="10.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>
+        runtime; build; native; contentfiles;
+        analyzers; buildtransitive
+      </IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory"
+      Version="10.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"
+      Version="10.0.11" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk"
+      Version="18.8.1" />
+    <PackageReference Include="xunit.v3"
+      Version="3.2.2" />
+    <PackageReference
+      Include="xunit.runner.visualstudio"
+      Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>
+        runtime; build; native; contentfiles;
+        analyzers; buildtransitive
+      </IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\web\Ampere\Ampere.csproj" />
+    <ProjectReference
+      Include="..\..\..\src\web\Ampere.Application\Ampere.Application.csproj" />
+    <ProjectReference
+      Include="..\..\..\src\web\Ampere.Domain\Ampere.Domain.csproj" />
+    <ProjectReference
+      Include="..\..\..\src\web\Ampere.Infrastructure\Ampere.Infrastructure.csproj" />
+    <ProjectReference
+      Include="..\..\..\src\web\Ampere.Composition\Ampere.Composition.csproj" />
   </ItemGroup>
 
 </Project>

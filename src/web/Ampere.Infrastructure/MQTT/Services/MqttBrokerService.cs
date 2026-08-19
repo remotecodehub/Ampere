@@ -1,200 +1,204 @@
+using System.Net;
+using System.Text;
+using Ampere.Application.Common.Abstractions;
 using Ampere.Application.MQTT.Abstractions;
-using System.Reflection;
-using System.Linq;
-using Ampere.Application.MQTT.Requests;
 using Ampere.Application.MQTT.Responses;
 using Ampere.Infrastructure.MQTT.Models;
-using Microsoft.EntityFrameworkCore;
 using MQTTnet;
 using MQTTnet.Protocol;
 using MQTTnet.Server;
 
 namespace Ampere.Infrastructure.MQTT.Services;
 
-/// <summary>
-/// Concrete implementation of the broker service using
-/// MQTTnet. This type remains in Infrastructure and does
-/// not leak MQTTnet types to Application.
-/// </summary>
-/// <remarks>Constructs the broker service.</remarks>
-public sealed class MqttBrokerService(IServiceProvider services, Ampere.Infrastructure.Persistence.AmpereDbContext dbContext) : IMqttBrokerService, IAsyncDisposable
+/// <summary>Runs the local MQTT broker.</summary>
+/// <param name="repository">The configuration repository.</param>
+/// <param name="runtime">The shared broker runtime.</param>
+public sealed class MqttBrokerService(
+    IRepository<MqttBrokerConfigurationEntity> repository,
+    MqttBrokerRuntime runtime) : IMqttBrokerService
 {
-    private readonly IServiceProvider _services = services;
-    private readonly Ampere.Infrastructure.Persistence.AmpereDbContext _dbContext = dbContext;
-    private dynamic? _server;
-    private DateTimeOffset? _startedAt;
-
-    /// <inheritdoc/>
-    public async Task StartAsync(CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async Task StartAsync(
+        CancellationToken cancellationToken)
     {
-        if (_server is not null && _server.IsStarted)
+        if (runtime.Server?.IsStarted == true)
         {
             return;
         }
 
-        MqttBrokerConfigurationEntity? cfg = await _dbContext.MqttBrokerConfigurations.OrderByDescending(x => x.UpdatedAt).FirstOrDefaultAsync(cancellationToken);
+        MqttBrokerConfigurationEntity? configuration =
+            await repository.FirstOrDefaultAsync(
+                _ => true,
+                [],
+                cancellationToken);
 
-        // Use reflection to avoid compile-time dependency on
-        // MQTTnet symbols while still leveraging the runtime
-        // package when available.
-        var mqttAssembly = AppDomain.CurrentDomain.GetAssemblies()
-            .FirstOrDefault(a => a.GetName().Name?.StartsWith("MQTTnet", StringComparison.OrdinalIgnoreCase) == true)
-            ?? (Assembly.Load("MQTTnet") ?? Assembly.Load("MQTTnet.AspNetCore"));
-
-        if (mqttAssembly is null)
+        if (configuration is null)
         {
-            // MQTTnet not available at runtime; mark started false.
-            return;
+            throw new InvalidOperationException(
+                "MQTT broker is not configured.");
         }
 
-        Type? factoryType = mqttAssembly.GetTypes().FirstOrDefault(t => t.Name == "MqttFactory" || t.Name == "MqttServerFactory");
-        if (factoryType is null)
+        if (configuration.UseTls)
         {
-            return;
+            throw new NotSupportedException(
+                "MQTT TLS requires a certificate.");
         }
 
-        var factory = Activator.CreateInstance(factoryType);
-        var createServerMethod = factoryType.GetMethod("CreateMqttServer", Type.EmptyTypes)
-                                 ?? factoryType.GetMethod("CreateServer", Type.EmptyTypes);
-        if (createServerMethod is null)
+        MqttServerFactory factory = new();
+        MqttServerOptionsBuilder options =
+            factory.CreateServerOptionsBuilder()
+                .WithDefaultEndpoint()
+                .WithDefaultEndpointPort(
+                    configuration.Port);
+
+        if (!string.IsNullOrWhiteSpace(
+            configuration.BindAddress))
         {
-            return;
+            IPAddress address = IPAddress.Parse(
+                configuration.BindAddress);
+            options.WithDefaultEndpointBoundIPAddress(
+                address);
         }
 
-        _server = createServerMethod.Invoke(factory, null);
+        MqttServer server = factory.CreateMqttServer(
+            options.Build());
 
-        // Prefer parameterless StartAsync when available.
-        MethodInfo? startMethod = _server.GetType().GetMethod("StartAsync", Type.EmptyTypes)
-            ?? _server.GetType().GetMethod("StartAsync", new[] { typeof(object) });
+        server.InterceptingPublishAsync +=
+            OnMessageReceivedAsync;
 
-        if (startMethod is not null)
-        {
-            var task = (Task)startMethod.Invoke(_server, null)!;
-            await task.ConfigureAwait(false);
-            _startedAt = DateTimeOffset.UtcNow;
-        }
+        await server.StartAsync();
+        runtime.Server = server;
+        runtime.StartedAt = DateTimeOffset.UtcNow;
     }
 
-    /// <inheritdoc/>
-    public async Task StopAsync(CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async Task StopAsync(
+        CancellationToken cancellationToken)
     {
-        if (_server is null)
+        if (runtime.Server is null)
         {
             return;
         }
 
-        await _server.StopAsync();
-        _server = null;
-        _startedAt = null;
+        await runtime.Server.StopAsync();
+        runtime.Server.Dispose();
+        runtime.Server = null;
+        runtime.StartedAt = null;
     }
 
-    /// <inheritdoc/>
-    public async Task RestartAsync(CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async Task RestartAsync(
+        CancellationToken cancellationToken)
     {
         await StopAsync(cancellationToken);
         await StartAsync(cancellationToken);
     }
 
-    /// <inheritdoc/>
-    public async Task<BrokerStatusResponse> GetStatusAsync(CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async Task<BrokerStatusResponse> GetStatusAsync(
+        CancellationToken cancellationToken)
     {
-        bool running = _server is not null && _server.IsStarted;
-        int count = 0;
-        int port = 0;
-        string? bind = null;
+        MqttBrokerConfigurationEntity? configuration =
+            await repository.FirstOrDefaultAsync(
+                _ => true,
+                [],
+                cancellationToken);
 
-        if (running && _server is not null)
+        int clientCount = 0;
+
+        if (runtime.Server?.IsStarted == true)
         {
-            var clients = await _server.GetConnectedClientsAsync();
-            count = (int)clients.Count;
+            IList<MqttClientStatus> clients =
+                await runtime.Server.GetClientsAsync();
+            clientCount = clients.Count;
         }
 
-        var cfg = await _dbContext.MqttBrokerConfigurations.OrderByDescending(x => x.UpdatedAt).FirstOrDefaultAsync(cancellationToken);
-        if (cfg is not null)
-        {
-            port = cfg.Port;
-            bind = cfg.BindAddress;
-        }
-
-        return new BrokerStatusResponse(running, _startedAt, port, bind, count);
+        return new BrokerStatusResponse(
+            runtime.Server?.IsStarted == true,
+            runtime.StartedAt,
+            configuration?.Port ?? 0,
+            configuration?.BindAddress,
+            clientCount);
     }
 
-    /// <inheritdoc/>
-    public async Task PublishAsync(string topic, byte[] payload, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<MqttClientResponse>>
+        GetClientsAsync(
+            CancellationToken cancellationToken)
     {
-        if (_server is null || !_server.IsStarted)
+        if (runtime.Server?.IsStarted != true)
         {
-            throw new InvalidOperationException("MQTT broker is not running.");
+            return [];
         }
 
-        // Build the application message via reflection to avoid
-        // compile-time dependency and then inject it into the
-        // runtime server instance.
-        var mqttAssembly = AppDomain.CurrentDomain.GetAssemblies()
-            .FirstOrDefault(a => a.GetName().Name?.StartsWith("MQTTnet", StringComparison.OrdinalIgnoreCase) == true);
+        IList<MqttClientStatus> clients =
+            await runtime.Server.GetClientsAsync();
 
-        if (mqttAssembly is null)
-        {
-            throw new InvalidOperationException("MQTTnet assembly not available at runtime.");
-        }
-
-        Type? builderType = mqttAssembly.GetTypes().FirstOrDefault(t => t.Name == "MqttApplicationMessageBuilder" || t.Name == "MqttApplicationMessageBuilder`1" );
-        if (builderType is null)
-        {
-            throw new InvalidOperationException("MQTT message builder type not found.");
-        }
-
-        var builder = Activator.CreateInstance(builderType);
-        MethodInfo? withTopic = builderType.GetMethod("WithTopic", new[] { typeof(string) });
-        MethodInfo? withPayload = builderType.GetMethod("WithPayload", new[] { typeof(byte[]) });
-        MethodInfo? withQos = builderType.GetMethod("WithQualityOfServiceLevel", new[] { mqttAssembly.GetTypes().FirstOrDefault(t => t.Name.Contains("MqttQualityOfServiceLevel") ) ?? typeof(object) });
-        MethodInfo? build = builderType.GetMethod("Build", Type.EmptyTypes);
-
-        withTopic?.Invoke(builder, new object[] { topic });
-        withPayload?.Invoke(builder, new object[] { payload });
-        var message = build?.Invoke(builder, null);
-
-        // Attempt to inject the message
-        var injectedType = mqttAssembly.GetTypes().FirstOrDefault(t => t.Name == "InjectedMqttApplicationMessage");
-        object? injected = null;
-        if (injectedType is not null)
-        {
-            var ctor = injectedType.GetConstructors().FirstOrDefault();
-            injected = ctor?.Invoke(new[] { message });
-        }
-
-        MethodInfo? injectMethod = _server.GetType().GetMethod("InjectApplicationMessage")
-            ?? _server.GetType().GetMethod("InjectMessage");
-
-        if (injectMethod is not null)
-        {
-            if (injected is not null)
-            {
-                var task = (Task)injectMethod.Invoke(_server, new[] { injected })!;
-                await task.ConfigureAwait(false);
-                return;
-            }
-
-            // Fallback to PublishAsync if available
-            var publishMethod = _server.GetType().GetMethod("PublishAsync", new[] { message?.GetType() }) ?? _server.GetType().GetMethod("PublishAsync", new[] { typeof(object) });
-            if (publishMethod is not null)
-            {
-                var task = (Task)publishMethod.Invoke(_server, new[] { message })!;
-                await task.ConfigureAwait(false);
-                return;
-            }
-        }
-
-        throw new InvalidOperationException("Unable to publish message: MQTT server does not expose injection or publish methods.");
+        return clients
+            .Select(client => new MqttClientResponse(
+                client.Id,
+                null,
+                client.ConnectedTimestamp,
+                client.RemoteEndPoint?.ToString()))
+            .ToArray();
     }
 
-    /// <inheritdoc/>
-    public async ValueTask DisposeAsync()
+    /// <inheritdoc />
+    public async Task PublishAsync(
+        string topic,
+        byte[] payload,
+        CancellationToken cancellationToken)
     {
-        if (_server is not null)
+        ArgumentException.ThrowIfNullOrWhiteSpace(topic);
+
+        if (runtime.Server?.IsStarted != true)
         {
-            await _server.StopAsync();
-            _server = null;
+            throw new InvalidOperationException(
+                "MQTT broker is not running.");
         }
+
+        MqttApplicationMessage message =
+            new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(payload)
+                .WithQualityOfServiceLevel(
+                    MqttQualityOfServiceLevel.AtLeastOnce)
+                .Build();
+
+        InjectedMqttApplicationMessage injected =
+            new(message);
+
+        await runtime.Server.InjectApplicationMessage(
+            injected,
+            cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async IAsyncEnumerable<MqttTopicMessageResponse>
+        WatchMessagesAsync(
+            [System.Runtime.CompilerServices.EnumeratorCancellation]
+            CancellationToken cancellationToken)
+    {
+        await foreach (MqttTopicMessageResponse message
+            in runtime.Messages.ReadAllAsync(cancellationToken))
+        {
+            yield return message;
+        }
+    }
+
+    private Task OnMessageReceivedAsync(
+        InterceptingPublishEventArgs args)
+    {
+        string payload = Encoding.UTF8.GetString(
+            args.ApplicationMessage.Payload);
+
+        runtime.Publish(
+            new MqttTopicMessageResponse(
+                args.ApplicationMessage.Topic,
+                payload,
+                args.ClientId,
+                DateTimeOffset.UtcNow));
+
+        return Task.CompletedTask;
     }
 }

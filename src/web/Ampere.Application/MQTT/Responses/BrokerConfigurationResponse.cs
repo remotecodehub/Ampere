@@ -1,5 +1,3 @@
-using Mediator.NET.Contracts;
-
 namespace Ampere.Application.MQTT.Responses;
 
 /// <summary>
@@ -12,9 +10,4 @@ public sealed record BrokerConfigurationResponse(
     bool StartOnBoot,
     bool UseTls,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt) : IResponse
-    
-{
-    public MQTT.Results.BrokerConfigurationResult ToResult()
-        => new (Id, BindAddress, Port, StartOnBoot, UseTls, CreatedAt, UpdatedAt);
-}
+    DateTimeOffset UpdatedAt);

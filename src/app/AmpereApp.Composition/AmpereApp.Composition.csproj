@@ -31,7 +31,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\AmpereApp.Application\AmpereApp.Application.csproj" />
-	  <ProjectReference Include="..\AmpereApp.Infrastructure\AmpereApp.Infrastructure.csproj" />
 	</ItemGroup>
 
 </Project>

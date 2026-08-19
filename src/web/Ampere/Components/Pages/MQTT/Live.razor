@@ -1,0 +1,133 @@
+@page "/mqtt/live"
+@using Ampere.Application.MQTT.Queries
+@using Ampere.Application.MQTT.Responses
+@using Mediator
+@using MudBlazor
+@implements IAsyncDisposable
+@inject IMediator Mediator
+
+<MudStack Spacing="3">
+    <MudText Typo="Typo.h4">
+        MQTT Live View
+    </MudText>
+
+    <MudStack Row="true">
+        <MudButton Variant="Variant.Filled"
+                   Disabled="_running"
+                   OnClick="StartAsync">
+            Start
+        </MudButton>
+        <MudButton Variant="Variant.Outlined"
+                   Disabled="!_running"
+                   OnClick="StopAsync">
+            Stop
+        </MudButton>
+    </MudStack>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudTable Items="_messages" Dense="true">
+            <HeaderContent>
+                <MudTh>Time</MudTh>
+                <MudTh>Topic</MudTh>
+                <MudTh>Client</MudTh>
+                <MudTh>Payload</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Time">
+                    @context.ReceivedAt
+                </MudTd>
+                <MudTd DataLabel="Topic">
+                    @context.Topic
+                </MudTd>
+                <MudTd DataLabel="Client">
+                    @context.ClientId
+                </MudTd>
+                <MudTd DataLabel="Payload">
+                    @context.Payload
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private readonly List<MqttTopicMessageResponse>
+        _messages = [];
+    private CancellationTokenSource? _cts;
+    private Task? _streamTask;
+    private bool _running;
+
+    private Task StartAsync()
+    {
+        if (_running)
+        {
+            return Task.CompletedTask;
+        }
+
+        _cts = new CancellationTokenSource();
+        _running = true;
+        _streamTask = ConsumeAsync(_cts.Token);
+        return Task.CompletedTask;
+    }
+
+    private async Task ConsumeAsync(
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await foreach (MqttTopicMessageResponse message
+                in Mediator.CreateStream(
+                    new WatchTopicsQuery())
+                    .WithCancellation(cancellationToken))
+            {
+                _messages.Insert(0, message);
+                if (_messages.Count > 100)
+                {
+                    _messages.RemoveAt(
+                        _messages.Count - 1);
+                }
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            _running = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task StopAsync()
+    {
+        if (_cts is null)
+        {
+            return;
+        }
+
+        await _cts.CancelAsync();
+        if (_streamTask is not null)
+        {
+            await _streamTask;
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (_cts is not null)
+        {
+            await _cts.CancelAsync();
+        }
+
+        if (_streamTask is not null)
+        {
+            await _streamTask;
+        }
+
+        _cts?.Dispose();
+        _cts = null;
+    }
+}

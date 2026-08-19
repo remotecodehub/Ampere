@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Ampere.Domain.Common;
+using Ampere.Domain.MQTT.Entities;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.MQTT.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -9,9 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Ampere.Infrastructure.Persistence;
 
-/// <summary>
-/// Represents the Ampere database context.
-/// </summary>
+/// <summary>Represents the Ampere database context.</summary>
 public sealed class AmpereDbContext(
     DbContextOptions<AmpereDbContext> options)
     : IdentityDbContext<User, Role, string>(options)
@@ -32,11 +31,17 @@ public sealed class AmpereDbContext(
             }
 
             ParameterExpression parameter =
-                Expression.Parameter(entityType.ClrType, "entity");
-            MemberExpression property = 
-                Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
+                Expression.Parameter(
+                    entityType.ClrType,
+                    "entity");
+            MemberExpression property =
+                Expression.Property(
+                    parameter,
+                    nameof(ISoftDeletable.IsDeleted));
             LambdaExpression filter =
-                Expression.Lambda(Expression.Not(property), parameter);
+                Expression.Lambda(
+                    Expression.Not(property),
+                    parameter);
 
             builder.Entity(entityType.ClrType)
                 .HasQueryFilter(filter);
@@ -47,11 +52,13 @@ public sealed class AmpereDbContext(
     }
 
     /// <inheritdoc />
-    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    public override int SaveChanges(
+        bool acceptAllChangesOnSuccess)
     {
         ApplyEntityIdentifiers();
         ApplySoftDelete();
-        return base.SaveChanges(acceptAllChangesOnSuccess);
+        return base.SaveChanges(
+            acceptAllChangesOnSuccess);
     }
 
     /// <inheritdoc />
@@ -63,7 +70,9 @@ public sealed class AmpereDbContext(
     }
 
     /// <inheritdoc />
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default)
     {
         ApplyEntityIdentifiers();
         ApplySoftDelete();
@@ -78,7 +87,8 @@ public sealed class AmpereDbContext(
     {
         ApplyEntityIdentifiers();
         ApplySoftDelete();
-        return base.SaveChangesAsync(cancellationToken);
+        return base.SaveChangesAsync(
+            cancellationToken);
     }
 
     private void ApplyEntityIdentifiers()
@@ -117,9 +127,14 @@ public sealed class AmpereDbContext(
         }
     }
 
-    /// <summary>
-    /// Gets persisted MQTT broker configurations.
-    /// </summary>
+    /// <summary>Gets broker configurations.</summary>
     public DbSet<MqttBrokerConfigurationEntity>
         MqttBrokerConfigurations { get; set; } = null!;
+
+    /// <summary>Gets configured MQTT topics.</summary>
+    public DbSet<MqttTopic> MqttTopics
+    {
+        get;
+        set;
+    } = null!;
 }

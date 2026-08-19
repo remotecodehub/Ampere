@@ -1,60 +1,82 @@
+using Ampere.Application.Common.Abstractions;
 using Ampere.Application.MQTT.Abstractions;
 using Ampere.Application.MQTT.Requests;
 using Ampere.Application.MQTT.Responses;
 using Ampere.Infrastructure.MQTT.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Ampere.Infrastructure.MQTT.Services;
 
-/// <summary>
-/// Persists and retrieves MQTT broker configuration using
-/// the application database.
-/// </summary>
-public sealed class MqttConfigurationService(Persistence.AmpereDbContext db) : IMqttConfigurationService
+/// <summary>Persists MQTT broker configuration.</summary>
+/// <param name="repository">The configuration repository.</param>
+public sealed class MqttConfigurationService(
+    IRepository<MqttBrokerConfigurationEntity> repository)
+    : IMqttConfigurationService
 {
-    private readonly Persistence.AmpereDbContext _db = db;
-
-    public async Task<BrokerConfigurationResponse?> GetConfigurationAsync(CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async Task<BrokerConfigurationResponse?>
+        GetConfigurationAsync(
+            CancellationToken cancellationToken)
     {
-        var entity = await _db.MqttBrokerConfigurations.OrderByDescending(x => x.UpdatedAt).FirstOrDefaultAsync(cancellationToken);
-        if (entity is null) return null;
-        return new BrokerConfigurationResponse(entity.Id, entity.BindAddress, entity.Port, entity.StartOnBoot, entity.UseTls, entity.CreatedAt, entity.UpdatedAt);
+        MqttBrokerConfigurationEntity? entity =
+            await repository.FirstOrDefaultAsync(
+                _ => true,
+                [],
+                cancellationToken);
+
+        return entity is null
+            ? null
+            : ToResponse(entity);
     }
 
-    public async Task<BrokerConfigurationResponse> SaveConfigurationAsync(ConfigureBrokerRequest request, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async Task<BrokerConfigurationResponse>
+        SaveConfigurationAsync(
+            ConfigureBrokerRequest request,
+            CancellationToken cancellationToken)
     {
-        var now = DateTimeOffset.UtcNow;
-        var existing = await _db.MqttBrokerConfigurations.OrderByDescending(x => x.UpdatedAt).FirstOrDefaultAsync(cancellationToken);
+        MqttBrokerConfigurationEntity? existing =
+            await repository.FirstOrDefaultAsync(
+                _ => true,
+                [],
+                cancellationToken);
 
         if (existing is null)
         {
-            var entity = new MqttBrokerConfigurationEntity
-            {
-                BindAddress = request.BindAddress,
-                Port = request.Port,
-                StartOnBoot = request.StartOnBoot,
-                UseTls = request.UseTls,
-                CreatedAt = now,
-                UpdatedAt = now
-            };
+            MqttBrokerConfigurationEntity entity =
+                new()
+                {
+                    BindAddress = request.BindAddress,
+                    Port = request.Port,
+                    StartOnBoot = request.StartOnBoot,
+                    UseTls = request.UseTls
+                };
 
-            _db.MqttBrokerConfigurations.Add(entity);
-            await _db.SaveChangesAsync(cancellationToken);
+            await repository.AddAsync(
+                entity,
+                cancellationToken);
 
-            return new BrokerConfigurationResponse(entity.Id, entity.BindAddress, entity.Port, entity.StartOnBoot, entity.UseTls, entity.CreatedAt, entity.UpdatedAt);
+            return ToResponse(entity);
         }
-        else
-        {
-            existing.BindAddress = request.BindAddress;
-            existing.Port = request.Port;
-            existing.StartOnBoot = request.StartOnBoot;
-            existing.UseTls = request.UseTls;
-            existing.UpdatedAt = now;
 
-            _db.MqttBrokerConfigurations.Update(existing);
-            await _db.SaveChangesAsync(cancellationToken);
+        existing.BindAddress = request.BindAddress;
+        existing.Port = request.Port;
+        existing.StartOnBoot = request.StartOnBoot;
+        existing.UseTls = request.UseTls;
+        repository.Update(existing);
 
-            return new BrokerConfigurationResponse(existing.Id, existing.BindAddress, existing.Port, existing.StartOnBoot, existing.UseTls, existing.CreatedAt, existing.UpdatedAt);
-        }
+        return ToResponse(existing);
+    }
+
+    private static BrokerConfigurationResponse ToResponse(
+        MqttBrokerConfigurationEntity entity)
+    {
+        return new BrokerConfigurationResponse(
+            entity.Id,
+            entity.BindAddress,
+            entity.Port,
+            entity.StartOnBoot,
+            entity.UseTls,
+            entity.CreatedAt,
+            entity.UpdatedAt);
     }
 }

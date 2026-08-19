@@ -5,23 +5,483 @@
     </assembly>
     <members>
         <member name="T:Ampere.Composition.Extensions.WebApplicationBuilderExtensions">
-            <summary>
-            Adds application services to the web host.
-            </summary>
+            <summary>Adds Ampere services to the web host.</summary>
         </member>
         <member name="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.RunAmpereAsync``2(Microsoft.AspNetCore.Builder.WebApplicationBuilder)">
             <inheritdoc cref="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.&lt;G&gt;$41F16C2D39AF52899E745C9C9F42FF83.RunAmpereAsync``2"/>
         </member>
         <member name="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.&lt;G&gt;$41F16C2D39AF52899E745C9C9F42FF83.RunAmpereAsync``2">
+            <summary>Runs the Ampere web application.</summary>
+            <typeparam name="TProgram">The program type.</typeparam>
+            <typeparam name="TApp">The root component.</typeparam>
+            <returns>A task for application startup.</returns>
+        </member>
+        <member name="T:Ampere.Composition.Extensions.WebApplicationExtensions">
             <summary>
-            Runs the Ampere web application.
+            
             </summary>
-            <typeparam name="T">
-            The App.razor component type.
-            </typeparam>
-            <returns>
-            A task representing application startup.
-            </returns>
+        </member>
+        <member name="M:Ampere.Composition.Extensions.WebApplicationExtensions.RunAmpereAsync``1(Microsoft.AspNetCore.Builder.WebApplication)">
+            <inheritdoc cref="M:Ampere.Composition.Extensions.WebApplicationExtensions.&lt;G&gt;$2D7FFC466F43CADF286749FB4DFA1BDE.RunAmpereAsync``1"/>
+        </member>
+        <member name="M:Ampere.Composition.Extensions.WebApplicationExtensions.&lt;G&gt;$2D7FFC466F43CADF286749FB4DFA1BDE.RunAmpereAsync``1">
+            <summary>
+            Overload Extension Method to setup http pipeline and run the app. 
+            </summary>
+        </member>
+        <member name="T:Mediator.MediatorOptions">
+            <summary>
+            Provide options for the Mediator source generator.
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptions.Namespace">
+            <summary>
+            The namespace in which the Mediator implementation is generated.
+            By default, the namespace is "Mediator".
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptions.GenerateTypesAsInternal">
+            <summary>
+            Wether or not generated types should be <c>internal</c> (they are public by default).
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptions.NotificationPublisherType">
+            <summary>
+            The <see cref="T:Mediator.INotificationPublisher" /> type to use when publishing notifications.
+            By default, the type is <see cref="T:Mediator.ForeachAwaitPublisher" />.
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptions.ServiceLifetime">
+            <summary>
+            The default lifetime of the services registered in the DI container by the Mediator source generator.
+            By default, the lifetime is <see cref="F:Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton" />.
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptions.Assemblies">
+            <summary>
+            The collection of assemblies to scan for Mediator handlers.
+            By default, the collection is empty, in which case the source generator will scan all assemblies through references from the source generated project.
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptions.PipelineBehaviors">
+            <summary>
+            The collection of types of pipeline behaviors to register in DI.
+            When the type is an unconstructed generic type, the source generator will register all the constructed types of the generic type (open generics that is supported during AoT).
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptions.StreamPipelineBehaviors">
+            <summary>
+            The collection of types of streaming pipeline behaviors to register in DI.
+            When the type is an unconstructed generic type, the source generator will register all the constructed types of the generic type (open generics that is supported during AoT).
+            </summary>
+        </member>
+        <member name="T:Mediator.MediatorOptionsAttribute">
+            <summary>
+            Provide options for the Mediator source generator.
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptionsAttribute.Namespace">
+            <summary>
+            The namespace in which the Mediator implementation is generated.
+            By default, the namespace is "Mediator".
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptionsAttribute.NotificationPublisherType">
+            <summary>
+            The <see cref="T:Mediator.INotificationPublisher" /> type to use when publishing notifications.
+            By default, the type is <see cref="T:Mediator.ForeachAwaitPublisher" />.
+            </summary>
+        </member>
+        <member name="P:Mediator.MediatorOptionsAttribute.ServiceLifetime">
+            <summary>
+            The default lifetime of the services registered in the DI container by the Mediator source generator.
+            By default, the lifetime is <see cref="F:Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton" />.
+            </summary>
+        </member>
+        <member name="T:Mediator.AssemblyReference">
+            <summary>
+            Represents an assembly reference.
+            This is used to specify the types or assemblies to scan for Mediator handlers.
+            </summary>
+        </member>
+        <member name="P:Mediator.AssemblyReference.Assembly">
+            <summary>
+            The assembly reference.
+            </summary>
+        </member>
+        <member name="M:Mediator.AssemblyReference.op_Implicit(System.Type)~Mediator.AssemblyReference">
+            <summary>
+            Creates a new instance of <see cref="T:Mediator.AssemblyReference" /> from the specified type.
+            </summary>
+            <param name="type">The type</param>
+            <returns>A new instance of <see cref="T:Mediator.AssemblyReference" /></returns>
+        </member>
+        <member name="M:Mediator.AssemblyReference.op_Implicit(System.Reflection.Assembly)~Mediator.AssemblyReference">
+            <summary>
+            Creates a new instance of <see cref="T:Mediator.AssemblyReference" /> from the specified assembly.
+            </summary>
+            <param name="assembly">The assembly</param>
+            <returns>A new instance of <see cref="T:Mediator.AssemblyReference" /></returns>
+        </member>
+        <member name="T:Mediator.Mediator">
+            <summary>
+            Generated code for Mediator implementation.
+            This type is also registered as a DI service.
+            Can be used directly for high performance scenarios.
+            </summary>
+        </member>
+        <member name="F:Mediator.Mediator.ServiceLifetime">
+            <summary>
+            The lifetime of Mediator-related service registrations in DI container.
+            </summary>
+        </member>
+        <member name="F:Mediator.Mediator.NotificationPublisherName">
+            <summary>
+            The name of the notification publisher service that was configured.
+            </summary>
+        </member>
+        <member name="F:Mediator.Mediator.TotalMessages">
+            <summary>
+            The total number of Mediator messages that were discovered.
+            </summary>
+        </member>
+        <member name="M:Mediator.Mediator.#ctor(System.IServiceProvider)">
+            <summary>
+            Constructor for DI, should not be used by consumer.
+            </summary>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.RegisterCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.RegisterCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Queries.GetTopicsQuery,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Queries.GetTopicsQuery.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Queries.GetConnectedClientsQuery,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Queries.GetConnectedClientsQuery.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Queries.GetBrokerStatusQuery,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Queries.GetBrokerStatusQuery.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Queries.GetBrokerConfigurationQuery,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Queries.GetBrokerConfigurationQuery.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.StopBrokerCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Commands.StopBrokerCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.StartBrokerCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Commands.StartBrokerCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.PublishMessageCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Commands.PublishMessageCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.CreateTopicCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Commands.CreateTopicCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Setup.Commands.InitializeSetupCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Setup.Commands.InitializeSetupCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.ConfigureBrokerCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.MQTT.Commands.ConfigureBrokerCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ResetPasswordCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ResetPasswordCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ForgotPasswordCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ForgotPasswordCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ConfirmEmailCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ConfirmEmailCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.RevokeTokenCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.RevokeTokenCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.RefreshTokenCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.RefreshTokenCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.LoginCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.LoginCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Queries.GetIdentityInfoQuery,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Queries.GetIdentityInfoQuery.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Setup.Queries.GetSetupStatusQuery,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Setup.Queries.GetSetupStatusQuery.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.CreateStream(Ampere.Application.MQTT.Queries.WatchTopicsQuery,System.Threading.CancellationToken)">
+            <summary>
+            Create a stream from request type global::Ampere.Application.MQTT.Queries.WatchTopicsQuery.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send``1(Mediator.IRequest{``0},System.Threading.CancellationToken)">
+            <summary>
+            Send request.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if request does not implement <see cref="T:Mediator.IRequest`1"/>.
+            Throws <see cref="T:Mediator.MissingMessageHandlerException"/> if no handler is registered.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.CreateStream``1(Mediator.IStreamRequest{``0},System.Threading.CancellationToken)">
+            <summary>
+            Create stream for request.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if request does not implement <see cref="T:Mediator.IStreamRequest`1"/>.
+            Throws <see cref="T:Mediator.MissingMessageHandlerException"/> if no handler is registered.
+            </summary>
+            <param name="request">Incoming message</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Async enumerable</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send``1(Mediator.ICommand{``0},System.Threading.CancellationToken)">
+            <summary>
+            Send command.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if command does not implement <see cref="T:Mediator.ICommand`1"/>.
+            Throws <see cref="T:Mediator.MissingMessageHandlerException"/> if no handler is registered.
+            </summary>
+            <param name="command">Incoming command</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.CreateStream``1(Mediator.IStreamCommand{``0},System.Threading.CancellationToken)">
+            <summary>
+            Create stream for command.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if command does not implement <see cref="T:Mediator.IStreamCommand`1"/>.
+            Throws <see cref="T:Mediator.MissingMessageHandlerException"/> if no handler is registered.
+            </summary>
+            <param name="command">Incoming message</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Async enumerable</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send``1(Mediator.IQuery{``0},System.Threading.CancellationToken)">
+            <summary>
+            Send query.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if query does not implement <see cref="T:Mediator.IQuery`1"/>.
+            Throws <see cref="T:Mediator.MissingMessageHandlerException"/> if no handler is registered.
+            </summary>
+            <param name="query">Incoming query</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.CreateStream``1(Mediator.IStreamQuery{``0},System.Threading.CancellationToken)">
+            <summary>
+            Create stream for query.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if query does not implement <see cref="T:Mediator.IStreamQuery`1"/>.
+            Throws <see cref="T:Mediator.MissingMessageHandlerException"/> if no handler is registered.
+            </summary>
+            <param name="query">Incoming message</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Async enumerable</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(System.Object,System.Threading.CancellationToken)">
+            <summary>
+            Send message.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if message does not implement <see cref="T:Mediator.IMessage"/>.
+            Throws <see cref="T:Mediator.MissingMessageHandlerException"/> if no handler is registered.
+            </summary>
+            <param name="message">Incoming message</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.CreateStream(System.Object,System.Threading.CancellationToken)">
+            <summary>
+            Create stream.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if message does not implement <see cref="T:Mediator.IStreamMessage"/>.
+            Throws <see cref="T:Mediator.MissingMessageHandlerException"/> if no handler is registered.
+            </summary>
+            <param name="message">Incoming message</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Async enumerable</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Publish(System.Object,System.Threading.CancellationToken)">
+            <summary>
+            Publish notification.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if notification does not implement <see cref="T:Mediator.INotification"/>.
+            Throws <see cref="T:System.AggregateException"/> if handlers throw exception(s).
+            Drops messages
+            </summary>
+            <param name="notification">Incoming notification</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Publish``1(``0,System.Threading.CancellationToken)">
+            <summary>
+            Publish notification.
+            Throws <see cref="T:System.ArgumentNullException"/> if message is null.
+            Throws <see cref="T:Mediator.InvalidMessageException"/> if notification does not implement <see cref="T:Mediator.INotification"/>.
+            Throws <see cref="T:System.AggregateException"/> if handlers throw exception(s).
+            </summary>
+            <param name="notification">Incoming notification</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions">
+            <summary>
+            DI extensions for Mediator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.AddMediator(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds the Mediator implementation and handlers of your application.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.AddMediator(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Mediator.MediatorOptions})">
+            <summary>
+            Adds the Mediator implementation and handlers of your application, with specified options.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type)">
             <summary>

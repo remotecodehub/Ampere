@@ -4,28 +4,26 @@ using Ampere.Application.Common.Pipeline.Validation;
 using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Handlers;
 using Ampere.Application.Identity.Validators;
-using Ampere.Application.Setup.Abstractions;
 using Ampere.Application.MQTT.Abstractions;
+using Ampere.Application.Setup.Abstractions;
 using Ampere.Infrastructure.Common.Repository;
 using Ampere.Infrastructure.Common.UnitOfWork;
-using Ampere.Infrastructure.MQTT.Services;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
+using Ampere.Infrastructure.MQTT.Services;
 using Ampere.Infrastructure.Persistence;
 using Ampere.Infrastructure.Persistence.Middlewares;
 using Ampere.Infrastructure.Setup.Services;
 using FluentValidation;
-using Mediator.Net;
-using Mediator.Net.MicrosoftDependencyInjection;
+using Mediator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MudBlazor.Services;
 using System.IdentityModel.Tokens.Jwt;
@@ -33,32 +31,21 @@ using System.Text;
 
 namespace Ampere.Composition.Extensions;
 
-/// <summary>
-/// Adds application services to the web host.
-/// </summary>
+/// <summary>Adds Ampere services to the web host.</summary>
 public static class WebApplicationBuilderExtensions
 {
     extension(WebApplicationBuilder builder)
     {
-        /// <summary>
-        /// Runs the Ampere web application.
-        /// </summary>
-        /// <typeparam name="T">
-        /// The App.razor component type.
-        /// </typeparam>
-        /// <returns>
-        /// A task representing application startup.
-        /// </returns>
-        public async Task RunAmpereAsync<TProgram, TApp>() where TProgram : class
+        /// <summary>Runs the Ampere web application.</summary>
+        /// <typeparam name="TProgram">The program type.</typeparam>
+        /// <typeparam name="TApp">The root component.</typeparam>
+        /// <returns>A task for application startup.</returns>
+        public async Task RunAmpereAsync<
+            TProgram,
+            TApp>()
+            where TProgram : class
             where TApp : IComponent
         {
-            if (builder.Environment.IsDevelopment()
-                && Environment.GetEnvironmentVariable(
-                    "DOTNET_RUNNING_IN_CONTAINER") != "true")
-            {
-                builder.Configuration.AddUserSecrets<TProgram>();
-            }
-
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
             builder.Services.AddControllers();
@@ -72,47 +59,36 @@ public static class WebApplicationBuilderExtensions
                 options => options.UseSqlServer(
                     builder.Configuration
                         .GetConnectionString("Ampere"),
-                    sqlOpt => sqlOpt.CommandTimeout(90)));
+                    sql => sql.CommandTimeout(90)));
 
-            builder.Services.AddIdentityCore<User>(options =>
-            {
-                options.User.RequireUniqueEmail = true;
-                options.SignIn.RequireConfirmedEmail = false;
-                options.Password.RequiredLength = 8;
-                options.Password.RequireDigit = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.DefaultLockoutTimeSpan =
-                    TimeSpan.FromMinutes(15);
-            })
+            builder.Services.AddIdentityCore<User>(
+                options =>
+                {
+                    options.User.RequireUniqueEmail = true;
+                    options.SignIn.RequireConfirmedEmail = false;
+                    options.Password.RequiredLength = 8;
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Lockout.MaxFailedAccessAttempts = 5;
+                    options.Lockout.DefaultLockoutTimeSpan =
+                        TimeSpan.FromMinutes(15);
+                })
                 .AddRoles<Role>()
                 .AddEntityFrameworkStores<AmpereDbContext>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();
 
-            builder.Services.AddScoped<IIdentityService,
-                IdentityService>();
-            builder.Services.AddScoped<IMessageValidator,
-                FluentMessageValidator>();
-            builder.Services.AddSingleton<IRevokedTokenStore,
-                RevokedTokenStore>();
-            builder.Services.AddScoped<IJwtTokenService,
-                JwtTokenService>();
-            builder.Services.AddScoped<IIdentityEmailSender,
-                LoggingIdentityEmailSender>();
-            builder.Services.AddScoped<ISystemSetupService,
-                SystemSetupService>();
+            builder.Services.AddScoped<IIdentityService, IdentityService>();
+            builder.Services.AddSingleton<IRevokedTokenStore, RevokedTokenStore>();
+            builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+            builder.Services.AddScoped<IIdentityEmailSender, LoggingIdentityEmailSender>();
+            builder.Services.AddScoped<ISystemSetupService, SystemSetupService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped(
-                typeof(IRepository<>),
-                typeof(Repository<>));
-            builder.Services.AddValidatorsFromAssemblyContaining<
-                RegisterCommandValidator>();
-
-            builder.Services.AddAuthentication(
-                JwtBearerDefaults.AuthenticationScheme)
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     JwtOptions jwt = builder.Configuration
@@ -153,26 +129,21 @@ public static class WebApplicationBuilderExtensions
                             string? tokenType = token?
                                 .Claims
                                 .FirstOrDefault(
-                                    x => x.Type ==
+                                    claim => claim.Type ==
                                         JwtRegisteredClaimNames.Typ)
                                 ?.Value;
 
-                            if (!string.Equals(
-                                tokenType,
-                                "access",
-                                StringComparison.Ordinal))
+                            if (!string.Equals(tokenType, "access", StringComparison.Ordinal))
                             {
-                                context.Fail(
-                                    "The token is not an "
-                                    + "access token.");
+                                context.Fail("The token is not an access token.");
                                 return Task.CompletedTask;
                             }
 
-                            if (token is not null
-                                && context.HttpContext.RequestServices
-                                    .GetRequiredService<
-                                        IRevokedTokenStore>()
-                                    .IsRevoked(token.Id))
+                            if (token is not null && 
+                                context.HttpContext
+                                .RequestServices
+                                .GetRequiredService<IRevokedTokenStore>()
+                                .IsRevoked(token.Id))
                             {
                                 context.Fail(
                                     "The access token "
@@ -189,49 +160,36 @@ public static class WebApplicationBuilderExtensions
                     IdentityPolicies.Administrator,
                     policy => policy.RequireClaim(
                         IdentityClaimTypes.Permission,
-                        AdministratorPermission))
+                        "system.admin"))
                 .AddPolicy(
                     IdentityPolicies.Manager,
                     policy => policy.RequireClaim(
                         IdentityClaimTypes.Permission,
-                        ManagerPermission))
+                        "system.manager"))
                 .AddPolicy(
                     IdentityPolicies.User,
                     policy => policy.RequireClaim(
                         IdentityClaimTypes.Permission,
-                        UserPermission));
+                        "system.user"));
 
-            builder.Services.AddSingleton<IMqttBrokerService,
-                MqttBrokerService>();
-            builder.Services.AddScoped<IMqttConfigurationService,
-                MqttConfigurationService>();
-
-            MediatorBuilder mediatorBuilder =
-                new MediatorBuilder();
-            mediatorBuilder
-                .RegisterHandlers(
-                    typeof(IdentityHandlers).Assembly)
-                .ConfigureCommandReceivePipe(pipe =>
-                {
-                    pipe.UseValidation();
-                    pipe.UseTransaction();
-                })
-                .ConfigureRequestPipe(pipe =>
-                {
-                    pipe.UseValidation();
-                });
-
-            builder.Services.RegisterMediator(
-                mediatorBuilder);
+            builder.Services.AddSingleton<MqttBrokerRuntime>();
+            builder.Services.AddScoped<IMqttBrokerService, MqttBrokerService>();
+            builder.Services.AddScoped<IMqttConfigurationService, MqttConfigurationService>();
+            builder.Services.AddHostedService<MqttBrokerHostedService>();
+            builder.Services.AddMediator(options =>
+            {
+                options.ServiceLifetime =
+                    ServiceLifetime.Scoped;
+                options.Assemblies =
+                    [typeof(IdentityHandlers).Assembly];
+                options.PipelineBehaviors =
+                [
+                    typeof(ValidationMiddleware<,>),
+                    typeof(TransactionMiddleware<,>)
+                ];
+            });
 
             await builder.Build().RunAmpereAsync<TApp>();
         }
     }
-
-    private const string AdministratorPermission =
-        "system.admin";
-    private const string ManagerPermission =
-        "system.manager";
-    private const string UserPermission =
-        "system.user";
 }

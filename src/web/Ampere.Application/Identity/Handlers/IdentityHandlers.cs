@@ -3,109 +3,198 @@ using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Commands;
 using Ampere.Application.Identity.Queries;
 using Ampere.Application.Identity.Responses;
-using Mediator.Net.Context;
-using Mediator.Net.Contracts;
+using Mediator;
 
 namespace Ampere.Application.Identity.Handlers;
 
-public class IdentityHandlers(IIdentityService identityService) : 
-IRequestHandler<RegisterCommand, IdentityResultResponse>,
-IRequestHandler<LoginCommand, Response<TokenResponse>>,
-IRequestHandler<RefreshTokenCommand, Response<TokenResponse>>,
-IRequestHandler<RevokeTokenCommand, Response<bool>>,
-IRequestHandler<ConfirmEmailCommand, Response<bool>>,
-IRequestHandler<ResendConfirmationEmailCommand, IdentityResultResponse>,
-IRequestHandler<ForgotPasswordCommand, IdentityResultResponse>,
-IRequestHandler<ResetPasswordCommand, IdentityResultResponse>,
-IRequestHandler<GetIdentityInfoQuery, Response<IdentityInfoResponse>>,
-IRequestHandler<UpdateIdentityInfoCommand, IdentityResultResponse>,
-IRequestHandler<ConfigureTwoFactorCommand, Response<TwoFactorResponse>>
+/// <summary>Handles identity messages.</summary>
+/// <param name="identityService">
+/// The identity service.
+/// </param>
+public sealed class IdentityHandlers(
+    IIdentityService identityService)
+    : IRequestHandler<RegisterCommand,
+        IdentityResultResponse>,
+      IRequestHandler<LoginCommand,
+        Response<TokenResponse>>,
+      IRequestHandler<RefreshTokenCommand,
+        Response<TokenResponse>>,
+      IRequestHandler<RevokeTokenCommand,
+        Response<bool>>,
+      IRequestHandler<ConfirmEmailCommand,
+        Response<bool>>,
+      IRequestHandler<ResendConfirmationEmailCommand,
+        IdentityResultResponse>,
+      IRequestHandler<ForgotPasswordCommand,
+        IdentityResultResponse>,
+      IRequestHandler<ResetPasswordCommand,
+        IdentityResultResponse>,
+      IRequestHandler<GetIdentityInfoQuery,
+        Response<IdentityInfoResponse>>,
+      IRequestHandler<UpdateIdentityInfoCommand,
+        IdentityResultResponse>,
+      IRequestHandler<ConfigureTwoFactorCommand,
+        Response<TwoFactorResponse>>
 {
- /// <summary>Executes the registration request.</summary>
-    /// <param name="context">The message context containing the registration request.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The registration result.</returns>
-    public Task<IdentityResultResponse> Handle(IReceiveContext<RegisterCommand> context, CancellationToken cancellationToken) =>
-        identityService.RegisterAsync(context.Message.Email, context.Message.Password, cancellationToken);
-    
-    /// <summary>Executes the login request and converts authentication failure to an application response.</summary>
-    /// <param name="context">The message context containing the login request.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The authentication response containing tokens when successful.</returns>
-    public async Task<Response<TokenResponse>> Handle(IReceiveContext<LoginCommand> context, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public ValueTask<IdentityResultResponse> Handle(
+        RegisterCommand request,
+        CancellationToken cancellationToken)
     {
-        TokenResponse? result = await identityService.LoginAsync(context.Message.Email, context.Message.Password, context.Message.TwoFactorCode, context.Message.TwoFactorRecoveryCode, cancellationToken);
-        return result is null ? Response.Failure<TokenResponse>(["Invalid credentials."]) : Response.Success(result);
-    }
-    /// <summary>Executes a refresh-token exchange.</summary>
-    /// <param name="context">The message context containing the refresh token.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The refreshed token response.</returns>
-    public async Task<Response<TokenResponse>> Handle(IReceiveContext<RefreshTokenCommand> context, CancellationToken cancellationToken)
-    {
-        TokenResponse? result = await identityService.RefreshAsync(context.Message.RefreshToken, cancellationToken);
-        return result is null ? Response.Failure<TokenResponse>(["Invalid refresh token."]) : Response.Success(result);
-    }
-    /// <summary>Executes token revocation.</summary>
-    /// <param name="context">The message context containing the access token.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>A response indicating whether revocation succeeded.</returns>
-    public async Task<Response<bool>> Handle(IReceiveContext<RevokeTokenCommand> context, CancellationToken cancellationToken) =>
-        Response.Success(await identityService.RevokeAsync(context.Message.AccessToken, cancellationToken));
-
-    /// <summary>Executes email confirmation.</summary>
-    /// <param name="context">The message context containing the confirmation request.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>A response indicating whether confirmation succeeded.</returns>
-    public async Task<Response<bool>> Handle(IReceiveContext<ConfirmEmailCommand> context, CancellationToken cancellationToken) =>
-        Response.Success(await identityService.ConfirmEmailAsync(context.Message.UserId, context.Message.Code, context.Message.ChangedEmail, cancellationToken));
-
-    /// <summary>Executes a confirmation-email resend request.</summary>
-    /// <param name="context">The message context containing the email address.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The resend result.</returns>
-    public Task<IdentityResultResponse> Handle(IReceiveContext<ResendConfirmationEmailCommand> context, CancellationToken cancellationToken) =>
-        identityService.ResendConfirmationEmailAsync(context.Message.Email, cancellationToken);
-
-    /// <summary>Executes a password-recovery request.</summary>
-    /// <param name="context">The message context containing the email address.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The recovery result.</returns>
-    public Task<IdentityResultResponse> Handle(IReceiveContext<ForgotPasswordCommand> context, CancellationToken cancellationToken) =>
-        identityService.ForgotPasswordAsync(context.Message.Email, cancellationToken);
-
-    /// <summary>Executes a password reset.</summary>
-    /// <param name="context">The message context containing the reset request.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The reset result.</returns>
-    public Task<IdentityResultResponse> Handle(IReceiveContext<ResetPasswordCommand> context, CancellationToken cancellationToken) =>
-        identityService.ResetPasswordAsync(context.Message.Email, context.Message.ResetCode, context.Message.NewPassword, cancellationToken);
-
-    /// <summary>Executes an identity information query.</summary>
-    /// <param name="context">The message context containing the user identifier.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The identity information response.</returns>
-    public async Task<Response<IdentityInfoResponse>> Handle(IReceiveContext<GetIdentityInfoQuery> context, CancellationToken cancellationToken)
-    {
-        IdentityInfoResponse? result = await identityService.GetInfoAsync(context.Message.UserId, cancellationToken);
-        return result is null ? Response.Failure<IdentityInfoResponse>(["User not found."]) : Response.Success(result);
+        return new ValueTask<IdentityResultResponse>(
+            identityService.RegisterAsync(
+                request.Email,
+                request.Password,
+                cancellationToken));
     }
 
-    /// <summary>Executes an identity information update.</summary>
-    /// <param name="context">The message context containing the update request.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The update result.</returns>
-    public Task<IdentityResultResponse> Handle(IReceiveContext<UpdateIdentityInfoCommand> context, CancellationToken cancellationToken) =>
-        identityService.UpdateInfoAsync(context.Message.UserId, context.Message.NewEmail, context.Message.NewPassword, context.Message.OldPassword, cancellationToken);
-
-    /// <summary>Executes two-factor configuration.</summary>
-    /// <param name="context">The message context containing the configuration request.</param>
-    /// <param name="cancellationToken">The token used to cancel the operation.</param>
-    /// <returns>The resulting two-factor configuration.</returns>
-    public async Task<Response<TwoFactorResponse>> Handle(IReceiveContext<ConfigureTwoFactorCommand> context, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async ValueTask<Response<TokenResponse>>
+        Handle(
+            LoginCommand request,
+            CancellationToken cancellationToken)
     {
-        TwoFactorResponse? result = await identityService.ConfigureTwoFactorAsync(context.Message.UserId, context.Message.Enable, context.Message.TwoFactorCode, context.Message.ResetRecoveryCodes, context.Message.ResetSharedKey, context.Message.ForgetMachine, cancellationToken);
-        return result is null ? Response.Failure<TwoFactorResponse>(["The two-factor configuration request is invalid."]) : Response.Success(result);
+        TokenResponse? result =
+            await identityService.LoginAsync(
+                request.Email,
+                request.Password,
+                request.TwoFactorCode,
+                request.TwoFactorRecoveryCode,
+                cancellationToken);
+
+        return result is null
+            ? Response.Failure<TokenResponse>(
+                ["Invalid credentials."])
+            : Response.Success(result);
     }
-   
+
+    /// <inheritdoc />
+    public async ValueTask<Response<TokenResponse>>
+        Handle(
+            RefreshTokenCommand request,
+            CancellationToken cancellationToken)
+    {
+        TokenResponse? result =
+            await identityService.RefreshAsync(
+                request.RefreshToken,
+                cancellationToken);
+
+        return result is null
+            ? Response.Failure<TokenResponse>(
+                ["Invalid refresh token."])
+            : Response.Success(result);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<Response<bool>> Handle(
+        RevokeTokenCommand request,
+        CancellationToken cancellationToken)
+    {
+        bool result = await identityService.RevokeAsync(
+            request.AccessToken,
+            cancellationToken);
+        return Response.Success(result);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<Response<bool>> Handle(
+        ConfirmEmailCommand request,
+        CancellationToken cancellationToken)
+    {
+        bool result =
+            await identityService.ConfirmEmailAsync(
+                request.UserId,
+                request.Code,
+                request.ChangedEmail,
+                cancellationToken);
+        return Response.Success(result);
+    }
+
+    /// <inheritdoc />
+    public ValueTask<IdentityResultResponse> Handle(
+        ResendConfirmationEmailCommand request,
+        CancellationToken cancellationToken)
+    {
+        return new ValueTask<IdentityResultResponse>(
+            identityService.ResendConfirmationEmailAsync(
+                request.Email,
+                cancellationToken));
+    }
+
+    /// <inheritdoc />
+    public ValueTask<IdentityResultResponse> Handle(
+        ForgotPasswordCommand request,
+        CancellationToken cancellationToken)
+    {
+        return new ValueTask<IdentityResultResponse>(
+            identityService.ForgotPasswordAsync(
+                request.Email,
+                cancellationToken));
+    }
+
+    /// <inheritdoc />
+    public ValueTask<IdentityResultResponse> Handle(
+        ResetPasswordCommand request,
+        CancellationToken cancellationToken)
+    {
+        return new ValueTask<IdentityResultResponse>(
+            identityService.ResetPasswordAsync(
+                request.Email,
+                request.ResetCode,
+                request.NewPassword,
+                cancellationToken));
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<Response<IdentityInfoResponse>>
+        Handle(
+            GetIdentityInfoQuery request,
+            CancellationToken cancellationToken)
+    {
+        IdentityInfoResponse? result =
+            await identityService.GetInfoAsync(
+                request.UserId,
+                cancellationToken);
+
+        return result is null
+            ? Response.Failure<IdentityInfoResponse>(
+                ["User not found."])
+            : Response.Success(result);
+    }
+
+    /// <inheritdoc />
+    public ValueTask<IdentityResultResponse> Handle(
+        UpdateIdentityInfoCommand request,
+        CancellationToken cancellationToken)
+    {
+        return new ValueTask<IdentityResultResponse>(
+            identityService.UpdateInfoAsync(
+                request.UserId,
+                request.NewEmail,
+                request.NewPassword,
+                request.OldPassword,
+                cancellationToken));
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<Response<TwoFactorResponse>>
+        Handle(
+            ConfigureTwoFactorCommand request,
+            CancellationToken cancellationToken)
+    {
+        TwoFactorResponse? result =
+            await identityService.ConfigureTwoFactorAsync(
+                request.UserId,
+                request.Enable,
+                request.TwoFactorCode,
+                request.ResetRecoveryCodes,
+                request.ResetSharedKey,
+                request.ForgetMachine,
+                cancellationToken);
+
+        return result is null
+            ? Response.Failure<TwoFactorResponse>(
+                ["Invalid 2FA configuration."])
+            : Response.Success(result);
+    }
 }

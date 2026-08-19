@@ -1,7 +1,8 @@
 using Ampere.Application.MQTT.Responses;
-using Mediator.Net.Contracts;
+using Mediator;
 
 namespace Ampere.Application.MQTT.Queries;
 
-/// <summary>Query to obtain current broker runtime status.</summary>
-public sealed record GetBrokerStatusQuery() : IRequest;
+/// <summary>Gets broker runtime status.</summary>
+public sealed record GetBrokerStatusQuery
+    : IRequest<BrokerStatusResponse>;

@@ -1,0 +1,91 @@
+@page "/mqtt/devices"
+@using Ampere.Application.MQTT.Queries
+@using Ampere.Application.MQTT.Responses
+@using Mediator
+@using MudBlazor
+@inject IMediator Mediator
+@inject IDialogService DialogService
+
+<MudStack Spacing="3">
+    <MudText Typo="Typo.h4">
+        MQTT Devices
+    </MudText>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudTable Items="_clients"
+                  Hover="true"
+                  Dense="true"
+                  Loading="_loading">
+            <HeaderContent>
+                <MudTh>Client ID</MudTh>
+                <MudTh>User</MudTh>
+                <MudTh>Endpoint</MudTh>
+                <MudTh>Connected</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Client ID"
+                       @onclick="() => ShowDetailsAsync(context)">
+                    @context.ClientId
+                </MudTd>
+                <MudTd DataLabel="User">
+                    @context.UserName
+                </MudTd>
+                <MudTd DataLabel="Endpoint">
+                    @context.Endpoint
+                </MudTd>
+                <MudTd DataLabel="Connected">
+                    @context.ConnectedAt
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+
+    <MudButton Variant="Variant.Filled"
+               OnClick="LoadAsync">
+        Refresh
+    </MudButton>
+</MudStack>
+
+@code {
+    private IReadOnlyList<MqttClientResponse> _clients = [];
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        try
+        {
+            _clients = await Mediator.Send(
+                new GetConnectedClientsQuery());
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task ShowDetailsAsync(
+        MqttClientResponse client)
+    {
+        DialogParameters parameters = new()
+        {
+            ["Client"] = client
+        };
+
+        await DialogService.ShowAsync<
+            DeviceDetailsDialog>(
+            "Device details",
+            parameters);
+    }
+}
+
+<style>
+    .mud-table-row {
+        cursor: pointer;
+    }
+</style>

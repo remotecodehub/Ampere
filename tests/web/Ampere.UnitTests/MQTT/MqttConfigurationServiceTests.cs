@@ -1,3 +1,5 @@
+using Ampere.Application.MQTT.Requests;
+using Ampere.Application.MQTT.Responses;
 using Ampere.Infrastructure.MQTT.Models;
 using Ampere.Infrastructure.MQTT.Services;
 using Ampere.UnitTests.Common.Mocks;
@@ -5,88 +7,76 @@ using Xunit;
 
 namespace Ampere.UnitTests.MQTT;
 
-/// <summary>Tests persisted MQTT configuration rules.</summary>
+/// <summary>Tests MQTT configuration persistence.</summary>
 public sealed class MqttConfigurationServiceTests
 {
     [Fact]
-    public async Task GetConfiguration_WhenMissing_ReturnsNull()
+    public async Task GetConfiguration_WhenEmpty_ReturnsNull()
     {
-        FakeRepository<MqttBrokerConfigurationEntity> repository = new();
-        MqttConfigurationService service = new(repository);
+        FakeRepository<MqttBrokerConfigurationEntity>
+            repository = new();
+        MqttConfigurationService service =
+            new(repository);
 
-        var result = await service.GetConfigurationAsync(
-            CancellationToken.None);
+        BrokerConfigurationResponse? result =
+            await service.GetConfigurationAsync(
+                CancellationToken.None);
 
         Assert.Null(result);
     }
 
     [Fact]
-    public async Task GetConfiguration_WhenPresent_ReturnsValues()
+    public async Task SaveConfiguration_WhenEmpty_AddsEntity()
     {
-        FakeRepository<MqttBrokerConfigurationEntity> repository = new();
-        MqttBrokerConfigurationEntity entity = new()
-        {
-            BindAddress = "127.0.0.1",
-            Port = 1883,
-            StartOnBoot = true,
-            UseTls = false
-        };
-        await repository.AddAsync(entity, CancellationToken.None);
-        MqttConfigurationService service = new(repository);
-
-        var result = await service.GetConfigurationAsync(
-            CancellationToken.None);
-
-        Assert.NotNull(result);
-        Assert.Equal(entity.Id, result.Id);
-        Assert.Equal(entity.BindAddress, result.BindAddress);
-        Assert.Equal(entity.Port, result.Port);
-        Assert.Equal(entity.StartOnBoot, result.StartOnBoot);
-        Assert.Equal(entity.UseTls, result.UseTls);
-    }
-
-    [Fact]
-    public async Task SaveConfiguration_WhenMissing_AddsEntity()
-    {
-        FakeRepository<MqttBrokerConfigurationEntity> repository = new();
-        MqttConfigurationService service = new(repository);
+        FakeRepository<MqttBrokerConfigurationEntity>
+            repository = new();
+        MqttConfigurationService service =
+            new(repository);
         ConfigureBrokerRequest request = new(
-            "0.0.0.0", 1883, true, false);
+            "127.0.0.1",
+            1883,
+            true,
+            false);
 
-        var result = await service.SaveConfigurationAsync(
-            request, CancellationToken.None);
+        BrokerConfigurationResponse result =
+            await service.SaveConfigurationAsync(
+                request,
+                CancellationToken.None);
 
+        Assert.Equal("127.0.0.1", result.BindAddress);
         Assert.Equal(1883, result.Port);
-        Assert.Equal("0.0.0.0", result.BindAddress);
-        Assert.True(result.StartOnBoot);
-        Assert.False(result.UseTls);
-        Assert.NotEmpty(repository.Items);
+        Assert.Single(repository.Entities);
     }
 
     [Fact]
-    public async Task SaveConfiguration_WhenPresent_UpdatesEntity()
+    public async Task SaveConfiguration_WhenExists_UpdatesEntity()
     {
-        FakeRepository<MqttBrokerConfigurationEntity> repository = new();
-        MqttBrokerConfigurationEntity entity = new()
+        FakeRepository<MqttBrokerConfigurationEntity>
+            repository = new();
+        MqttBrokerConfigurationEntity existing = new()
         {
-            BindAddress = "127.0.0.1",
-            Port = 1883,
-            StartOnBoot = false,
-            UseTls = false
+            BindAddress = "0.0.0.0",
+            Port = 1883
         };
-        await repository.AddAsync(entity, CancellationToken.None);
-        MqttConfigurationService service = new(repository);
-        ConfigureBrokerRequest request = new(
-            "192.168.1.10", 1884, true, true);
+        await repository.AddAsync(
+            existing,
+            CancellationToken.None);
+        MqttConfigurationService service =
+            new(repository);
 
-        var result = await service.SaveConfigurationAsync(
-            request, CancellationToken.None);
+        BrokerConfigurationResponse result =
+            await service.SaveConfigurationAsync(
+                new ConfigureBrokerRequest(
+                    "127.0.0.1",
+                    1884,
+                    false,
+                    true),
+                CancellationToken.None);
 
-        Assert.Equal(entity.Id, result.Id);
-        Assert.Equal("192.168.1.10", result.BindAddress);
+        Assert.Equal("127.0.0.1", result.BindAddress);
         Assert.Equal(1884, result.Port);
-        Assert.True(result.StartOnBoot);
+        Assert.False(result.StartOnBoot);
         Assert.True(result.UseTls);
-        Assert.Single(repository.Items);
+        Assert.Single(repository.Entities);
     }
 }

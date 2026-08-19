@@ -1,0 +1,105 @@
+@page "/mqtt/topics"
+@using Ampere.Application.Common.Responses
+@using Ampere.Application.MQTT.Commands
+@using Ampere.Application.MQTT.Queries
+@using Ampere.Application.MQTT.Requests
+@using Ampere.Application.MQTT.Responses
+@using Mediator
+@using MudBlazor
+@inject IMediator Mediator
+
+<MudStack Spacing="3">
+    <MudText Typo="Typo.h4">
+        MQTT Topics
+    </MudText>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudTextField @bind-Value="_name"
+                          Label="Topic"
+                          Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="_description"
+                          Label="Description"
+                          Variant="Variant.Outlined" />
+            <MudButton Variant="Variant.Filled"
+                       OnClick="CreateAsync">
+                Create topic
+            </MudButton>
+            @if (_error is not null)
+            {
+                <MudAlert Severity="Severity.Error">
+                    @_error
+                </MudAlert>
+            }
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudTable Items="_topics" Dense="true">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh>Enabled</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    @context.Name
+                </MudTd>
+                <MudTd DataLabel="Description">
+                    @context.Description
+                </MudTd>
+                <MudTd DataLabel="Enabled">
+                    @context.Enabled
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private string _name = string.Empty;
+    private string? _description;
+    private string? _error;
+    private IReadOnlyList<MqttTopicResponse> _topics = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _topics = await Mediator.Send(
+            new GetTopicsQuery());
+    }
+
+    private async Task CreateAsync()
+    {
+        _error = null;
+
+        if (string.IsNullOrWhiteSpace(_name))
+        {
+            _error = "Topic name is required.";
+            return;
+        }
+
+        Response<MqttTopicResponse> result =
+            await Mediator.Send(
+                new CreateTopicCommand(
+                    new CreateTopicRequest(
+                        _name,
+                        _description)));
+
+        if (!result.Succeeded)
+        {
+            _error = string.Join(
+                ", ",
+                result.Errors);
+            return;
+        }
+
+        _name = string.Empty;
+        _description = null;
+        await LoadAsync();
+    }
+}
