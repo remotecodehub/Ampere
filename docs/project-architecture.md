@@ -2,10 +2,9 @@
 
 ## Solution model
 
-Ampere now uses one project per DDD layer.
+Ampere uses one project per DDD layer.
 
 The web solution is `Ampere.Web.slnx`.
-
 Its projects are:
 
 - `Ampere`: Presentation.
@@ -17,8 +16,8 @@ Its projects are:
 The mobile solution is `Ampere.App.slnx`.
 It follows the same project-per-layer model.
 
-Mobile is present as architectural
-foundation but is not the current focus.
+Mobile is an architectural foundation but
+is not the current focus.
 
 ## Dependency direction
 
@@ -33,7 +32,7 @@ foundation but is not the current focus.
           +----------> Domain <-------+
 ```
 
-The practical dependency rules are:
+The practical rules are:
 
 - Presentation may reference Application.
 - Presentation may reference Composition
@@ -41,12 +40,12 @@ The practical dependency rules are:
 - Application may reference Domain.
 - Infrastructure may reference Application
   and Domain.
-- Composition may reference all application
-  layers required to compose services.
+- Composition may reference all layers.
 - Domain must not reference other layers.
-- Application must not reference Infrastructure.
-- Infrastructure must not reference Presentation.
-- Infrastructure must not reference Composition.
+- Application must not reference
+  Infrastructure.
+- Infrastructure must not reference
+  Presentation or Composition.
 
 ## Responsibilities
 
@@ -58,10 +57,14 @@ For web this includes:
 
 - Blazor components;
 - controllers;
-- startup and hosting.
+- hosting startup.
 
 Controllers do not contain business rules.
-Controllers do not access EF Core directly.
+Controllers do not access EF Core.
+
+MQTT pages use only MudBlazor components.
+MQTT pages do not have code-behind files or
+external CSS files.
 
 ### Application
 
@@ -79,6 +82,11 @@ Features are organized with:
 
 Application defines abstractions for
 infrastructure capabilities.
+
+Mediator uses source-generated typed requests,
+handlers and stream handlers.
+
+`Mediator.Net` is forbidden.
 
 ### Domain
 
@@ -98,10 +106,9 @@ Domain is independent of external technology.
 Contains implementations of Application
 abstractions and external integrations.
 
-EF Core, database providers, MQTT libraries,
-ASP.NET Identity infrastructure and other
-external dependencies belong here unless a
-specific architectural rule says otherwise.
+EF Core, database providers, MQTTnet, ASP.NET
+Identity infrastructure and other external
+dependencies belong here.
 
 ### Composition
 
@@ -111,16 +118,15 @@ Dependency injection registrations belong
 here. Registrations must be explicit and
 compile-time based.
 
-Do not move service registration into
-Application, Domain or Infrastructure.
+Do not use reflection to discover services.
 
 ## Persistence
 
-The persistence flow remains:
+The persistence flow is:
 
 ```text
 Presentation
-    -> Mediator.NET
+    -> Mediator
     -> Application Handler
     -> Feature Service
     -> IRepository<TEntity>
@@ -130,28 +136,50 @@ Presentation
     -> SQL database
 ```
 
-`IRepository<TEntity>` belongs to
-`Ampere.Application`.
-Its implementation belongs to
-`Ampere.Infrastructure`.
+`IRepository<TEntity>` belongs to Application.
+Its implementation belongs to Infrastructure.
 
-Feature Services are the consumers of the
-repository abstraction.
+Feature Services consume the repository.
 They must not inject or use `DbContext`.
+
+If direct context access becomes unavoidable,
+create a dedicated Infrastructure repository
+whose Application abstraction hides the context.
 
 `IUnitOfWork` belongs to Application and its
 implementation belongs to Infrastructure.
-Repositories do not call `SaveChangesAsync`.
+Repositories do not call SaveChangesAsync.
 
-Transactional Mediator.NET requests are
-coordinated by the transaction middleware in
-Infrastructure.
+Transactional requests are coordinated by
+the transaction pipeline in Infrastructure.
+
+## MQTT
+
+MQTTnet is an Infrastructure dependency.
+
+The broker runtime is long-lived shared state.
+It is held by a singleton runtime object.
+The feature Service remains scoped so it can
+consume the scoped repository safely.
+
+Broker configuration is persisted through
+`IRepository<MqttBrokerConfigurationEntity>`.
+
+A hosted startup service creates a scope and
+starts the broker when `StartOnBoot` is enabled.
+
+Live messages are exposed through Mediator
+`IStreamRequest<T>` and consumed by the REST
+stream endpoint and Blazor live page.
+
+MQTTnet types must remain outside Application
+contracts. No `dynamic` or reflection may be
+used against MQTTnet assemblies.
 
 ## Shared domain base
 
 Persisted entities implement `IEntityBase`.
-Domain entities should inherit `EntityBase`
-when possible.
+Domain entities should inherit `EntityBase`.
 
 The base contract contains:
 
@@ -167,19 +195,26 @@ ASP.NET Identity entities may implement the
 contract directly because Identity already
 provides their framework base classes.
 
-## Feature isolation
+## Testing
 
-Do not place infrastructure-specific models
-in Domain or Application.
+Web unit tests live under:
 
-When an external package requires a model,
-keep that model in Infrastructure and expose
-an Application abstraction when the feature
-needs it.
+`tests/web/Ampere.UnitTests`
 
-The Application project must not reference
-NuGet packages merely to access an
-Infrastructure implementation.
+Shared fixtures and fakes live under
+`Common/Fixtures` and `Common/Mocks`.
+Feature tests live in feature directories.
+
+MQTT tests do not require an external broker.
+Runtime tests use ephemeral local ports.
+
+Coverlet collector generates Cobertura XML.
+The MQTT executable feature scope requires
+at least 80 percent line and branch coverage.
+
+The CI job publishes the coverage report in
+the GitHub Actions summary and fails below
+that threshold.
 
 ## Mobile
 
@@ -193,11 +228,8 @@ layered project structure:
 - Composition.
 
 Platform-specific MAUI code remains inside
-the Presentation project or the appropriate
+the Presentation project or appropriate
 platform boundary.
-
-Mobile services must follow the same DDD
-dependency rules as the web application.
 
 ## IoT and OS
 
