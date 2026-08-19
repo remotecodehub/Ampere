@@ -17,11 +17,10 @@ namespace Ampere.UnitTests.SignalR;
 public sealed class SignalRDispatchTests
 {
     [Fact]
-    public async Task Command_DispatchesToHandler()
+    public async Task DiscoveryCommand_DispatchesToHandler()
     {
-        ServiceProvider provider = CreateProvider();
-        IMediator mediator =
-            provider.GetRequiredService<IMediator>();
+        IMediator mediator = CreateProvider()
+            .GetRequiredService<IMediator>();
 
         Response<DiscoveryResponse> result =
             await mediator.Send(
@@ -33,11 +32,42 @@ public sealed class SignalRDispatchTests
     }
 
     [Fact]
+    public async Task RelayCommand_DispatchesToHandler()
+    {
+        IMediator mediator = CreateProvider()
+            .GetRequiredService<IMediator>();
+
+        Response<RelayStateResponse> result =
+            await mediator.Send(
+                new SetRelayCommand("endpoint", true),
+                CancellationToken.None);
+
+        Assert.True(result.Succeeded);
+        Assert.True(result.Data?.State);
+    }
+
+    [Fact]
+    public async Task FirmwareCommand_DispatchesToHandler()
+    {
+        IMediator mediator = CreateProvider()
+            .GetRequiredService<IMediator>();
+
+        Response<FirmwareProgressResponse> result =
+            await mediator.Send(
+                new StartFirmwareUpdateCommand(
+                    "node",
+                    "2.0.0"),
+                CancellationToken.None);
+
+        Assert.True(result.Succeeded);
+        Assert.Equal("node", result.Data?.NodeId);
+    }
+
+    [Fact]
     public async Task Query_DispatchesToHandler()
     {
-        ServiceProvider provider = CreateProvider();
-        IMediator mediator =
-            provider.GetRequiredService<IMediator>();
+        IMediator mediator = CreateProvider()
+            .GetRequiredService<IMediator>();
 
         Response<TelemetrySnapshotResponse> result =
             await mediator.Send(
@@ -91,9 +121,8 @@ public sealed class SignalRDispatchTests
     [Fact]
     public async Task Command_InvalidInput_IsRejectedByPipeline()
     {
-        ServiceProvider provider = CreateProvider();
-        IMediator mediator =
-            provider.GetRequiredService<IMediator>();
+        IMediator mediator = CreateProvider()
+            .GetRequiredService<IMediator>();
 
         await Assert.ThrowsAsync<ValidationException>(
             async () => await mediator.Send(
