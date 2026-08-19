@@ -86,6 +86,46 @@ public sealed class IdentityTestFixture : IDisposable
         return user;
     }
 
+    /// <summary>
+    /// Generates an authenticator code and verifies it through the same
+    /// configured Identity token provider used by the service under test.
+    /// </summary>
+    /// <param name="user">The user for whom the code is generated.</param>
+    /// <returns>A code accepted by the configured authenticator provider.</returns>
+    public async Task<string> GenerateValidAuthenticatorCodeAsync(User user)
+    {
+        string? key = await UserManager.GetAuthenticatorKeyAsync(user);
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            IdentityResult resetResult =
+                await UserManager.ResetAuthenticatorKeyAsync(user);
+            Assert.True(resetResult.Succeeded);
+        }
+
+        string providerName = UserManager.Options.Tokens
+            .AuthenticatorTokenProvider;
+
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            string code = await UserManager.GenerateTwoFactorTokenAsync(
+                user,
+                providerName);
+
+            if (await UserManager.VerifyTwoFactorTokenAsync(
+                    user,
+                    providerName,
+                    code))
+            {
+                return code;
+            }
+
+            await Task.Delay(50);
+        }
+
+        throw new InvalidOperationException(
+            "The configured Identity authenticator token provider did not accept a token it generated.");
+    }
+
     /// <inheritdoc />
     public void Dispose()
     {
