@@ -5,6 +5,7 @@ using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Handlers;
 using Ampere.Application.Identity.Validators;
 using Ampere.Application.Setup.Abstractions;
+using Ampere.Infrastructure.Common.Hubs;
 using Ampere.Infrastructure.Common.Repository;
 using Ampere.Infrastructure.Common.UnitOfWork;
 using Ampere.Infrastructure.Identity.Models;
@@ -47,6 +48,7 @@ public static class WebApplicationBuilderExtensions
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
             builder.Services.AddControllers();
+            builder.Services.AddSignalR();
             builder.Services.AddOpenApi();
             builder.Services.AddMudServices();
             builder.Services.Configure<JwtOptions>(
@@ -84,6 +86,7 @@ public static class WebApplicationBuilderExtensions
             builder.Services.AddScoped<IIdentityEmailSender, LoggingIdentityEmailSender>();
             builder.Services.AddScoped<ISystemSetupService, SystemSetupService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddSingleton<ISignalRService, SignalRService>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -131,17 +134,22 @@ public static class WebApplicationBuilderExtensions
                                         JwtRegisteredClaimNames.Typ)
                                 ?.Value;
 
-                            if (!string.Equals(tokenType, "access", StringComparison.Ordinal))
+                            if (!string.Equals(
+                                tokenType,
+                                "access",
+                                StringComparison.Ordinal))
                             {
-                                context.Fail("The token is not an access token.");
+                                context.Fail(
+                                    "The token is not an access token.");
                                 return Task.CompletedTask;
                             }
 
-                            if (token is not null && 
+                            if (token is not null &&
                                 context.HttpContext
-                                .RequestServices
-                                .GetRequiredService<IRevokedTokenStore>()
-                                .IsRevoked(token.Id))
+                                    .RequestServices
+                                    .GetRequiredService<
+                                        IRevokedTokenStore>()
+                                    .IsRevoked(token.Id))
                             {
                                 context.Fail(
                                     "The access token "

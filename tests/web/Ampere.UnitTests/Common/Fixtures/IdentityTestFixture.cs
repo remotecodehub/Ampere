@@ -1,5 +1,6 @@
 using Ampere.Application.Identity.Abstractions;
 using Ampere.Infrastructure.Identity.Models;
+using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
 using Ampere.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -36,7 +37,7 @@ public sealed class IdentityTestFixture : IDisposable
         services.AddScoped<IIdentityEmailSender,
             TestIdentityEmailSender>();
         services.Configure<
-            Ampere.Infrastructure.Identity.Options.JwtOptions>(
+            JwtOptions>(
             options =>
             {
                 options.Key =

@@ -84,6 +84,9 @@ public sealed partial  class SystemSetupService(
         return IdentityResultResponse.Success();
     }
 
+    /// <summary>
+    /// Log System Setup Complete Attribute
+    /// </summary>
     [LoggerMessage(
         EventId = 1001,
         Level = LogLevel.Information,

@@ -1,4 +1,5 @@
 using Ampere.Application.Identity.Responses;
+using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
 using Microsoft.Extensions.Logging;
 using Xunit;
@@ -28,7 +29,7 @@ public sealed class IdentityInfrastructureBranchTests
     [Fact]
     public void JwtOptions_DefaultsAreConfigured()
     {
-        Ampere.Infrastructure.Identity.Options.JwtOptions options =
+        JwtOptions options =
             new()
             {
                 Key = "01234567890123456789012345678901"

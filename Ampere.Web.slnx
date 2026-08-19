@@ -18,9 +18,6 @@
   <Folder Name="/Ampere/.github/skills/dotnet-ddd/">
     <File Path=".github/skills/dotnet-ddd/SKILL.md" />
   </Folder>
-  <Folder Name="/Ampere/.github/skills/iot-mqtt/">
-    <File Path=".github/skills/iot-mqtt/SKILL.md" />
-  </Folder>
   <Folder Name="/Ampere/.github/skills/maui/">
     <File Path=".github/skills/maui/SKILL.md" />
   </Folder>

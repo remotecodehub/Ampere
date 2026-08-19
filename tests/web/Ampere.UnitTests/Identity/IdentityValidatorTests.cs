@@ -1,3 +1,4 @@
+using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Commands;
 using Ampere.Application.Identity.Responses;
 using Ampere.Application.Identity.Validators;
@@ -135,7 +136,7 @@ public sealed class IdentityValidatorTests
     }
 
     private sealed class FakeIdentityService :
-        Ampere.Application.Identity.Abstractions.IIdentityService
+        IIdentityService
     {
         public Task<IdentityResultResponse> RegisterAsync(
             string email, string password,

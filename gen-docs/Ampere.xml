@@ -4,25 +4,6 @@
         <name>Ampere</name>
     </assembly>
     <members>
-        <member name="T:Ampere.Composition.Extensions.WebApplicationBuilderExtensions">
-            <summary>
-            Adds application services to the web host.
-            </summary>
-        </member>
-        <member name="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.RunAmpereAsync``1(Microsoft.AspNetCore.Builder.WebApplicationBuilder)">
-            <inheritdoc cref="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.&lt;G&gt;$41F16C2D39AF52899E745C9C9F42FF83.RunAmpereAsync``1"/>
-        </member>
-        <member name="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.&lt;G&gt;$41F16C2D39AF52899E745C9C9F42FF83.RunAmpereAsync``1">
-            <summary>
-            Runs the Ampere web application.
-            </summary>
-            <typeparam name="T">
-            The App.razor component type.
-            </typeparam>
-            <returns>
-            A task representing application startup.
-            </returns>
-        </member>
         <member name="T:Ampere.Controllers.v1.IdentityController">
             <summary>Exposes identity endpoints.</summary>
             <param name="mediator">The application mediator.</param>
@@ -82,6 +63,29 @@
             <param name="request">The setup credentials.</param>
             <param name="cancellationToken">The cancellation token.</param>
             <returns>The setup result.</returns>
+        </member>
+        <member name="T:Ampere.Controllers.v1.SignalRController">
+            <summary>Exposes SignalR orchestration endpoints.</summary>
+            <param name="mediator">The application mediator.</param>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.#ctor(Mediator.IMediator)">
+            <summary>Exposes SignalR orchestration endpoints.</summary>
+            <param name="mediator">The application mediator.</param>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.StartDiscovery(Ampere.Application.SignalR.Requests.StartDiscoveryRequest,System.Threading.CancellationToken)">
+            <summary>Starts device discovery.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.SetRelay(Ampere.Application.SignalR.Requests.SetRelayRequest,System.Threading.CancellationToken)">
+            <summary>Changes an endpoint relay state.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.StartFirmwareUpdate(Ampere.Application.SignalR.Requests.FirmwareUpdateRequest,System.Threading.CancellationToken)">
+            <summary>Starts a firmware update flow.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.GetSnapshot(Ampere.Application.SignalR.Requests.GetTelemetrySnapshotRequest,System.Threading.CancellationToken)">
+            <summary>Gets the latest telemetry.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.WatchTelemetry(Ampere.Application.SignalR.Requests.WatchTelemetryRequest,System.Threading.CancellationToken)">
+            <summary>Streams live telemetry.</summary>
         </member>
         <member name="T:Program">
             <summary>
