@@ -388,6 +388,26 @@ public sealed class IdentityControllerTests
     }
 
     [Fact]
+    public async Task UpdateInfo_Success_ReturnsOk()
+    {
+        Mock<IMediator> mediator = new();
+        mediator.Setup(item => item.Send(
+                It.IsAny<UpdateIdentityInfoCommand>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(new ValueTask<IdentityResultResponse>(
+                IdentityResultResponse.Success()));
+        IdentityController controller = CreateController(
+            mediator,
+            new Claim(ClaimTypes.NameIdentifier, "user"));
+
+        IActionResult result = await controller.UpdateInfo(
+            new InfoRequest("new@b.com", "Password2!", "Password1!"),
+            CancellationToken.None);
+
+        Assert.IsType<OkResult>(result);
+    }
+
+    [Fact]
     public async Task UpdateInfo_Failure_ReturnsBadRequest()
     {
         Mock<IMediator> mediator = new();
@@ -445,6 +465,26 @@ public sealed class IdentityControllerTests
 
         OkObjectResult ok = Assert.IsType<OkObjectResult>(result);
         Assert.Same(response, ok.Value);
+    }
+
+    [Fact]
+    public async Task ConfigureTwoFactor_Failure_ReturnsBadRequest()
+    {
+        Mock<IMediator> mediator = new();
+        mediator.Setup(item => item.Send(
+                It.IsAny<ConfigureTwoFactorCommand>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(new ValueTask<Response<TwoFactorResponse>>(
+                Response.Failure<TwoFactorResponse>("error")));
+        IdentityController controller = CreateController(
+            mediator,
+            new Claim(ClaimTypes.NameIdentifier, "user"));
+
+        IActionResult result = await controller.ConfigureTwoFactor(
+            new TwoFactorRequest(true, "123456", false, false, false),
+            CancellationToken.None);
+
+        Assert.IsType<BadRequestObjectResult>(result);
     }
 
     private static IdentityController CreateController(
