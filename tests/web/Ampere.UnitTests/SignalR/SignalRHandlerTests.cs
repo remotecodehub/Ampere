@@ -39,8 +39,10 @@ public sealed class SignalRHandlerTests
                 CancellationToken.None);
 
         Assert.True(result.Succeeded);
-        Assert.True(result.Data?.State);
-        Assert.True(service.Relay?.State);
+        Assert.True(result.Data is not null);
+        Assert.True(result.Data!.State);
+        Assert.True(service.Relay is not null);
+        Assert.True(service.Relay!.State);
     }
 
     [Fact]
@@ -119,6 +121,15 @@ public sealed class SignalRHandlerTests
         {
             Telemetry = response;
             return Task.CompletedTask;
+        }
+
+        public Task<IReadOnlyList<TelemetryResponse>>
+            GetTelemetrySnapshotAsync(
+                string? houseId,
+                CancellationToken cancellationToken)
+        {
+            return Task.FromResult(
+                (IReadOnlyList<TelemetryResponse>)[]);
         }
 
         public async IAsyncEnumerable<TelemetryResponse>
