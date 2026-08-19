@@ -243,7 +243,7 @@ public sealed class SignalRServiceTests
                     cancellation.Token)
                 .GetAsyncEnumerator(cancellation.Token);
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
+        await Assert.ThrowsAsync<TaskCanceledException>(
             async () => await enumerator.MoveNextAsync());
     }
 

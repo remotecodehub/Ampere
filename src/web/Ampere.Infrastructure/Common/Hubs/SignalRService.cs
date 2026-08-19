@@ -93,11 +93,7 @@ public sealed class SignalRService(
         await foreach (TelemetryResponse response in
             _telemetry.Reader.ReadAllAsync(cancellationToken))
         {
-            if (houseId is null ||
-                string.Equals(
-                    response.HouseId,
-                    houseId,
-                    StringComparison.OrdinalIgnoreCase))
+            if (houseId is null || string.Equals(response.HouseId, houseId, StringComparison.OrdinalIgnoreCase))
             {
                 yield return response;
             }
