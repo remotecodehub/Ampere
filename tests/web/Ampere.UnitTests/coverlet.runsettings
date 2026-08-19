@@ -7,8 +7,9 @@
         <Configuration>
           <Format>cobertura</Format>
           <Include>
-            [Ampere.Application]Ampere.Application.*;
-            [Ampere.Infrastructure]Ampere.Infrastructure.*
+            [Ampere.Application]Ampere.Application.MQTT.*;
+            [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.*;
+            [Ampere.Infrastructure]Ampere.Infrastructure.Identity.*
           </Include>
           <ExcludeByAttribute>
             CompilerGeneratedAttribute;
