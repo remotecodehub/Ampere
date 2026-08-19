@@ -18,7 +18,6 @@ using Ampere.Infrastructure.Setup.Services;
 using FluentValidation;
 using Mediator.Net;
 using Mediator.Net.MicrosoftDependencyInjection;
-using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

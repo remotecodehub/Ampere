@@ -7,8 +7,8 @@ namespace Ampere.Infrastructure.Identity.Models;
 /// Represents an Ampere application role.
 /// </summary>
 public class Role(
-    string? roleName = null)
-    : IdentityRole<string>(roleName ?? string.Empty),
+    string? name = null)
+    : IdentityRole<string>(name ?? string.Empty),
       IEntityBase,
       ISoftDeletable
 {
