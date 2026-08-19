@@ -1,4 +1,4 @@
-using Ampere.Infrastructure.MQTT.Models;
+using Ampere.Domain.MQTT.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -6,11 +6,11 @@ namespace Ampere.Infrastructure.Persistence.Configurations;
 
 /// <summary>Configures persisted MQTT topics.</summary>
 public sealed class MqttTopicConfiguration
-    : IEntityTypeConfiguration<MqttTopicEntity>
+    : IEntityTypeConfiguration<MqttTopic>
 {
     /// <inheritdoc />
     public void Configure(
-        EntityTypeBuilder<MqttTopicEntity> builder)
+        EntityTypeBuilder<MqttTopic> builder)
     {
         builder.ToTable("MqttTopics");
         builder.HasKey(entity => entity.Id);
