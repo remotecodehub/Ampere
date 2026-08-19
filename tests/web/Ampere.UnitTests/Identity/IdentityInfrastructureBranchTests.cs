@@ -11,21 +11,17 @@ public sealed class IdentityInfrastructureBranchTests
     [Fact]
     public async Task LoggingEmailSender_LogsBothMessageKinds()
     {
-        using LoggerFactory factory = (LoggerFactory)LoggerFactory.Create(
-            builder => builder.AddDebug()
-        );
+        using ILoggerFactory factory = LoggerFactory.Create(
+            builder => builder.AddDebug());
         ILogger<LoggingIdentityEmailSender> logger =
             factory.CreateLogger<LoggingIdentityEmailSender>();
-        LoggingIdentityEmailSender sender =
-            new(logger);
+        LoggingIdentityEmailSender sender = new(logger);
 
         await sender.SendConfirmationAsync(
-            "user@example.com",
-            "/confirm",
+            "user@example.com", "/confirm",
             CancellationToken.None);
         await sender.SendPasswordResetAsync(
-            "user@example.com",
-            "/reset",
+            "user@example.com", "/reset",
             CancellationToken.None);
     }
 
