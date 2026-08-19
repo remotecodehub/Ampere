@@ -13,13 +13,17 @@ public sealed class IdentityValidatorTests
     {
         FakeIdentityService service = new();
         RegisterCommandValidator validator = new(service);
+        CancellationToken token =
+            TestContext.Current.CancellationToken;
 
         FluentValidation.Results.ValidationResult valid =
-            await validator.ValidateAsync(new RegisterCommand(
-                "user@example.com", "Password1!"));
+            await validator.ValidateAsync(
+                new RegisterCommand(
+                    "user@example.com", "Password1$"), token);
         FluentValidation.Results.ValidationResult invalid =
-            await validator.ValidateAsync(new RegisterCommand(
-                "user@example.com", "short"));
+            await validator.ValidateAsync(
+                new RegisterCommand(
+                    "user@example.com", "short"), token);
 
         Assert.True(valid.IsValid);
         Assert.False(invalid.IsValid);
@@ -29,41 +33,52 @@ public sealed class IdentityValidatorTests
     public async Task LoginValidator_CoversCredentialsAnd2FaRules()
     {
         LoginCommandValidator validator = new();
+        CancellationToken token =
+            TestContext.Current.CancellationToken;
 
         Assert.True((await validator.ValidateAsync(
             new LoginCommand(
-                "user@example.com", "Password1!"))).IsValid);
+                "user@example.com", "Password1$"), token)).IsValid);
         Assert.False((await validator.ValidateAsync(
-            new LoginCommand("", "short", "123456", "code")))
+            new LoginCommand(
+                "", "short", "123456", "code"), token))
             .IsValid);
         Assert.False((await validator.ValidateAsync(
             new LoginCommand(
-                "user@example.com", "Password1!",
-                "123456", "code"))).IsValid);
+                "user@example.com", "Password1$",
+                "123456", "code"), token)).IsValid);
     }
 
     [Fact]
     public async Task SimpleTokenValidators_RejectEmptyValues()
     {
-        Assert.False((await new RefreshTokenCommandValidator()
-            .ValidateAsync(new RefreshTokenCommand(""))).IsValid);
-        Assert.True((await new RefreshTokenCommandValidator()
-            .ValidateAsync(new RefreshTokenCommand("token"))).IsValid);
-        Assert.False((await new RevokeTokenCommandValidator()
-            .ValidateAsync(new RevokeTokenCommand(""))).IsValid);
-        Assert.True((await new RevokeTokenCommandValidator()
-            .ValidateAsync(new RevokeTokenCommand("token"))).IsValid);
+        CancellationToken token =
+            TestContext.Current.CancellationToken;
+        RefreshTokenCommandValidator refresh = new();
+        RevokeTokenCommandValidator revoke = new();
+
+        Assert.False((await refresh.ValidateAsync(
+            new RefreshTokenCommand(""), token)).IsValid);
+        Assert.True((await refresh.ValidateAsync(
+            new RefreshTokenCommand("token"), token)).IsValid);
+        Assert.False((await revoke.ValidateAsync(
+            new RevokeTokenCommand(""), token)).IsValid);
+        Assert.True((await revoke.ValidateAsync(
+            new RevokeTokenCommand("token"), token)).IsValid);
     }
 
     [Fact]
     public async Task ConfirmEmailValidator_RequiresUserAndCode()
     {
         ConfirmEmailCommandValidator validator = new();
+        CancellationToken token =
+            TestContext.Current.CancellationToken;
 
         Assert.True((await validator.ValidateAsync(
-            new ConfirmEmailCommand("user", "code"))).IsValid);
+            new ConfirmEmailCommand("user", "code"), token))
+            .IsValid);
         Assert.False((await validator.ValidateAsync(
-            new ConfirmEmailCommand("", ""))).IsValid);
+            new ConfirmEmailCommand("", ""), token)).IsValid);
     }
 
     [Fact]
@@ -71,44 +86,52 @@ public sealed class IdentityValidatorTests
     {
         ResendConfirmationEmailCommandValidator resend = new();
         ForgotPasswordCommandValidator forgot = new();
+        CancellationToken token =
+            TestContext.Current.CancellationToken;
 
         Assert.True((await resend.ValidateAsync(
             new ResendConfirmationEmailCommand(
-                "user@example.com"))).IsValid);
+                "user@example.com"), token)).IsValid);
         Assert.False((await resend.ValidateAsync(
-            new ResendConfirmationEmailCommand("bad"))).IsValid);
+            new ResendConfirmationEmailCommand("bad"), token))
+            .IsValid);
         Assert.True((await forgot.ValidateAsync(
             new ForgotPasswordCommand(
-                "user@example.com"))).IsValid);
+                "user@example.com"), token)).IsValid);
         Assert.False((await forgot.ValidateAsync(
-            new ForgotPasswordCommand("bad"))).IsValid);
+            new ForgotPasswordCommand("bad"), token)).IsValid);
     }
 
     [Fact]
     public async Task ResetPasswordValidator_ValidatesAllFields()
     {
         ResetPasswordCommandValidator validator = new();
+        CancellationToken token =
+            TestContext.Current.CancellationToken;
 
         Assert.True((await validator.ValidateAsync(
             new ResetPasswordCommand(
-                "user@example.com", "code", "Password1!")))
-            .IsValid);
+                "user@example.com", "code", "Password1$"),
+            token)).IsValid);
         Assert.False((await validator.ValidateAsync(
             new ResetPasswordCommand(
-                "bad", "", "short"))).IsValid);
+                "bad", "", "short"), token)).IsValid);
     }
 
     [Fact]
     public async Task UpdateIdentityValidator_OptionalFieldsHaveRules()
     {
         UpdateIdentityInfoCommandValidator validator = new();
+        CancellationToken token =
+            TestContext.Current.CancellationToken;
 
         Assert.True((await validator.ValidateAsync(
             new UpdateIdentityInfoCommand(
-                "user", null, null, "Password1!"))).IsValid);
+                "user", null, null, "Password1$"),
+            token)).IsValid);
         Assert.False((await validator.ValidateAsync(
             new UpdateIdentityInfoCommand(
-                "", "bad", "short", ""))).IsValid);
+                "", "bad", "short", ""), token)).IsValid);
     }
 
     private sealed class FakeIdentityService :
