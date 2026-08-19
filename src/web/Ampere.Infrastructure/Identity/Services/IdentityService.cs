@@ -20,7 +20,6 @@ namespace Ampere.Infrastructure.Identity.Services;
 /// <param name="tokenService">The service used to create and validate JWT tokens.</param>
 /// <param name="revokedTokenStore">The store used to track revoked tokens.</param>
 /// <param name="emailSender">The service used to send identity-related email messages.</param>
-/// <param name="logger">The logger used to record operational identity events.</param>
 public sealed class IdentityService(
     UserManager<User> userManager,
     RoleManager<Role> roleManager,

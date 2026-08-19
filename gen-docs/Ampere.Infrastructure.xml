@@ -4,6 +4,32 @@
         <name>Ampere.Infrastructure</name>
     </assembly>
     <members>
+        <member name="T:Ampere.Infrastructure.Common.Hubs.SignalRService">
+            <summary>Publishes Ampere events through SignalR.</summary>
+            <param name="hubContext">The SignalR hub context.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Hubs.SignalRService.#ctor(Microsoft.AspNetCore.SignalR.IHubContext{Microsoft.AspNetCore.SignalR.Hub{Ampere.Application.Common.Contracts.IAmpereSignalRClient},Ampere.Application.Common.Contracts.IAmpereSignalRClient})">
+            <summary>Publishes Ampere events through SignalR.</summary>
+            <param name="hubContext">The SignalR hub context.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Hubs.SignalRService.NotifyDiscoveryAsync(Ampere.Application.SignalR.Responses.DiscoveryResponse,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Hubs.SignalRService.NotifyRelayStateAsync(Ampere.Application.SignalR.Responses.RelayStateResponse,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Hubs.SignalRService.NotifyFirmwareProgressAsync(Ampere.Application.SignalR.Responses.FirmwareProgressResponse,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Hubs.SignalRService.PublishTelemetryAsync(Ampere.Application.SignalR.Responses.TelemetryResponse,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Hubs.SignalRService.GetTelemetrySnapshotAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Hubs.SignalRService.WatchTelemetryAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="T:Ampere.Infrastructure.Common.Repository.Repository`1">
             <summary>
             Provides EF Core persistence operations.
@@ -204,7 +230,6 @@
             <param name="tokenService">The service used to create and validate JWT tokens.</param>
             <param name="revokedTokenStore">The store used to track revoked tokens.</param>
             <param name="emailSender">The service used to send identity-related email messages.</param>
-            <param name="logger">The logger used to record operational identity events.</param>
         </member>
         <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.#ctor(Microsoft.AspNetCore.Identity.UserManager{Ampere.Infrastructure.Identity.Models.User},Microsoft.AspNetCore.Identity.RoleManager{Ampere.Infrastructure.Identity.Models.Role},Microsoft.AspNetCore.Identity.SignInManager{Ampere.Infrastructure.Identity.Models.User},Ampere.Application.Identity.Abstractions.IJwtTokenService,Ampere.Application.Identity.Abstractions.IRevokedTokenStore,Ampere.Application.Identity.Abstractions.IIdentityEmailSender)">
             <summary>
@@ -216,7 +241,6 @@
             <param name="tokenService">The service used to create and validate JWT tokens.</param>
             <param name="revokedTokenStore">The store used to track revoked tokens.</param>
             <param name="emailSender">The service used to send identity-related email messages.</param>
-            <param name="logger">The logger used to record operational identity events.</param>
         </member>
         <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.RegisterAsync(System.String,System.String,System.Threading.CancellationToken)">
             <summary>
@@ -431,6 +455,12 @@
             <param name="cancellationToken">The cancellation token.</param>
             <returns>The handler response.</returns>
         </member>
+        <member name="T:Ampere.Infrastructure.Setup.Services.SystemSetupService">
+            <inheritdoc/>
+        </member>
+        <member name="M:Ampere.Infrastructure.Setup.Services.SystemSetupService.#ctor(Microsoft.AspNetCore.Identity.UserManager{Ampere.Infrastructure.Identity.Models.User},Microsoft.AspNetCore.Identity.RoleManager{Ampere.Infrastructure.Identity.Models.Role},Microsoft.Extensions.Logging.ILogger{Ampere.Infrastructure.Setup.Services.SystemSetupService})">
+            <inheritdoc/>
+        </member>
         <member name="M:Ampere.Infrastructure.Setup.Services.SystemSetupService.GetSetupStatusAsync(System.Threading.CancellationToken)">
             <summary>
             Gets whether initial system setup is required or has already been completed.
@@ -446,6 +476,11 @@
             <param name="password">The administrator password.</param>
             <param name="cancellationToken">The token used to cancel the operation.</param>
             <returns>The result of the setup operation.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Setup.Services.SystemSetupService.LogSystemSetupComplete(Microsoft.Extensions.Logging.ILogger,System.String)">
+            <summary>
+            Log System Setup Complete Attribute
+            </summary>
         </member>
     </members>
 </doc>

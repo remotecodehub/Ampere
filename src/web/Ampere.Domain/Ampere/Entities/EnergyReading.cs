@@ -82,11 +82,7 @@ public sealed class EnergyReading(
 
     private static decimal Validate(decimal value)
     {
-        if (value < 0)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(value));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(value);
 
         return value;
     }

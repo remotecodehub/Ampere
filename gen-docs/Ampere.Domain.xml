@@ -4,6 +4,144 @@
         <name>Ampere.Domain</name>
     </assembly>
     <members>
+        <member name="T:Ampere.Domain.Ampere.Entities.DeviceEndpoint">
+            <summary>Models an addressable Sonoff endpoint.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.DeviceEndpoint.#ctor(System.String,Ampere.Domain.Ampere.Enums.EndpointKind,System.String)">
+            <summary>Models an addressable Sonoff endpoint.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.DeviceEndpoint.Name">
+            <summary>Gets or sets the endpoint name.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.DeviceEndpoint.Kind">
+            <summary>Gets the endpoint kind.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.DeviceEndpoint.SonoffId">
+            <summary>Gets the owning Sonoff identifier.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.DeviceEndpoint.RelayState">
+            <summary>Gets or sets the relay state.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.DeviceEndpoint.SetRelayState(System.Boolean)">
+            <summary>Changes the relay state.</summary>
+        </member>
+        <member name="T:Ampere.Domain.Ampere.Entities.EnergyReading">
+            <summary>Stores one electrical telemetry sample.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.EnergyReading.#ctor(System.String,System.String,System.DateTimeOffset,System.Decimal,System.Decimal,System.Decimal,System.Decimal)">
+            <summary>Stores one electrical telemetry sample.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.EnergyReading.SonoffId">
+            <summary>Gets the Sonoff identifier.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.EnergyReading.EndpointId">
+            <summary>Gets the endpoint identifier.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.EnergyReading.MeasuredAt">
+            <summary>Gets the measurement timestamp.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.EnergyReading.Voltage">
+            <summary>Gets the voltage in volts.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.EnergyReading.Current">
+            <summary>Gets the current in amperes.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.EnergyReading.Power">
+            <summary>Gets the power in watts.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.EnergyReading.EnergyWh">
+            <summary>Gets the cumulative energy in Wh.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.EnergyReading.CalculateMonthlyWh(System.Collections.Generic.IEnumerable{Ampere.Domain.Ampere.Entities.EnergyReading},System.Int32,System.Int32)">
+            <summary>Calculates monthly consumption in Wh.</summary>
+        </member>
+        <member name="T:Ampere.Domain.Ampere.Entities.House">
+            <summary>Models a managed electrical house.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.House.#ctor(System.String)">
+            <summary>Models a managed electrical house.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.House.Name">
+            <summary>Gets or sets the house name.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.House.Address">
+            <summary>Gets or sets the house address.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.House.Rooms">
+            <summary>Gets the configured rooms.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.House.Devices">
+            <summary>Gets the registered Sonoff devices.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.House.AddRoom(System.String)">
+            <summary>Adds a room to the house.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.House.AddDevice(System.String,System.String)">
+            <summary>Registers a Sonoff device.</summary>
+        </member>
+        <member name="T:Ampere.Domain.Ampere.Entities.Room">
+            <summary>Models a room in a managed house.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.Room.#ctor(System.String)">
+            <summary>Models a room in a managed house.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.Room.Name">
+            <summary>Gets or sets the room name.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.Room.Endpoints">
+            <summary>Gets the room endpoints.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.Room.AddEndpoint(System.String,Ampere.Domain.Ampere.Enums.EndpointKind,System.String)">
+            <summary>Adds a Sonoff endpoint.</summary>
+        </member>
+        <member name="T:Ampere.Domain.Ampere.Entities.SonoffDevice">
+            <summary>Models an AmperEsp Sonoff controller.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.SonoffDevice.#ctor(System.String,System.String)">
+            <summary>Models an AmperEsp Sonoff controller.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.SonoffDevice.NodeId">
+            <summary>Gets the assigned radio node identifier.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.SonoffDevice.MacAddress">
+            <summary>Gets the device MAC address.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.SonoffDevice.FirmwareVersion">
+            <summary>Gets or sets the firmware version.</summary>
+        </member>
+        <member name="P:Ampere.Domain.Ampere.Entities.SonoffDevice.Status">
+            <summary>Gets the device status.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.SonoffDevice.MarkOnline">
+            <summary>Marks the device as online.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.SonoffDevice.MarkOffline">
+            <summary>Marks the device as offline.</summary>
+        </member>
+        <member name="M:Ampere.Domain.Ampere.Entities.SonoffDevice.MarkUpdating">
+            <summary>Marks the device as updating.</summary>
+        </member>
+        <member name="T:Ampere.Domain.Ampere.Enums.DeviceStatus">
+            <summary>Defines a Sonoff device status.</summary>
+        </member>
+        <member name="F:Ampere.Domain.Ampere.Enums.DeviceStatus.Offline">
+            <summary>The device is not reachable.</summary>
+        </member>
+        <member name="F:Ampere.Domain.Ampere.Enums.DeviceStatus.Online">
+            <summary>The device is reachable.</summary>
+        </member>
+        <member name="F:Ampere.Domain.Ampere.Enums.DeviceStatus.Updating">
+            <summary>The device is being updated.</summary>
+        </member>
+        <member name="T:Ampere.Domain.Ampere.Enums.EndpointKind">
+            <summary>Defines a Sonoff endpoint kind.</summary>
+        </member>
+        <member name="F:Ampere.Domain.Ampere.Enums.EndpointKind.Outlet">
+            <summary>An electrical outlet endpoint.</summary>
+        </member>
+        <member name="F:Ampere.Domain.Ampere.Enums.EndpointKind.Switch">
+            <summary>A relay or light switch endpoint.</summary>
+        </member>
         <member name="T:Ampere.Domain.Common.EntityBase">
             <summary>
             Provides common persistence metadata.

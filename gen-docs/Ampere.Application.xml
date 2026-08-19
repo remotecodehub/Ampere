@@ -129,6 +129,27 @@
             The entities to remove.
             </param>
         </member>
+        <member name="T:Ampere.Application.Common.Abstractions.ISignalRService">
+            <summary>Defines server-to-app SignalR operations.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Abstractions.ISignalRService.NotifyDiscoveryAsync(Ampere.Application.SignalR.Responses.DiscoveryResponse,System.Threading.CancellationToken)">
+            <summary>Notifies discovery state.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Abstractions.ISignalRService.NotifyRelayStateAsync(Ampere.Application.SignalR.Responses.RelayStateResponse,System.Threading.CancellationToken)">
+            <summary>Notifies a relay state change.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Abstractions.ISignalRService.NotifyFirmwareProgressAsync(Ampere.Application.SignalR.Responses.FirmwareProgressResponse,System.Threading.CancellationToken)">
+            <summary>Notifies firmware progress.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Abstractions.ISignalRService.PublishTelemetryAsync(Ampere.Application.SignalR.Responses.TelemetryResponse,System.Threading.CancellationToken)">
+            <summary>Publishes telemetry to connected apps.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Abstractions.ISignalRService.GetTelemetrySnapshotAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Gets the latest telemetry snapshot.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Abstractions.ISignalRService.WatchTelemetryAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Reads the live telemetry stream.</summary>
+        </member>
         <member name="T:Ampere.Application.Common.Abstractions.ITransactionalRequest">
             <summary>
             Marks a message as requiring a transaction.
@@ -179,6 +200,21 @@
             <param name="cancellationToken">
             The cancellation token.
             </param>
+        </member>
+        <member name="T:Ampere.Application.Common.Contracts.IAmpereSignalRClient">
+            <summary>Defines SignalR client notifications.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Contracts.IAmpereSignalRClient.DiscoveryStateChanged(Ampere.Application.SignalR.Responses.DiscoveryResponse)">
+            <summary>Notifies discovery state.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Contracts.IAmpereSignalRClient.RelayStateChanged(Ampere.Application.SignalR.Responses.RelayStateResponse)">
+            <summary>Notifies a relay state change.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Contracts.IAmpereSignalRClient.FirmwareUpdateProgress(Ampere.Application.SignalR.Responses.FirmwareProgressResponse)">
+            <summary>Notifies firmware progress.</summary>
+        </member>
+        <member name="M:Ampere.Application.Common.Contracts.IAmpereSignalRClient.TelemetryUpdated(Ampere.Application.SignalR.Responses.TelemetryResponse)">
+            <summary>Notifies telemetry updates.</summary>
         </member>
         <member name="T:Ampere.Application.Common.Contracts.IdentityClaimTypes">
             <summary>Contains claim-type names used by InvisibleSP identity tokens.</summary>
@@ -1050,6 +1086,202 @@
         </member>
         <member name="P:Ampere.Application.Setup.Responses.SetupStatusResponse.IsSetupComplete">
             <summary>Indicates whether initial setup has completed.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Commands.SetRelayCommand">
+            <summary>Requests a relay state change.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Commands.SetRelayCommand.#ctor(System.String,System.Boolean)">
+            <summary>Requests a relay state change.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Commands.StartDiscoveryCommand">
+            <summary>Starts device discovery.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Commands.StartDiscoveryCommand.#ctor(System.String,System.Int32)">
+            <summary>Starts device discovery.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Commands.StartFirmwareUpdateCommand">
+            <summary>Starts a firmware update notification flow.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Commands.StartFirmwareUpdateCommand.#ctor(System.String,System.String)">
+            <summary>Starts a firmware update notification flow.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Handlers.SignalRHandlers">
+            <summary>Handles SignalR commands and queries.</summary>
+            <param name="signalRService">The hub service.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.SignalRHandlers.#ctor(Ampere.Application.Common.Abstractions.ISignalRService)">
+            <summary>Handles SignalR commands and queries.</summary>
+            <param name="signalRService">The hub service.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.SignalRHandlers.Handle(Ampere.Application.SignalR.Commands.StartDiscoveryCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.SignalRHandlers.Handle(Ampere.Application.SignalR.Commands.SetRelayCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.SignalRHandlers.Handle(Ampere.Application.SignalR.Commands.StartFirmwareUpdateCommand,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.SignalRHandlers.Handle(Ampere.Application.SignalR.Queries.GetTelemetrySnapshotQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Application.SignalR.Handlers.SignalRStreamHandlers">
+            <summary>Handles live telemetry streams.</summary>
+            <param name="signalRService">The hub service.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.SignalRStreamHandlers.#ctor(Ampere.Application.Common.Abstractions.ISignalRService)">
+            <summary>Handles live telemetry streams.</summary>
+            <param name="signalRService">The hub service.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.SignalRStreamHandlers.Handle(Ampere.Application.SignalR.Queries.WatchTelemetryQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Application.SignalR.Handlers.TelemetryNotificationHandler">
+            <summary>Handles telemetry notifications.</summary>
+            <param name="signalRService">The hub service.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.TelemetryNotificationHandler.#ctor(Ampere.Application.Common.Abstractions.ISignalRService)">
+            <summary>Handles telemetry notifications.</summary>
+            <param name="signalRService">The hub service.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Handlers.TelemetryNotificationHandler.Handle(Ampere.Application.SignalR.Notifications.TelemetryUpdatedNotification,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Application.SignalR.Notifications.TelemetryUpdatedNotification">
+            <summary>Publishes a new telemetry sample.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Notifications.TelemetryUpdatedNotification.#ctor(Ampere.Application.SignalR.Responses.TelemetryResponse)">
+            <summary>Publishes a new telemetry sample.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Queries.GetTelemetrySnapshotQuery">
+            <summary>Gets the latest telemetry snapshot.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Queries.GetTelemetrySnapshotQuery.#ctor(System.String)">
+            <summary>Gets the latest telemetry snapshot.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Queries.WatchTelemetryQuery">
+            <summary>Streams live telemetry notifications.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Queries.WatchTelemetryQuery.#ctor(System.String)">
+            <summary>Streams live telemetry notifications.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Requests.FirmwareUpdateRequest">
+            <summary>Requests a Sonoff firmware update.</summary>
+            <param name="NodeId">The radio node identifier.</param>
+            <param name="Version">The firmware version.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Requests.FirmwareUpdateRequest.#ctor(System.String,System.String)">
+            <summary>Requests a Sonoff firmware update.</summary>
+            <param name="NodeId">The radio node identifier.</param>
+            <param name="Version">The firmware version.</param>
+        </member>
+        <member name="P:Ampere.Application.SignalR.Requests.FirmwareUpdateRequest.NodeId">
+            <summary>The radio node identifier.</summary>
+        </member>
+        <member name="P:Ampere.Application.SignalR.Requests.FirmwareUpdateRequest.Version">
+            <summary>The firmware version.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Requests.GetTelemetrySnapshotRequest">
+            <summary>Requests the latest telemetry snapshot.</summary>
+            <param name="HouseId">An optional house filter.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Requests.GetTelemetrySnapshotRequest.#ctor(System.String)">
+            <summary>Requests the latest telemetry snapshot.</summary>
+            <param name="HouseId">An optional house filter.</param>
+        </member>
+        <member name="P:Ampere.Application.SignalR.Requests.GetTelemetrySnapshotRequest.HouseId">
+            <summary>An optional house filter.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Requests.SetRelayRequest">
+            <summary>Requests a relay state change.</summary>
+            <param name="EndpointId">The endpoint identifier.</param>
+            <param name="State">The desired relay state.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Requests.SetRelayRequest.#ctor(System.String,System.Boolean)">
+            <summary>Requests a relay state change.</summary>
+            <param name="EndpointId">The endpoint identifier.</param>
+            <param name="State">The desired relay state.</param>
+        </member>
+        <member name="P:Ampere.Application.SignalR.Requests.SetRelayRequest.EndpointId">
+            <summary>The endpoint identifier.</summary>
+        </member>
+        <member name="P:Ampere.Application.SignalR.Requests.SetRelayRequest.State">
+            <summary>The desired relay state.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Requests.StartDiscoveryRequest">
+            <summary>Starts a Sonoff discovery window.</summary>
+            <param name="HouseId">The target house identifier.</param>
+            <param name="WindowSeconds">The discovery duration.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Requests.StartDiscoveryRequest.#ctor(System.String,System.Int32)">
+            <summary>Starts a Sonoff discovery window.</summary>
+            <param name="HouseId">The target house identifier.</param>
+            <param name="WindowSeconds">The discovery duration.</param>
+        </member>
+        <member name="P:Ampere.Application.SignalR.Requests.StartDiscoveryRequest.HouseId">
+            <summary>The target house identifier.</summary>
+        </member>
+        <member name="P:Ampere.Application.SignalR.Requests.StartDiscoveryRequest.WindowSeconds">
+            <summary>The discovery duration.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Requests.WatchTelemetryRequest">
+            <summary>Requests a live telemetry stream.</summary>
+            <param name="HouseId">An optional house filter.</param>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Requests.WatchTelemetryRequest.#ctor(System.String)">
+            <summary>Requests a live telemetry stream.</summary>
+            <param name="HouseId">An optional house filter.</param>
+        </member>
+        <member name="P:Ampere.Application.SignalR.Requests.WatchTelemetryRequest.HouseId">
+            <summary>An optional house filter.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Responses.DiscoveryResponse">
+            <summary>Describes a discovery state notification.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Responses.DiscoveryResponse.#ctor(System.String,System.Int32,System.Boolean)">
+            <summary>Describes a discovery state notification.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Responses.FirmwareProgressResponse">
+            <summary>Describes firmware update progress.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Responses.FirmwareProgressResponse.#ctor(System.String,System.Int32,System.String)">
+            <summary>Describes firmware update progress.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Responses.RelayStateResponse">
+            <summary>Describes a relay state change.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Responses.RelayStateResponse.#ctor(System.String,System.Boolean)">
+            <summary>Describes a relay state change.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Responses.TelemetryResponse">
+            <summary>Describes live electrical telemetry.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Responses.TelemetryResponse.#ctor(System.String,System.String,System.String,System.DateTimeOffset,System.Decimal,System.Decimal,System.Decimal,System.Decimal,System.Boolean)">
+            <summary>Describes live electrical telemetry.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Responses.TelemetrySnapshotResponse">
+            <summary>Contains the latest endpoint telemetry.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Responses.TelemetrySnapshotResponse.#ctor(System.Collections.Generic.IReadOnlyList{Ampere.Application.SignalR.Responses.TelemetryResponse})">
+            <summary>Contains the latest endpoint telemetry.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Validators.SetRelayCommandValidator">
+            <summary>Validates relay commands.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Validators.SetRelayCommandValidator.#ctor">
+            <summary>Initializes validation rules.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Validators.StartDiscoveryCommandValidator">
+            <summary>Validates discovery commands.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Validators.StartDiscoveryCommandValidator.#ctor">
+            <summary>Initializes validation rules.</summary>
+        </member>
+        <member name="T:Ampere.Application.SignalR.Validators.StartFirmwareUpdateCommandValidator">
+            <summary>Validates firmware update commands.</summary>
+        </member>
+        <member name="M:Ampere.Application.SignalR.Validators.StartFirmwareUpdateCommandValidator.#ctor">
+            <summary>Initializes validation rules.</summary>
         </member>
     </members>
 </doc>

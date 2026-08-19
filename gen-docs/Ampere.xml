@@ -83,6 +83,29 @@
             <param name="cancellationToken">The cancellation token.</param>
             <returns>The setup result.</returns>
         </member>
+        <member name="T:Ampere.Controllers.v1.SignalRController">
+            <summary>Exposes SignalR orchestration endpoints.</summary>
+            <param name="mediator">The application mediator.</param>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.#ctor(Mediator.IMediator)">
+            <summary>Exposes SignalR orchestration endpoints.</summary>
+            <param name="mediator">The application mediator.</param>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.StartDiscovery(Ampere.Application.SignalR.Requests.StartDiscoveryRequest,System.Threading.CancellationToken)">
+            <summary>Starts device discovery.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.SetRelay(Ampere.Application.SignalR.Requests.SetRelayRequest,System.Threading.CancellationToken)">
+            <summary>Changes an endpoint relay state.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.StartFirmwareUpdate(Ampere.Application.SignalR.Requests.FirmwareUpdateRequest,System.Threading.CancellationToken)">
+            <summary>Starts a firmware update flow.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.GetSnapshot(Ampere.Application.SignalR.Requests.GetTelemetrySnapshotRequest,System.Threading.CancellationToken)">
+            <summary>Gets the latest telemetry.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SignalRController.WatchTelemetry(Ampere.Application.SignalR.Requests.WatchTelemetryRequest,System.Threading.CancellationToken)">
+            <summary>Streams live telemetry.</summary>
+        </member>
         <member name="T:Program">
             <summary>
             Auto-generated public partial Program class for top-level statement apps.
