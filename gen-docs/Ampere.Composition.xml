@@ -16,6 +16,19 @@
             <typeparam name="TApp">The root component.</typeparam>
             <returns>A task for application startup.</returns>
         </member>
+        <member name="T:Ampere.Composition.Extensions.WebApplicationExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Ampere.Composition.Extensions.WebApplicationExtensions.RunAmpereAsync``1(Microsoft.AspNetCore.Builder.WebApplication)">
+            <inheritdoc cref="M:Ampere.Composition.Extensions.WebApplicationExtensions.&lt;G&gt;$2D7FFC466F43CADF286749FB4DFA1BDE.RunAmpereAsync``1"/>
+        </member>
+        <member name="M:Ampere.Composition.Extensions.WebApplicationExtensions.&lt;G&gt;$2D7FFC466F43CADF286749FB4DFA1BDE.RunAmpereAsync``1">
+            <summary>
+            Overload Extension Method to setup http pipeline and run the app. 
+            </summary>
+        </member>
         <member name="T:Mediator.MediatorOptions">
             <summary>
             Provide options for the Mediator source generator.

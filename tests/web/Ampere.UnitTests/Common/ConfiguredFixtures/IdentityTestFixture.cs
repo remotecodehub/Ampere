@@ -1,7 +1,9 @@
 using Ampere.Application.Identity.Abstractions;
 using Ampere.Infrastructure.Identity.Models;
+using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
 using Ampere.Infrastructure.Persistence;
+using Ampere.UnitTests.Common.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,59 +14,55 @@ namespace Ampere.UnitTests.Common.ConfiguredFixtures;
 /// <summary>Builds a fully configured in-memory Identity fixture.</summary>
 public sealed class IdentityTestFixture : IDisposable
 {
-    private readonly ServiceProvider provider;
+    private readonly ServiceProvider _provider;
+
+    internal CapturingEmailSender EmailSender { get; }
 
     /// <summary>Initializes the Identity test fixture.</summary>
     public IdentityTestFixture()
     {
-        ServiceCollection services = new();
+        EmailSender = new CapturingEmailSender();
+        var services = new ServiceCollection();
         services.AddLogging();
         services.AddHttpContextAccessor();
-        services.AddDbContext<AmpereDbContext>(options =>
-            options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+        services.AddAuthentication(options => options.DefaultScheme = IdentityConstants.ApplicationScheme)
+            .AddCookie(IdentityConstants.ApplicationScheme);
+        services.AddDbContext<AmpereDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString("N")));
         services.AddIdentityCore<User>(options =>
-        {
-            options.User.RequireUniqueEmail = true;
-            options.Password.RequireDigit = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequiredLength = 4;
-            options.SignIn.RequireConfirmedEmail = false;
-        }).AddRoles<Role>()
-        .AddEntityFrameworkStores<AmpereDbContext>()
-        .AddSignInManager()
-        .AddDefaultTokenProviders();
-        services.AddScoped<IIdentityEmailSender,
-            TestIdentityEmailSender>();
-        services.Configure<
-            Ampere.Infrastructure.Identity.Options.JwtOptions>(
-            options =>
             {
-                options.Key =
-                    "01234567890123456789012345678901";
-                options.Issuer = "Ampere.Tests";
-                options.Audience = "Ampere.Tests";
-            });
-        services.AddSingleton<IRevokedTokenStore,
-            RevokedTokenStore>();
-        services.AddScoped<IJwtTokenService,
-            JwtTokenService>();
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+            })
+            .AddRoles<Role>()
+            .AddSignInManager<SignInManager<User>>()
+            .AddEntityFrameworkStores<AmpereDbContext>()
+            .AddDefaultTokenProviders();
+        services.Configure<JwtOptions>(options =>
+        {
+            options.Key = "ampere-test-secret-key-with-at-least-256-bits-2026";
+            options.Issuer = "Ampere.Test";
+            options.Audience = "Ampere.Test";
+            options.AccessTokenLifetime = TimeSpan.FromMinutes(15);
+            options.RefreshTokenLifetime = TimeSpan.FromDays(14);
+        });
+        services.AddSingleton<IRevokedTokenStore, RevokedTokenStore>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddSingleton<IIdentityEmailSender>(EmailSender);
         services.AddScoped<IdentityService>();
-        provider = services.BuildServiceProvider();
+        
+        _provider = services.BuildServiceProvider();
+        _provider.GetRequiredService<AmpereDbContext>().Database.EnsureCreated();
     }
-
-    /// <summary>Gets the Identity service under test.</summary>
-    public IdentityService Service =>
-        provider.GetRequiredService<IdentityService>();
-
-    /// <summary>Gets the user manager.</summary>
-    public UserManager<User> UserManager =>
-        provider.GetRequiredService<UserManager<User>>();
-
-    /// <summary>Gets the role manager.</summary>
-    public RoleManager<Role> RoleManager =>
-        provider.GetRequiredService<RoleManager<Role>>();
+        
+    public IdentityService Service => _provider.GetRequiredService<IdentityService>();
+    public IJwtTokenService TokenService => _provider.GetRequiredService<IJwtTokenService>();
+    public UserManager<User> UserManager => _provider.GetRequiredService<UserManager<User>>();
+    public RoleManager<Role> RoleManager => _provider.GetRequiredService<RoleManager<Role>>();
 
     /// <summary>Creates and stores a user.</summary>
     /// <param name="email">The user's email.</param>
@@ -129,7 +127,7 @@ public sealed class IdentityTestFixture : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        provider.Dispose();
+        _provider.Dispose();
     }
 
     private sealed class TestIdentityEmailSender :

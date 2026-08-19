@@ -3,11 +3,17 @@ using Microsoft.Extensions.Hosting;
 using Scalar.AspNetCore;
 
 namespace Ampere.Composition.Extensions;
+/// <summary>
+/// 
+/// </summary>
 
 public static class WebApplicationExtensions
 {
     extension(WebApplication app)
     {
+        /// <summary>
+        /// Overload Extension Method to setup http pipeline and run the app. 
+        /// </summary>
         public async Task RunAmpereAsync<T>() where T : Microsoft.AspNetCore.Components.IComponent
         {
             
