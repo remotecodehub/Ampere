@@ -7,11 +7,10 @@
         <Configuration>
           <Format>cobertura</Format>
           <Include>
-            [Ampere]Ampere.*,
+            [Ampere]Ampere.Controllers.*,
             [Ampere.Application]Ampere.Application.*,
             [Ampere.Domain]Ampere.Domain.*,
-            [Ampere.Infrastructure]Ampere.Infrastructure.*,
-            [Ampere.Composition]Ampere.Composition.*
+            [Ampere.Infrastructure]Ampere.Infrastructure.*
           </Include>
           <Exclude>
             [Ampere]Microsoft.AspNetCore.OpenApi.Generated*,
