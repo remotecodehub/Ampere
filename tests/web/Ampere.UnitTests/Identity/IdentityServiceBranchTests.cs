@@ -3,7 +3,7 @@ using Ampere.Application.Identity.Responses;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
-using Ampere.UnitTests.Common.Fixtures;
+using Ampere.UnitTests.Common.ConfiguredFixtures;
 using Microsoft.Extensions.Options;
 using Xunit;
 
