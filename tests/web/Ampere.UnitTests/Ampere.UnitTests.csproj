@@ -11,8 +11,9 @@
       $(MSBuildProjectDirectory)/TestResults/
     </CoverletOutput>
     <Include>
-      [Ampere]Ampere.Controllers.*
-      [Ampere.Application]Ampere.Application.*
+      [Ampere]Ampere.Controllers.*;
+      [Ampere.Application]Ampere.Application.*;
+      [Ampere.Domain]Ampere.Domain.*;
       [Ampere.Infrastructure]Ampere.Infrastructure.*;
     </Include>
     <Threshold>80</Threshold>
