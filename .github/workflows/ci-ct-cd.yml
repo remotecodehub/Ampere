@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
@@ -37,7 +37,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
@@ -57,15 +57,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.*
-          
+
       - name: Restore
         run: dotnet restore ${{ github.workspace }}/tests/web/Ampere.UnitTests/Ampere.UnitTests.csproj
-        
+
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.5.11
 
@@ -80,6 +80,7 @@ jobs:
             --configuration Release `
             --no-restore `
             --collect:"XPlat Code Coverage" `
+            --settings $env:GITHUB_WORKSPACE/tests/web/Ampere.UnitTests/coverlet.runsettings `
             --results-directory $env:GITHUB_WORKSPACE/artifacts/test-results `
             --logger "trx;LogFileName=test-results.trx" 2>&1 | Tee-Object -FilePath $outputFile
           $exitCode = $LASTEXITCODE
@@ -137,7 +138,7 @@ jobs:
           "BRANCH_COVERAGE=$([math]::Round($branchRate, 2))" | Out-File artifacts/branch-rate.txt -Encoding utf8
 
           if ($lineRate -lt 80 -or $branchRate -lt 80) {
-            Write-Host "Coverage gate failed. Line coverage: $([math]::Round($lineRate, 2))%; Branch coverage: $([math]::Round($branchRate, 2))%; minimum: 80%."
+            Write-Error "Coverage gate failed. Line coverage: $([math]::Round($lineRate, 2))%; Branch coverage: $([math]::Round($branchRate, 2))%; minimum: 80%."
           }
 
       - name: Append test execution report
