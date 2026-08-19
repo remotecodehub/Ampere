@@ -1,4 +1,5 @@
 using Ampere.Application.Common.Abstractions;
+using Ampere.Application.Common.Responses;
 using Ampere.Application.SignalR.Commands;
 using Ampere.Application.SignalR.Handlers;
 using Ampere.Application.SignalR.Notifications;
@@ -16,13 +17,14 @@ public sealed class SignalRHandlerTests
         FakeSignalRService service = new();
         SignalRHandlers handler = new(service);
 
-        var result = await handler.Handle(
-            new StartDiscoveryCommand("house", 60),
-            CancellationToken.None);
+        Response<DiscoveryResponse> result =
+            await handler.Handle(
+                new StartDiscoveryCommand("house", 60),
+                CancellationToken.None);
 
         Assert.True(result.Succeeded);
         Assert.Equal("house", result.Data?.HouseId);
-        Assert.Equal(60, service.Discovery?.WindowSeconds);
+        Assert.Equal(60, result.Data?.WindowSeconds);
     }
 
     [Fact]
@@ -31,11 +33,13 @@ public sealed class SignalRHandlerTests
         FakeSignalRService service = new();
         SignalRHandlers handler = new(service);
 
-        var result = await handler.Handle(
-            new SetRelayCommand("endpoint", true),
-            CancellationToken.None);
+        Response<RelayStateResponse> result =
+            await handler.Handle(
+                new SetRelayCommand("endpoint", true),
+                CancellationToken.None);
 
         Assert.True(result.Succeeded);
+        Assert.True(result.Data?.State);
         Assert.True(service.Relay?.State);
     }
 
@@ -45,9 +49,10 @@ public sealed class SignalRHandlerTests
         FakeSignalRService service = new();
         SignalRHandlers handler = new(service);
 
-        var result = await handler.Handle(
-            new StartFirmwareUpdateCommand("node", "2.0.0"),
-            CancellationToken.None);
+        Response<FirmwareProgressResponse> result =
+            await handler.Handle(
+                new StartFirmwareUpdateCommand("node", "2.0.0"),
+                CancellationToken.None);
 
         Assert.True(result.Succeeded);
         Assert.Equal(5, result.Data?.Percent);
