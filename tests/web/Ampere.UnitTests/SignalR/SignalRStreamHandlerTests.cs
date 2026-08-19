@@ -59,6 +59,15 @@ public sealed class SignalRStreamHandlerTests
             return Task.CompletedTask;
         }
 
+        public Task<IReadOnlyList<TelemetryResponse>>
+            GetTelemetrySnapshotAsync(
+                string? houseId,
+                CancellationToken cancellationToken)
+        {
+            return Task.FromResult(
+                (IReadOnlyList<TelemetryResponse>)[]);
+        }
+
         public async IAsyncEnumerable<TelemetryResponse>
             WatchTelemetryAsync(
                 string? houseId,
