@@ -6,7 +6,8 @@ on:
     tags: [v*]
   pull_request:
     types: [opened, synchronize]
-
+  workflow_dispatch:
+    
 permissions:
   contents: read
 
@@ -24,7 +25,7 @@ jobs:
           - target_framework: net10.0-ios
             os: macos-26
             workload: ios
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
