@@ -1,4 +1,3 @@
-using Mediator.Net.Contracts;
 namespace Ampere.Application.MQTT.Responses;
 
 /// <summary>
@@ -9,8 +8,4 @@ public sealed record BrokerStatusResponse(
     DateTimeOffset? StartedAt,
     int Port,
     string? BindAddress,
-    int ConnectedClientsCount) : IResponse
-{
-    public MQTT.Results.BrokerStatusResult ToResult()
-        => new (IsRunning, StartedAt, Port, BindAddress, ConnectedClientsCount);
-}
+    int ConnectedClientsCount) ;
