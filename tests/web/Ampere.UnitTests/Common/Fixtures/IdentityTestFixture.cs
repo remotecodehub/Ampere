@@ -2,11 +2,9 @@ using Ampere.Application.Identity.Abstractions;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Services;
 using Ampere.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Ampere.UnitTests.Common.Fixtures;
 
@@ -62,6 +60,10 @@ public sealed class IdentityTestFixture : IDisposable
     public AmpereDbContext DbContext =>
         provider.GetRequiredService<AmpereDbContext>();
 
+    /// <summary>Gets the user manager.</summary>
+    public UserManager<User> UserManager =>
+        provider.GetRequiredService<UserManager<User>>();
+
     /// <summary>Creates and stores a user.</summary>
     /// <param name="email">The user's email.</param>
     /// <param name="password">The user's password.</param>
@@ -70,14 +72,12 @@ public sealed class IdentityTestFixture : IDisposable
         string email,
         string password = "Password1!")
     {
-        UserManager<User> manager =
-            provider.GetRequiredService<UserManager<User>>();
         User user = new(email)
         {
             Email = email,
             EmailConfirmed = true
         };
-        IdentityResult result = await manager.CreateAsync(
+        IdentityResult result = await UserManager.CreateAsync(
             user,
             password);
         Assert.True(result.Succeeded);
