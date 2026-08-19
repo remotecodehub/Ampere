@@ -1,5 +1,6 @@
 using System.Threading.Channels;
 using Ampere.Application.Common.Abstractions;
+using Ampere.Application.Common.Contracts;
 using Ampere.Application.SignalR.Responses;
 using Microsoft.AspNetCore.SignalR;
 
@@ -8,7 +9,9 @@ namespace Ampere.Infrastructure.Common.Hubs;
 /// <summary>Publishes Ampere events through SignalR.</summary>
 /// <param name="hubContext">The SignalR hub context.</param>
 public sealed class SignalRService(
-    IHubContext<Hub> hubContext) : ISignalRService
+    IHubContext<Hub<IAmpereSignalRClient>,
+        IAmpereSignalRClient> hubContext)
+    : ISignalRService
 {
     private readonly Channel<TelemetryResponse> _telemetry =
         Channel.CreateUnbounded<TelemetryResponse>();
@@ -18,10 +21,8 @@ public sealed class SignalRService(
         DiscoveryResponse response,
         CancellationToken cancellationToken)
     {
-        return hubContext.Clients.All.SendAsync(
-            "DiscoveryStateChanged",
-            response,
-            cancellationToken);
+        return hubContext.Clients.All
+            .DiscoveryStateChanged(response);
     }
 
     /// <inheritdoc />
@@ -29,10 +30,8 @@ public sealed class SignalRService(
         RelayStateResponse response,
         CancellationToken cancellationToken)
     {
-        return hubContext.Clients.All.SendAsync(
-            "RelayStateChanged",
-            response,
-            cancellationToken);
+        return hubContext.Clients.All
+            .RelayStateChanged(response);
     }
 
     /// <inheritdoc />
@@ -40,10 +39,8 @@ public sealed class SignalRService(
         FirmwareProgressResponse response,
         CancellationToken cancellationToken)
     {
-        return hubContext.Clients.All.SendAsync(
-            "FirmwareUpdateProgress",
-            response,
-            cancellationToken);
+        return hubContext.Clients.All
+            .FirmwareUpdateProgress(response);
     }
 
     /// <inheritdoc />
@@ -55,10 +52,8 @@ public sealed class SignalRService(
             response,
             cancellationToken);
 
-        await hubContext.Clients.All.SendAsync(
-            "TelemetryUpdated",
-            response,
-            cancellationToken);
+        await hubContext.Clients.All
+            .TelemetryUpdated(response);
     }
 
     /// <inheritdoc />
