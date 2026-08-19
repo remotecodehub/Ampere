@@ -111,6 +111,24 @@ public sealed class SignalRServiceTests
     }
 
     [Fact]
+    public async Task PublishTelemetry_CancellationStopsPublish()
+    {
+        (SignalRService service, Mock<IAmpereSignalRClient> client) =
+            CreateService();
+        using CancellationTokenSource cancellation = new();
+        cancellation.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            async () => await service.PublishTelemetryAsync(
+                CreateTelemetry("house", "endpoint"),
+                cancellation.Token));
+
+        client.Verify(item => item.TelemetryUpdated(
+                It.IsAny<TelemetryResponse>()),
+            Times.Never);
+    }
+
+    [Fact]
     public async Task Snapshot_FiltersHouseCaseInsensitively()
     {
         (SignalRService service, _) = CreateService();
@@ -166,6 +184,26 @@ public sealed class SignalRServiceTests
 
         Assert.True(await enumerator.MoveNextAsync());
         Assert.Equal("endpoint", enumerator.Current.EndpointId);
+        cancellation.Cancel();
+    }
+
+    [Fact]
+    public async Task WatchTelemetry_NullHouseReturnsAll()
+    {
+        (SignalRService service, _) = CreateService();
+        using CancellationTokenSource cancellation = new();
+        await service.PublishTelemetryAsync(
+            CreateTelemetry("house", "endpoint"),
+            CancellationToken.None);
+
+        await using IAsyncEnumerator<TelemetryResponse> enumerator =
+            service.WatchTelemetryAsync(
+                    null,
+                    cancellation.Token)
+                .GetAsyncEnumerator(cancellation.Token);
+
+        Assert.True(await enumerator.MoveNextAsync());
+        Assert.Equal("house", enumerator.Current.HouseId);
         cancellation.Cancel();
     }
 
