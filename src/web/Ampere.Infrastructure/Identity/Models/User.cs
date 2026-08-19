@@ -8,7 +8,8 @@ namespace Ampere.Infrastructure.Identity.Models;
 /// </summary>
 public class User(
     string? userName = null)
-    : IdentityUser<string>(userName ?? string.Empty),
+    : IdentityUser<string>(
+        Guid.CreateVersion7().ToString()) ,
       IEntityBase,
       ISoftDeletable
 {
