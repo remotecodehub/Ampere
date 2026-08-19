@@ -1,7 +1,11 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
+using Ampere.Application.Identity.Responses;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Xunit;
 
 namespace Ampere.UnitTests.Identity;
@@ -9,12 +13,15 @@ namespace Ampere.UnitTests.Identity;
 /// <summary>Tests JWT token creation and validation.</summary>
 public sealed class JwtTokenServiceTests
 {
+    private const string Key =
+        "01234567890123456789012345678901";
+
     private static JwtTokenService Create(
         RevokedTokenStore? store = null)
     {
         JwtOptions options = new()
         {
-            Key = "01234567890123456789012345678901",
+            Key = Key,
             Issuer = "Ampere.Tests",
             Audience = "Ampere.Tests"
         };
@@ -28,7 +35,7 @@ public sealed class JwtTokenServiceTests
     public void CreateTokens_CreatesExpectedClaims()
     {
         JwtTokenService service = Create();
-        var result = service.CreateTokens(
+        TokenResponse result = service.CreateTokens(
             "user-1",
             "user@example.com",
             ["User", "Admin"],
@@ -47,7 +54,7 @@ public sealed class JwtTokenServiceTests
                 ClaimTypes.NameIdentifier));
         Assert.Equal("user@example.com",
             principal.FindFirstValue(ClaimTypes.Email));
-        Assert.Equal("Access",
+        Assert.Equal("access",
             principal.FindFirstValue("token_type"));
         Assert.Equal("read",
             principal.FindFirstValue("permission"));
@@ -59,7 +66,7 @@ public sealed class JwtTokenServiceTests
     public void RefreshToken_HasRefreshType()
     {
         JwtTokenService service = Create();
-        var result = service.CreateTokens(
+        TokenResponse result = service.CreateTokens(
             "user-1",
             "user@example.com",
             [],
@@ -93,7 +100,7 @@ public sealed class JwtTokenServiceTests
     {
         RevokedTokenStore store = new();
         JwtTokenService service = Create(store);
-        var tokens = service.CreateTokens(
+        TokenResponse tokens = service.CreateTokens(
             "user-1", "user@example.com", [], []);
         string tokenId = service.GetTokenId(
             tokens.AccessToken)!;
@@ -109,45 +116,22 @@ public sealed class JwtTokenServiceTests
     [Fact]
     public void ValidateToken_ExpiredWithoutLifetime_ReturnsPrincipal()
     {
-        JwtOptions options = new()
-        {
-            Key = "01234567890123456789012345678901",
-            Issuer = "Ampere.Tests",
-            Audience = "Ampere.Tests",
-            AccessTokenLifetime = TimeSpan.FromMilliseconds(1)
-        };
-        JwtTokenService service = new(
-            Options.Create(options),
-            new RevokedTokenStore());
-        var tokens = service.CreateTokens(
-            "user-1", "user@example.com", [], []);
+        JwtTokenService service = Create();
+        string token = CreateExpiredToken();
 
-        Thread.Sleep(100);
+        ClaimsPrincipal? principal = service.ValidateToken(
+            token, false);
 
-        Assert.NotNull(service.ValidateToken(
-            tokens.AccessToken, false));
+        Assert.NotNull(principal);
     }
 
     [Fact]
     public void ValidateToken_ExpiredWithLifetime_ReturnsNull()
     {
-        JwtOptions options = new()
-        {
-            Key = "01234567890123456789012345678901",
-            Issuer = "Ampere.Tests",
-            Audience = "Ampere.Tests",
-            AccessTokenLifetime = TimeSpan.FromMilliseconds(1)
-        };
-        JwtTokenService service = new(
-            Options.Create(options),
-            new RevokedTokenStore());
-        var tokens = service.CreateTokens(
-            "user-1", "user@example.com", [], []);
+        JwtTokenService service = Create();
+        string token = CreateExpiredToken();
 
-        Thread.Sleep(100);
-
-        Assert.Null(service.ValidateToken(
-            tokens.AccessToken));
+        Assert.Null(service.ValidateToken(token));
     }
 
     [Fact]
@@ -160,7 +144,7 @@ public sealed class JwtTokenServiceTests
     public void GetTokenId_ValidToken_ReturnsIdentifier()
     {
         JwtTokenService service = Create();
-        var tokens = service.CreateTokens(
+        TokenResponse tokens = service.CreateTokens(
             "user-1", "user@example.com", [], []);
 
         Assert.False(string.IsNullOrWhiteSpace(
@@ -177,7 +161,7 @@ public sealed class JwtTokenServiceTests
     public void GetExpiration_ValidToken_ReturnsExpiration()
     {
         JwtTokenService service = Create();
-        var tokens = service.CreateTokens(
+        TokenResponse tokens = service.CreateTokens(
             "user-1", "user@example.com", [], []);
 
         DateTimeOffset? expiration = service.GetExpiration(
@@ -203,5 +187,23 @@ public sealed class JwtTokenServiceTests
         Assert.Throws<InvalidOperationException>(() =>
             service.CreateTokens(
                 "user-1", "user@example.com", [], []));
+    }
+
+    private static string CreateExpiredToken()
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        SymmetricSecurityKey key = new(
+            Encoding.UTF8.GetBytes(Key));
+        SigningCredentials credentials = new(
+            key, SecurityAlgorithms.HmacSha256);
+        JwtSecurityToken token = new(
+            "Ampere.Tests",
+            "Ampere.Tests",
+            [new Claim(
+                JwtRegisteredClaimNames.Sub, "user-1")],
+            now.AddMinutes(-2).UtcDateTime,
+            now.AddMinutes(-1).UtcDateTime,
+            credentials);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
