@@ -30,7 +30,6 @@ public sealed class MqttConfigurationService(Persistence.AmpereDbContext db) : I
         {
             var entity = new MqttBrokerConfigurationEntity
             {
-                Id = Guid.NewGuid(),
                 BindAddress = request.BindAddress,
                 Port = request.Port,
                 StartOnBoot = request.StartOnBoot,

@@ -32,17 +32,11 @@ public sealed class AmpereDbContext(
             }
 
             ParameterExpression parameter =
-                Expression.Parameter(
-                    entityType.ClrType,
-                    "entity");
-            MemberExpression property =
-                Expression.Property(
-                    parameter,
-                    nameof(ISoftDeletable.IsDeleted));
+                Expression.Parameter(entityType.ClrType, "entity");
+            MemberExpression property = 
+                Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
             LambdaExpression filter =
-                Expression.Lambda(
-                    Expression.Not(property),
-                    parameter);
+                Expression.Lambda(Expression.Not(property), parameter);
 
             builder.Entity(entityType.ClrType)
                 .HasQueryFilter(filter);
@@ -53,13 +47,11 @@ public sealed class AmpereDbContext(
     }
 
     /// <inheritdoc />
-    public override int SaveChanges(
-        bool acceptAllChangesOnSuccess)
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
         ApplyEntityIdentifiers();
         ApplySoftDelete();
-        return base.SaveChanges(
-            acceptAllChangesOnSuccess);
+        return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
     /// <inheritdoc />
@@ -71,9 +63,7 @@ public sealed class AmpereDbContext(
     }
 
     /// <inheritdoc />
-    public override Task<int> SaveChangesAsync(
-        bool acceptAllChangesOnSuccess,
-        CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
         ApplyEntityIdentifiers();
         ApplySoftDelete();
@@ -88,8 +78,7 @@ public sealed class AmpereDbContext(
     {
         ApplyEntityIdentifiers();
         ApplySoftDelete();
-        return base.SaveChangesAsync(
-            cancellationToken);
+        return base.SaveChangesAsync(cancellationToken);
     }
 
     private void ApplyEntityIdentifiers()

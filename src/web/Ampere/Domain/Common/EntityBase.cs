@@ -3,12 +3,12 @@ namespace Ampere.Domain.Common;
 /// <summary>
 /// Provides common persistence metadata.
 /// </summary>
-public abstract class EntityBase(
+public abstract class EntityBase(string id = "",
     DateTimeOffset? createdAt = null) : IEntityBase
 {
     /// <inheritdoc />
-    public string Id { get; set; } =
-        Guid.CreateVersion7().ToString();
+    public string Id { get; set; } = id == string.Empty ?
+        Guid.CreateVersion7().ToString() : id;
 
     /// <inheritdoc />
     public DateTimeOffset CreatedAt { get; set; } =
