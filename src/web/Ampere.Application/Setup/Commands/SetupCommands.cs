@@ -1,9 +1,12 @@
-using Mediator.Net.Contracts;
+using Ampere.Application.Identity.Responses;
+using Mediator;
 
 namespace Ampere.Application.Setup.Commands;
 
-
-/// <summary>Requests creation of the initial administrator account.</summary>
-/// <param name="Email">The administrator email address.</param>
+/// <summary>Requests initial administrator creation.</summary>
+/// <param name="Email">The administrator email.</param>
 /// <param name="Password">The administrator password.</param>
-public sealed record InitializeSetupCommand(string Email, string Password) : IRequest;
+public sealed record InitializeSetupCommand(
+    string Email,
+    string Password)
+    : IRequest<IdentityResultResponse>;
