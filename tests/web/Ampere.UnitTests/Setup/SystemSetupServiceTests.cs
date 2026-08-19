@@ -2,7 +2,7 @@ using Ampere.Application.Identity.Responses;
 using Ampere.Application.Setup.Responses;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Setup.Services;
-using Ampere.UnitTests.Common.Fixtures;
+using Ampere.UnitTests.Common.ConfiguredFixtures;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
