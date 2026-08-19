@@ -9,10 +9,14 @@ public sealed class SonoffDevice(
     string macAddress) : EntityBase
 {
     /// <summary>Gets the assigned radio node identifier.</summary>
-    public string NodeId { get; } = nodeId;
+    public string NodeId { get; } = Validate(
+        nodeId,
+        nameof(nodeId));
 
     /// <summary>Gets the device MAC address.</summary>
-    public string MacAddress { get; } = macAddress;
+    public string MacAddress { get; } = Validate(
+        macAddress,
+        nameof(macAddress));
 
     /// <summary>Gets or sets the firmware version.</summary>
     public string FirmwareVersion { get; set; } = string.Empty;
@@ -36,5 +40,19 @@ public sealed class SonoffDevice(
     public void MarkUpdating()
     {
         Status = DeviceStatus.Updating;
+    }
+
+    private static string Validate(
+        string value,
+        string parameterName)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException(
+                "A value is required.",
+                parameterName);
+        }
+
+        return value.Trim();
     }
 }
