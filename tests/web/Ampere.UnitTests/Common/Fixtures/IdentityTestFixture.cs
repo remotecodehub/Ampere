@@ -6,6 +6,7 @@ using Ampere.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace Ampere.UnitTests.Common.Fixtures;
 
@@ -30,10 +31,9 @@ public sealed class IdentityTestFixture : IDisposable
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequiredLength = 4;
             options.SignIn.RequireConfirmedEmail = false;
-        });
-        services.AddRoles<Role>();
-        services.AddEntityFrameworkStores<AmpereDbContext>();
-        services.AddSignInManager();
+        }).AddRoles<Role>()
+        .AddEntityFrameworkStores<AmpereDbContext>()
+        .AddSignInManager();
         services.AddScoped<IIdentityEmailSender,
             TestIdentityEmailSender>();
         services.Configure<

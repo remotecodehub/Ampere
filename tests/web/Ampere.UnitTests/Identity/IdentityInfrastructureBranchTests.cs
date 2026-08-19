@@ -1,6 +1,7 @@
 using Ampere.Application.Identity.Responses;
 using Ampere.Infrastructure.Identity.Services;
 using Microsoft.Extensions.Logging;
+using Xunit;
 
 namespace Ampere.UnitTests.Identity;
 
@@ -10,8 +11,9 @@ public sealed class IdentityInfrastructureBranchTests
     [Fact]
     public async Task LoggingEmailSender_LogsBothMessageKinds()
     {
-        using LoggerFactory factory = LoggerFactory.Create(
-            builder => builder.AddDebug());
+        using LoggerFactory factory = (LoggerFactory)LoggerFactory.Create(
+            builder => builder.AddDebug()
+        );
         ILogger<LoggingIdentityEmailSender> logger =
             factory.CreateLogger<LoggingIdentityEmailSender>();
         LoggingIdentityEmailSender sender =

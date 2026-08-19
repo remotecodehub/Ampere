@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
 using Microsoft.Extensions.Options;
+using Xunit;
 
 namespace Ampere.UnitTests.Identity;
 

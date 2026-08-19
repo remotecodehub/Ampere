@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.UnitTests.Common.Fixtures;
+using Xunit;
 
 namespace Ampere.UnitTests.Identity;
 
@@ -14,7 +15,7 @@ public sealed class IdentityServiceBranchTests
         User user = await fixture.CreateUserAsync(
             "recovery@example.com");
         await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
-        string[]? codes = await fixture.UserManager
+        string[]? codes = (string[]?)await fixture.UserManager
             .GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
         await fixture.UserManager.SetTwoFactorEnabledAsync(
             user, true);

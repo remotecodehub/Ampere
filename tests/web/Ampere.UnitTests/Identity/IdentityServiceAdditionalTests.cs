@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.UnitTests.Common.Fixtures;
+using Microsoft.AspNetCore.Identity;
+using Xunit;
 
 namespace Ampere.UnitTests.Identity;
 
