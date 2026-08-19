@@ -1,3 +1,4 @@
+using Ampere.Application.Common.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
@@ -100,7 +101,8 @@ public static class WebApplicationExtensions
 
             app.MapStaticAssets();
             app.MapControllers();
-            app.MapHub<Hub>("/hubs/ampere");
+            app.MapHub<Hub<IAmpereSignalRClient>>(
+                "/hubs/ampere");
             app.MapRazorComponents<T>()
                 .AddInteractiveServerRenderMode();
 
