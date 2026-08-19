@@ -2,7 +2,9 @@ using Ampere.Application.Common.Abstractions;
 using Ampere.Application.Common.Pipeline.Validation;
 using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Handlers;
+using Ampere.Application.SignalR.Commands;
 using Ampere.Application.SignalR.Handlers;
+using Ampere.Application.SignalR.Validators;
 using Ampere.Infrastructure.Common.Hubs;
 using Ampere.Infrastructure.Common.Repository;
 using Ampere.Infrastructure.Common.UnitOfWork;
@@ -12,6 +14,7 @@ using Ampere.Infrastructure.Identity.Services;
 using Ampere.Infrastructure.Persistence;
 using Ampere.Infrastructure.Persistence.Middlewares;
 using Ampere.UnitTests.Common.Mocks;
+using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +60,11 @@ public sealed class AmpereTestFixture : IDisposable
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IdentityService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Register the validators consumed by ValidationMiddleware, matching the
+        // application composition root. Without this registration the middleware
+        // receives an empty validator collection and invalid commands reach handlers.
+        services.AddScoped<IValidator<SetRelayCommand>, SetRelayCommandValidator>();
 
         // Dispatch tests intentionally use a deterministic fake at the application boundary.
         // The concrete SignalR implementation is also registered so it can be resolved and tested
