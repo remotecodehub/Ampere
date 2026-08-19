@@ -43,9 +43,10 @@ public sealed class JwtTokenServiceTests
 
         Assert.NotNull(principal);
         Assert.Equal("user-1",
-            principal.FindFirstValue("sub"));
+            principal.FindFirstValue(
+                ClaimTypes.NameIdentifier));
         Assert.Equal("user@example.com",
-            principal.FindFirstValue("email"));
+            principal.FindFirstValue(ClaimTypes.Email));
         Assert.Equal("Access",
             principal.FindFirstValue("token_type"));
         Assert.Equal("read",
@@ -68,7 +69,7 @@ public sealed class JwtTokenServiceTests
             result.RefreshToken);
 
         Assert.NotNull(principal);
-        Assert.Equal("Refresh",
+        Assert.Equal("refresh",
             principal.FindFirstValue("token_type"));
     }
 
@@ -113,13 +114,15 @@ public sealed class JwtTokenServiceTests
             Key = "01234567890123456789012345678901",
             Issuer = "Ampere.Tests",
             Audience = "Ampere.Tests",
-            AccessTokenLifetime = TimeSpan.FromSeconds(-1)
+            AccessTokenLifetime = TimeSpan.FromMilliseconds(1)
         };
         JwtTokenService service = new(
             Options.Create(options),
             new RevokedTokenStore());
         var tokens = service.CreateTokens(
             "user-1", "user@example.com", [], []);
+
+        Thread.Sleep(100);
 
         Assert.NotNull(service.ValidateToken(
             tokens.AccessToken, false));
@@ -133,13 +136,15 @@ public sealed class JwtTokenServiceTests
             Key = "01234567890123456789012345678901",
             Issuer = "Ampere.Tests",
             Audience = "Ampere.Tests",
-            AccessTokenLifetime = TimeSpan.FromSeconds(-1)
+            AccessTokenLifetime = TimeSpan.FromMilliseconds(1)
         };
         JwtTokenService service = new(
             Options.Create(options),
             new RevokedTokenStore());
         var tokens = service.CreateTokens(
             "user-1", "user@example.com", [], []);
+
+        Thread.Sleep(100);
 
         Assert.Null(service.ValidateToken(
             tokens.AccessToken));
