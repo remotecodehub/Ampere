@@ -24,7 +24,7 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Client ID"
-                       @onclick="ShowDetailsAsync">
+                       @onclick="() => ShowDetailsAsync(context)">
                     @context.ClientId
                 </MudTd>
                 <MudTd DataLabel="User">
