@@ -25,11 +25,13 @@ public sealed class MqttBrokerServiceTests
                 .WithDefaultEndpoint()
                 .WithDefaultEndpointPort(0)
                 .Build());
+        await server.StartAsync();
         runtime.Server = server;
 
-        await service.StartAsync( TestContext.Current.CancellationToken);
+        await service.StartAsync(TestContext.Current.CancellationToken);
 
         Assert.Same(server, runtime.Server);
+        Assert.True(server.IsStarted);
         await runtime.DisposeAsync();
     }
 
@@ -41,7 +43,7 @@ public sealed class MqttBrokerServiceTests
         MqttBrokerService service = new(repository, runtime);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
-            () => service.StartAsync( TestContext.Current.CancellationToken));
+            () => service.StartAsync(TestContext.Current.CancellationToken));
 
         await runtime.DisposeAsync();
     }
@@ -55,12 +57,12 @@ public sealed class MqttBrokerServiceTests
             {
                 Port = MqttTestPort.Get(),
                 UseTls = true
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
 
         await Assert.ThrowsAsync<NotSupportedException>(
-            () => service.StartAsync( TestContext.Current.CancellationToken));
+            () => service.StartAsync(TestContext.Current.CancellationToken));
 
         await runtime.DisposeAsync();
     }
@@ -74,12 +76,12 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "not-an-ip",
                 Port = MqttTestPort.Get()
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
 
         await Assert.ThrowsAsync<FormatException>(
-            () => service.StartAsync( TestContext.Current.CancellationToken));
+            () => service.StartAsync(TestContext.Current.CancellationToken));
 
         await runtime.DisposeAsync();
     }
@@ -93,15 +95,15 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "127.0.0.1",
                 Port = MqttTestPort.Get()
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
 
-        await service.StartAsync( TestContext.Current.CancellationToken);
+        await service.StartAsync(TestContext.Current.CancellationToken);
 
         Assert.True(runtime.Server!.IsStarted);
         Assert.NotNull(runtime.StartedAt);
-        await service.StopAsync( TestContext.Current.CancellationToken);
+        await service.StopAsync(TestContext.Current.CancellationToken);
         await runtime.DisposeAsync();
     }
 
@@ -112,7 +114,7 @@ public sealed class MqttBrokerServiceTests
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
 
-        await service.StopAsync( TestContext.Current.CancellationToken);
+        await service.StopAsync(TestContext.Current.CancellationToken);
 
         Assert.Null(runtime.Server);
         Assert.Null(runtime.StartedAt);
@@ -128,12 +130,12 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "127.0.0.1",
                 Port = MqttTestPort.Get()
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
-        await service.StartAsync( TestContext.Current.CancellationToken);
+        await service.StartAsync(TestContext.Current.CancellationToken);
 
-        await service.StopAsync( TestContext.Current.CancellationToken);
+        await service.StopAsync(TestContext.Current.CancellationToken);
 
         Assert.Null(runtime.Server);
         Assert.Null(runtime.StartedAt);
@@ -149,14 +151,14 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "127.0.0.1",
                 Port = MqttTestPort.Get()
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
 
-        await service.RestartAsync( TestContext.Current.CancellationToken);
+        await service.RestartAsync(TestContext.Current.CancellationToken);
 
         Assert.True(runtime.Server!.IsStarted);
-        await service.StopAsync( TestContext.Current.CancellationToken);
+        await service.StopAsync(TestContext.Current.CancellationToken);
         await runtime.DisposeAsync();
     }
 
@@ -168,7 +170,7 @@ public sealed class MqttBrokerServiceTests
         MqttBrokerService service = new(repository, runtime);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
-            () => service.RestartAsync( TestContext.Current.CancellationToken));
+            () => service.RestartAsync(TestContext.Current.CancellationToken));
 
         Assert.Null(runtime.Server);
         await runtime.DisposeAsync();
@@ -183,12 +185,12 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "0.0.0.0",
                 Port = 1883
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
 
         BrokerStatusResponse result = await service.GetStatusAsync(
-             TestContext.Current.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         Assert.False(result.IsRunning);
         Assert.Equal(1883, result.Port);
@@ -207,20 +209,20 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "127.0.0.1",
                 Port = port
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
-        await service.StartAsync( TestContext.Current.CancellationToken);
+        await service.StartAsync(TestContext.Current.CancellationToken);
         MqttClient client = await ConnectClientAsync(port);
 
         BrokerStatusResponse result = await service.GetStatusAsync(
-             TestContext.Current.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         Assert.True(result.IsRunning);
         Assert.Equal(1, result.ConnectedClientsCount);
         await client.DisconnectAsync(new(), TestContext.Current.CancellationToken);
         client.Dispose();
-        await service.StopAsync( TestContext.Current.CancellationToken);
+        await service.StopAsync(TestContext.Current.CancellationToken);
         await runtime.DisposeAsync();
     }
 
@@ -232,7 +234,7 @@ public sealed class MqttBrokerServiceTests
         MqttBrokerService service = new(repository, runtime);
 
         IReadOnlyList<MqttClientResponse> clients =
-            await service.GetClientsAsync( TestContext.Current.CancellationToken);
+            await service.GetClientsAsync(TestContext.Current.CancellationToken);
 
         Assert.Empty(clients);
         await runtime.DisposeAsync();
@@ -248,19 +250,19 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "127.0.0.1",
                 Port = port
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
-        await service.StartAsync( TestContext.Current.CancellationToken);
+        await service.StartAsync(TestContext.Current.CancellationToken);
         MqttClient client = await ConnectClientAsync(port);
 
         IReadOnlyList<MqttClientResponse> clients =
-            await service.GetClientsAsync( TestContext.Current.CancellationToken);
+            await service.GetClientsAsync(TestContext.Current.CancellationToken);
 
         Assert.NotEmpty(clients);
         await client.DisconnectAsync(new(), TestContext.Current.CancellationToken);
         client.Dispose();
-        await service.StopAsync( TestContext.Current.CancellationToken);
+        await service.StopAsync(TestContext.Current.CancellationToken);
         await runtime.DisposeAsync();
     }
 
@@ -273,7 +275,7 @@ public sealed class MqttBrokerServiceTests
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => service.PublishAsync(
-                "test/topic", [1, 2, 3],  TestContext.Current.CancellationToken));
+                "test/topic", [1, 2, 3], TestContext.Current.CancellationToken));
 
         await runtime.DisposeAsync();
     }
@@ -286,7 +288,7 @@ public sealed class MqttBrokerServiceTests
         MqttBrokerService service = new(repository, runtime);
 
         await Assert.ThrowsAsync<ArgumentException>(
-            () => service.PublishAsync(" ", [],  TestContext.Current.CancellationToken));
+            () => service.PublishAsync(" ", [], TestContext.Current.CancellationToken));
 
         await runtime.DisposeAsync();
     }
@@ -301,10 +303,10 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "127.0.0.1",
                 Port = port
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
-        await service.StartAsync( TestContext.Current.CancellationToken);
+        await service.StartAsync(TestContext.Current.CancellationToken);
         MqttClient client = await ConnectClientAsync(port);
         TaskCompletionSource<string> received = new(
             TaskCreationOptions.RunContinuationsAsynchronously);
@@ -312,17 +314,20 @@ public sealed class MqttBrokerServiceTests
         {
             string payload = args.ApplicationMessage.Payload.Length == 0
                 ? string.Empty
-                : System.Text.Encoding.UTF8.GetString(
+                : Encoding.UTF8.GetString(
                     args.ApplicationMessage.Payload);
             received.TrySetResult(payload);
             return Task.CompletedTask;
         };
-        await client.SubscribeAsync("test/topic", MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce, TestContext.Current.CancellationToken);
+        await client.SubscribeAsync(
+            "test/topic",
+            MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce,
+            TestContext.Current.CancellationToken);
 
         await service.PublishAsync(
             "test/topic",
-            System.Text.Encoding.UTF8.GetBytes("hello"),
-             TestContext.Current.CancellationToken);
+            Encoding.UTF8.GetBytes("hello"),
+            TestContext.Current.CancellationToken);
 
         string result = await received.Task.WaitAsync(
             TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
@@ -343,17 +348,19 @@ public sealed class MqttBrokerServiceTests
             {
                 BindAddress = "127.0.0.1",
                 Port = port
-            },  TestContext.Current.CancellationToken);
+            }, TestContext.Current.CancellationToken);
         MqttBrokerRuntime runtime = new();
         MqttBrokerService service = new(repository, runtime);
-        await service.StartAsync( TestContext.Current.CancellationToken);
+        await service.StartAsync(TestContext.Current.CancellationToken);
         MqttClient client = await ConnectClientAsync(port);
         Task<MqttTopicMessageResponse> messageTask =
             ReadFirstMessageAsync(service);
-        await client.PublishAsync(new MqttApplicationMessageBuilder()
+        await client.PublishAsync(
+            new MqttApplicationMessageBuilder()
                 .WithTopic("telemetry/power")
                 .WithPayload("42")
-                .Build(), TestContext.Current.CancellationToken);
+                .Build(),
+            TestContext.Current.CancellationToken);
 
         MqttTopicMessageResponse message = await messageTask.WaitAsync(
             TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
@@ -362,7 +369,7 @@ public sealed class MqttBrokerServiceTests
         Assert.Equal(client.Options.ClientId, message.ClientId);
         await client.DisconnectAsync(new(), TestContext.Current.CancellationToken);
         client.Dispose();
-        await service.StopAsync( TestContext.Current.CancellationToken);
+        await service.StopAsync(TestContext.Current.CancellationToken);
         await runtime.DisposeAsync();
     }
 
@@ -404,7 +411,8 @@ public sealed class MqttBrokerServiceTests
         ReadFirstMessageAsync(MqttBrokerService service)
     {
         await foreach (MqttTopicMessageResponse message in
-            service.WatchMessagesAsync( TestContext.Current.CancellationToken))
+            service.WatchMessagesAsync(
+                TestContext.Current.CancellationToken))
         {
             return message;
         }
