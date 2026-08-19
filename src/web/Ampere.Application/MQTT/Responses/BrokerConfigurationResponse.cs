@@ -10,4 +10,9 @@ public sealed record BrokerConfigurationResponse(
     bool StartOnBoot,
     bool UseTls,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt)
+    
+{
+    public MQTT.Results.BrokerConfigurationResult ToResult()
+        => new (Id, BindAddress, Port, StartOnBoot, UseTls, CreatedAt, UpdatedAt);
+}

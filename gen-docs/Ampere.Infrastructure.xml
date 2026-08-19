@@ -1,0 +1,554 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Ampere.Infrastructure</name>
+    </assembly>
+    <members>
+        <member name="T:Ampere.Infrastructure.Common.Repository.Repository`1">
+            <summary>
+            Provides EF Core persistence operations.
+            </summary>
+            <typeparam name="TEntity">The entity type.</typeparam>
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.#ctor(Ampere.Infrastructure.Persistence.AmpereDbContext)">
+            <summary>
+            Provides EF Core persistence operations.
+            </summary>
+            <typeparam name="TEntity">The entity type.</typeparam>
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.GetByIdAsync(System.String,System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[],System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.GetTrackedByIdAsync(System.String,System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[],System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.FirstOrDefaultAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[],System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.ListAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,System.Object}}[],System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.ExistsAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.AddAsync(`0,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.Update(`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.Remove(`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.Repository.Repository`1.RemoveRange(System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Infrastructure.Common.UnitOfWork.UnitOfWork">
+            <summary>
+            Coordinates EF Core persistence transactions.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.UnitOfWork.UnitOfWork.#ctor(Ampere.Infrastructure.Persistence.AmpereDbContext)">
+            <summary>
+            Coordinates EF Core persistence transactions.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.UnitOfWork.UnitOfWork.SaveChangesAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.UnitOfWork.UnitOfWork.BeginTransactionAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.UnitOfWork.UnitOfWork.CommitTransactionAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.UnitOfWork.UnitOfWork.RollbackTransactionAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Common.UnitOfWork.UnitOfWork.DisposeAsync">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Infrastructure.Identity.Models.Role">
+            <summary>
+            Represents an Ampere application role.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Models.Role.#ctor(System.String)">
+            <summary>
+            Represents an Ampere application role.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.Role.IsDeleted">
+            <summary>
+            Gets or sets whether the role is deleted.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.Role.DeletedAt">
+            <summary>
+            Gets or sets the deletion timestamp.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.Role.CreatedAt">
+            <summary>
+            Gets or sets the creation timestamp.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.Role.CreatedBy">
+            <summary>
+            Gets or sets the creator identifier.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.Role.UpdatedAt">
+            <summary>
+            Gets or sets the last update timestamp.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.Role.UpdatedBy">
+            <summary>
+            Gets or sets the last updater identifier.
+            </summary>
+        </member>
+        <member name="T:Ampere.Infrastructure.Identity.Models.User">
+            <summary>
+            Represents an Ampere application user.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Models.User.#ctor(System.String)">
+            <summary>
+            Represents an Ampere application user.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.DisplayName">
+            <summary>
+            Gets or sets the display name.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.FirstName">
+            <summary>
+            Gets or sets the first name.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.SurName">
+            <summary>
+            Gets or sets the surname.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.IsDeleted">
+            <summary>
+            Gets or sets whether the user is deleted.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.DeletedAt">
+            <summary>
+            Gets or sets the deletion timestamp.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.CreatedAt">
+            <summary>
+            Gets or sets the creation timestamp.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.CreatedBy">
+            <summary>
+            Gets or sets the creator identifier.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.UpdatedAt">
+            <summary>
+            Gets or sets the last update timestamp.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.UpdatedBy">
+            <summary>
+            Gets or sets the last updater identifier.
+            </summary>
+        </member>
+        <member name="T:Ampere.Infrastructure.Identity.Options.JwtOptions">
+            <summary>Defines configuration options used by the application JWT implementation.</summary>
+        </member>
+        <member name="F:Ampere.Infrastructure.Identity.Options.JwtOptions.SectionName">
+            <summary>Gets the configuration section name containing these options.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Options.JwtOptions.Key">
+            <summary>Gets or sets the secret key used to sign JWTs.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Options.JwtOptions.Issuer">
+            <summary>Gets or sets the JWT issuer.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Options.JwtOptions.Audience">
+            <summary>Gets or sets the JWT audience.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Options.JwtOptions.AccessTokenLifetime">
+            <summary>Gets or sets the lifetime of an access token.</summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Options.JwtOptions.RefreshTokenLifetime">
+            <summary>Gets or sets the lifetime of a refresh token.</summary>
+        </member>
+        <member name="T:Ampere.Infrastructure.Identity.Services.IdentityService">
+            <summary>
+            Provides identity operations for users, authentication, account recovery, and two-factor authentication.
+            </summary>
+            <param name="userManager">The user manager used to manage application users.</param>
+            <param name="roleManager">The role manager used to manage application roles.</param>
+            <param name="signInManager">The sign-in manager used to validate user passwords and lockout state.</param>
+            <param name="tokenService">The service used to create and validate JWT tokens.</param>
+            <param name="revokedTokenStore">The store used to track revoked tokens.</param>
+            <param name="emailSender">The service used to send identity-related email messages.</param>
+            <param name="logger">The logger used to record operational identity events.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.#ctor(Microsoft.AspNetCore.Identity.UserManager{Ampere.Infrastructure.Identity.Models.User},Microsoft.AspNetCore.Identity.RoleManager{Ampere.Infrastructure.Identity.Models.Role},Microsoft.AspNetCore.Identity.SignInManager{Ampere.Infrastructure.Identity.Models.User},Ampere.Application.Identity.Abstractions.IJwtTokenService,Ampere.Application.Identity.Abstractions.IRevokedTokenStore,Ampere.Application.Identity.Abstractions.IIdentityEmailSender)">
+            <summary>
+            Provides identity operations for users, authentication, account recovery, and two-factor authentication.
+            </summary>
+            <param name="userManager">The user manager used to manage application users.</param>
+            <param name="roleManager">The role manager used to manage application roles.</param>
+            <param name="signInManager">The sign-in manager used to validate user passwords and lockout state.</param>
+            <param name="tokenService">The service used to create and validate JWT tokens.</param>
+            <param name="revokedTokenStore">The store used to track revoked tokens.</param>
+            <param name="emailSender">The service used to send identity-related email messages.</param>
+            <param name="logger">The logger used to record operational identity events.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.RegisterAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Registers a new user and sends an email confirmation link.
+            </summary>
+            <param name="email">The email address of the user.</param>
+            <param name="password">The password to assign to the user.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The result of the registration operation.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.LoginAsync(System.String,System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Authenticates a user and issues JWT access and refresh tokens when all required authentication factors are valid.
+            </summary>
+            <param name="email">The user's email address.</param>
+            <param name="password">The user's password.</param>
+            <param name="twoFactorCode">The authenticator application code, when two-factor authentication is enabled.</param>
+            <param name="twoFactorRecoveryCode">The recovery code, when two-factor authentication is enabled and a recovery code is used.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The issued tokens, or <see langword="null"/> when authentication fails.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.RefreshAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Exchanges a valid refresh token for a new access and refresh token pair and revokes the previous refresh token.
+            </summary>
+            <param name="refreshToken">The refresh token to exchange.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The new token pair, or <see langword="null"/> when the refresh token is invalid.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.RevokeAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Revokes a valid access token until its natural expiration.
+            </summary>
+            <param name="accessToken">The access token to revoke.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns><see langword="true"/> when the token was revoked; otherwise, <see langword="false"/>.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.ConfirmEmailAsync(System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Confirms a user's email address or confirms a changed email address using a supplied Identity token.
+            </summary>
+            <param name="userId">The identifier of the user.</param>
+            <param name="code">The confirmation token.</param>
+            <param name="changedEmail">The new email address when confirming an email change; otherwise <see langword="null"/>.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns><see langword="true"/> when confirmation succeeds; otherwise, <see langword="false"/>.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.ResendConfirmationEmailAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Resends an email confirmation link when the specified user exists and remains unconfirmed.
+            </summary>
+            <param name="email">The email address of the user.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The result of the resend operation.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.ForgotPasswordAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Starts a password recovery operation for a user with a password.
+            </summary>
+            <param name="email">The email address of the user.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>A successful result whether or not a matching password-bearing user exists.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.ResetPasswordAsync(System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Resets a user's password using a valid password-reset token.
+            </summary>
+            <param name="email">The email address of the user.</param>
+            <param name="resetCode">The password-reset token.</param>
+            <param name="newPassword">The new password.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The result of the password reset operation.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.GetInfoAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets basic identity information for a user.
+            </summary>
+            <param name="userId">The identifier of the user.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The user's identity information, or <see langword="null"/> when the user does not exist.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.UpdateInfoAsync(System.String,System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Updates a user's email address and password after validating the current password.
+            </summary>
+            <param name="userId">The identifier of the user.</param>
+            <param name="newEmail">The new email address, or <see langword="null"/> to leave it unchanged.</param>
+            <param name="newPassword">The new password, or <see langword="null"/> to leave it unchanged.</param>
+            <param name="oldPassword">The current password.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The result of the update operation.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.IdentityService.ConfigureTwoFactorAsync(System.String,System.Nullable{System.Boolean},System.String,System.Boolean,System.Boolean,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Configures authenticator-based two-factor authentication and optionally rotates its recovery material.
+            </summary>
+            <param name="userId">The identifier of the user.</param>
+            <param name="enable">Whether to enable or disable two-factor authentication.</param>
+            <param name="twoFactorCode">The authenticator code used to validate enabling two-factor authentication.</param>
+            <param name="resetRecoveryCodes">Whether new recovery codes should be generated.</param>
+            <param name="resetSharedKey">Whether the authenticator shared key should be regenerated.</param>
+            <param name="forgetMachine">Whether the current machine should be forgotten; reserved for parity with the Identity API contract.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The current two-factor configuration, or <see langword="null"/> when the user does not exist or an enable operation fails.</returns>
+        </member>
+        <member name="T:Ampere.Infrastructure.Identity.Services.LoggingIdentityEmailSender">
+            <summary>
+            Logs identity email messages instead of delivering them through an external email provider.
+            </summary>
+            <param name="logger">The logger used to record email messages.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.LoggingIdentityEmailSender.#ctor(Microsoft.Extensions.Logging.ILogger{Ampere.Infrastructure.Identity.Services.LoggingIdentityEmailSender})">
+            <summary>
+            Logs identity email messages instead of delivering them through an external email provider.
+            </summary>
+            <param name="logger">The logger used to record email messages.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.LoggingIdentityEmailSender.SendConfirmationAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Logs an email confirmation message.
+            </summary>
+            <param name="email">The recipient email address.</param>
+            <param name="confirmationLink">The confirmation link.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>A completed task.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.LoggingIdentityEmailSender.SendPasswordResetAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Logs a password reset message.
+            </summary>
+            <param name="email">The recipient email address.</param>
+            <param name="resetLink">The password reset link.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>A completed task.</returns>
+        </member>
+        <member name="T:Ampere.Infrastructure.Identity.Services.JwtTokenService">
+            <summary>Creates and validates signed JWT access and refresh tokens.</summary>
+            <param name="options">The configured JWT options.</param>
+            <param name="revokedTokens">The store used to reject revoked tokens.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.JwtTokenService.#ctor(Microsoft.Extensions.Options.IOptions{Ampere.Infrastructure.Identity.Options.JwtOptions},Ampere.Application.Identity.Abstractions.IRevokedTokenStore)">
+            <summary>Creates and validates signed JWT access and refresh tokens.</summary>
+            <param name="options">The configured JWT options.</param>
+            <param name="revokedTokens">The store used to reject revoked tokens.</param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.JwtTokenService.CreateTokens(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.JwtTokenService.ValidateToken(System.String,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.JwtTokenService.GetTokenId(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.JwtTokenService.GetExpiration(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Infrastructure.Identity.Services.RevokedTokenStore">
+            <summary>Stores revoked token identifiers in process until their natural expiration.</summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.RevokedTokenStore.IsRevoked(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Identity.Services.RevokedTokenStore.Revoke(System.String,System.DateTimeOffset)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Infrastructure.MQTT.Models.MqttBrokerConfigurationEntity">
+            <summary>
+            Stores the persisted MQTT broker settings.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.MQTT.Models.MqttBrokerConfigurationEntity.BindAddress">
+            <summary>
+            Gets or sets the broker bind address.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.MQTT.Models.MqttBrokerConfigurationEntity.Port">
+            <summary>
+            Gets or sets the broker port.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.MQTT.Models.MqttBrokerConfigurationEntity.StartOnBoot">
+            <summary>
+            Gets or sets whether the broker starts on boot.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.MQTT.Models.MqttBrokerConfigurationEntity.UseTls">
+            <summary>
+            Gets or sets whether TLS is enabled.
+            </summary>
+        </member>
+        <member name="T:Ampere.Infrastructure.MQTT.Services.MqttBrokerService">
+            <summary>
+            Concrete implementation of the broker service using
+            MQTTnet. This type remains in Infrastructure and does
+            not leak MQTTnet types to Application.
+            </summary>
+            <remarks>Constructs the broker service.</remarks>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.#ctor(System.IServiceProvider,Ampere.Infrastructure.Persistence.AmpereDbContext)">
+            <summary>
+            Concrete implementation of the broker service using
+            MQTTnet. This type remains in Infrastructure and does
+            not leak MQTTnet types to Application.
+            </summary>
+            <remarks>Constructs the broker service.</remarks>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.StartAsync(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.StopAsync(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.RestartAsync(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.GetStatusAsync(System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.PublishAsync(System.String,System.Byte[],System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttBrokerService.DisposeAsync">
+            <inheritdoc/>
+        </member>
+        <member name="T:Ampere.Infrastructure.MQTT.Services.MqttConfigurationService">
+            <summary>
+            Persists and retrieves MQTT broker configuration using
+            the application database.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.MQTT.Services.MqttConfigurationService.#ctor(Ampere.Infrastructure.Persistence.AmpereDbContext)">
+            <summary>
+            Persists and retrieves MQTT broker configuration using
+            the application database.
+            </summary>
+        </member>
+        <member name="T:Ampere.Infrastructure.Persistence.AmpereDbContext">
+            <summary>
+            Represents the Ampere database context.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.AmpereDbContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{Ampere.Infrastructure.Persistence.AmpereDbContext})">
+            <summary>
+            Represents the Ampere database context.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.AmpereDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.AmpereDbContext.SaveChanges(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.AmpereDbContext.SaveChanges">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.AmpereDbContext.SaveChangesAsync(System.Boolean,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.AmpereDbContext.SaveChangesAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:Ampere.Infrastructure.Persistence.AmpereDbContext.MqttBrokerConfigurations">
+            <summary>
+            Gets persisted MQTT broker configurations.
+            </summary>
+        </member>
+        <member name="T:Ampere.Infrastructure.Persistence.Configurations.MqttBrokerConfigurationConfiguration">
+            <summary>
+            Configures the MQTT broker settings entity.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Configurations.MqttBrokerConfigurationConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{Ampere.Infrastructure.MQTT.Models.MqttBrokerConfigurationEntity})">
+            <summary>
+            Configures the MQTT broker entity.
+            </summary>
+            <param name="builder">
+            The entity type builder.
+            </param>
+        </member>
+        <member name="T:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1">
+            <summary>
+            Executes marked requests in a database transaction.
+            </summary>
+            <typeparam name="TContext">
+            The Mediator pipeline context type.
+            </typeparam>
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.#ctor(Ampere.Application.Common.Abstractions.IUnitOfWork)">
+            <summary>
+            Executes marked requests in a database transaction.
+            </summary>
+            <typeparam name="TContext">
+            The Mediator pipeline context type.
+            </typeparam>
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.ShouldExecute(`0,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.BeforeExecute(`0,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.Execute(`0,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.AfterExecute(`0,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddleware`1.OnException(System.Exception,`0)">
+            <inheritdoc />
+        </member>
+        <member name="T:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddlewareExtensions">
+            <summary>
+            Configures transactional Mediator pipelines.
+            </summary>
+        </member>
+        <member name="M:Ampere.Infrastructure.Persistence.Middlewares.TransactionMiddlewareExtensions.UseTransaction``1(Mediator.Net.Pipeline.IPipeConfigurator{``0})">
+            <summary>
+            Adds the transaction middleware.
+            </summary>
+            <typeparam name="TContext">
+            The Mediator pipeline context type.
+            </typeparam>
+            <param name="configurator">
+            The pipeline configurator.
+            </param>
+        </member>
+        <member name="M:Ampere.Infrastructure.Setup.Services.SystemSetupService.GetSetupStatusAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets whether initial system setup is required or has already been completed.
+            </summary>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The current setup status.</returns>
+        </member>
+        <member name="M:Ampere.Infrastructure.Setup.Services.SystemSetupService.InitializeSetupAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Creates the initial administrator account when system setup has not yet been completed.
+            </summary>
+            <param name="email">The administrator email address.</param>
+            <param name="password">The administrator password.</param>
+            <param name="cancellationToken">The token used to cancel the operation.</param>
+            <returns>The result of the setup operation.</returns>
+        </member>
+    </members>
+</doc>

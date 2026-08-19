@@ -13,6 +13,6 @@ public sealed class StartBrokerCommandHandler(IMqttBrokerService brokerService) 
     {
         await brokerService.StartAsync(cancellationToken);
         var status = await brokerService.GetStatusAsync(cancellationToken);
-        return Ampere.Application.Common.Responses.Response.Success(status);
+        return Application.Common.Responses.Response.Success(status);
     }
 }

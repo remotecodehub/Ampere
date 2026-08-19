@@ -19,16 +19,17 @@ using FluentValidation;
 using Mediator.Net;
 using Mediator.Net.MicrosoftDependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MudBlazor.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 
 namespace Ampere.Composition.Extensions;
 
@@ -49,7 +50,7 @@ public static class WebApplicationBuilderExtensions
         /// A task representing application startup.
         /// </returns>
         public async Task RunAmpereAsync<TProgram, TApp>() where TProgram : class
-            where TApp : Microsoft.AspNetCore.Components.IComponent
+            where TApp : IComponent
         {
             if (builder.Environment.IsDevelopment()
                 && Environment.GetEnvironmentVariable(
@@ -210,10 +211,6 @@ public static class WebApplicationBuilderExtensions
             mediatorBuilder
                 .RegisterHandlers(
                     typeof(IdentityHandlers).Assembly)
-                .RegisterHandlers(
-                    typeof(
-                        Ampere.Application.MQTT.Handlers
-                            .MqttHandlers).Assembly)
                 .ConfigureCommandReceivePipe(pipe =>
                 {
                     pipe.UseValidation();

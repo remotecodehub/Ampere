@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Ampere</name>
+    </assembly>
+    <members>
+        <member name="T:Ampere.Composition.Extensions.WebApplicationBuilderExtensions">
+            <summary>
+            Adds application services to the web host.
+            </summary>
+        </member>
+        <member name="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.RunAmpereAsync``1(Microsoft.AspNetCore.Builder.WebApplicationBuilder)">
+            <inheritdoc cref="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.&lt;G&gt;$41F16C2D39AF52899E745C9C9F42FF83.RunAmpereAsync``1"/>
+        </member>
+        <member name="M:Ampere.Composition.Extensions.WebApplicationBuilderExtensions.&lt;G&gt;$41F16C2D39AF52899E745C9C9F42FF83.RunAmpereAsync``1">
+            <summary>
+            Runs the Ampere web application.
+            </summary>
+            <typeparam name="T">
+            The App.razor component type.
+            </typeparam>
+            <returns>
+            A task representing application startup.
+            </returns>
+        </member>
+        <member name="T:Ampere.Controllers.v1.IdentityController">
+            <summary>Exposes HTTP endpoints for registration, authentication, account management, and two-factor authentication.</summary>
+            <param name="mediator">The mediator used to dispatch application requests.</param>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.#ctor(Mediator.Net.IMediator)">
+            <summary>Exposes HTTP endpoints for registration, authentication, account management, and two-factor authentication.</summary>
+            <param name="mediator">The mediator used to dispatch application requests.</param>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.Register(Ampere.Application.Identity.Requests.RegisterRequest,System.Threading.CancellationToken)">
+            <summary>Registers a new user.</summary>
+            <param name="request">The registration payload.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response representing the registration result.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.Login(Ampere.Application.Identity.Requests.LoginRequest,System.Threading.CancellationToken)">
+            <summary>Authenticates a user with a password and optional second factor.</summary>
+            <param name="request">The login payload.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response containing tokens when authentication succeeds.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.Refresh(Ampere.Application.Identity.Requests.RefreshRequest,System.Threading.CancellationToken)">
+            <summary>Exchanges a refresh token for a new token pair.</summary>
+            <param name="request">The refresh-token payload.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response containing the refreshed tokens.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.Revoke(System.Threading.CancellationToken)">
+            <summary>Revokes the access token supplied by the authenticated caller.</summary>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response indicating whether revocation succeeded.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.ConfirmEmail(System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>Confirms a user's email address.</summary>
+            <param name="userId">The user identifier from the confirmation link.</param>
+            <param name="code">The confirmation token.</param>
+            <param name="changedEmail">The replacement email address when confirming an email change.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response indicating whether confirmation succeeded.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.ResendConfirmationEmail(Ampere.Application.Identity.Requests.EmailRequest,System.Threading.CancellationToken)">
+            <summary>Resends a user's email confirmation link.</summary>
+            <param name="request">The email payload.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response representing the resend result.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.ForgotPassword(Ampere.Application.Identity.Requests.EmailRequest,System.Threading.CancellationToken)">
+            <summary>Starts password recovery for an email address.</summary>
+            <param name="request">The email payload.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response representing the recovery result.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.ResetPassword(Ampere.Application.Identity.Requests.ResetPasswordRequest,System.Threading.CancellationToken)">
+            <summary>Resets a user's password using a reset token.</summary>
+            <param name="request">The password reset payload.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response representing the reset result.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.GetInfo(System.Threading.CancellationToken)">
+            <summary>Gets identity information for the authenticated user.</summary>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response containing identity information.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.UpdateInfo(Ampere.Application.Identity.Requests.InfoRequest,System.Threading.CancellationToken)">
+            <summary>Updates identity information for the authenticated user.</summary>
+            <param name="request">The identity update payload.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response representing the update result.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.IdentityController.ConfigureTwoFactor(Ampere.Application.Identity.Requests.TwoFactorRequest,System.Threading.CancellationToken)">
+            <summary>Configures authenticator-based two-factor authentication for the authenticated user.</summary>
+            <param name="request">The two-factor configuration payload.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response containing the resulting two-factor configuration.</returns>
+        </member>
+        <member name="T:Ampere.Controllers.v1.MqttController">
+            <summary>
+            Exposes REST endpoints to manage the local MQTT broker.
+            Thin controller: delegates to mediator requests and
+            does not contain business logic.
+            </summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.MqttController.#ctor(Mediator.Net.IMediator)">
+            <summary>
+            Exposes REST endpoints to manage the local MQTT broker.
+            Thin controller: delegates to mediator requests and
+            does not contain business logic.
+            </summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.MqttController.GetStatus(System.Threading.CancellationToken)">
+            <summary>Gets the current broker status.</summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The broker status.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.MqttController.GetConfiguration(System.Threading.CancellationToken)">
+            <summary>Gets the persisted broker configuration.</summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The stored configuration when present.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.MqttController.Configure(Ampere.Application.MQTT.Requests.ConfigureBrokerRequest,System.Threading.CancellationToken)">
+            <summary>Persists and applies broker configuration.</summary>
+            <param name="request">Configuration payload.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The stored configuration.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.MqttController.Start(System.Threading.CancellationToken)">
+            <summary>Starts the broker.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.MqttController.Stop(System.Threading.CancellationToken)">
+            <summary>Stops the broker.</summary>
+        </member>
+        <member name="M:Ampere.Controllers.v1.MqttController.Publish(Ampere.Application.MQTT.Requests.PublishMessageRequest,System.Threading.CancellationToken)">
+            <summary>Publishes a message to a topic.</summary>
+            <param name="request">Publish payload.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="T:Ampere.Controllers.v1.SetupController">
+            <summary>Exposes anonymous endpoints used during first-time application setup.</summary>
+            <param name="mediator">The mediator used to dispatch setup requests.</param>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SetupController.#ctor(Mediator.Net.IMediator)">
+            <summary>Exposes anonymous endpoints used during first-time application setup.</summary>
+            <param name="mediator">The mediator used to dispatch setup requests.</param>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SetupController.GetStatus(System.Threading.CancellationToken)">
+            <summary>Gets the current first-time setup status.</summary>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>The current setup status.</returns>
+        </member>
+        <member name="M:Ampere.Controllers.v1.SetupController.Initialize(Ampere.Application.Setup.Requests.InitializeSetupRequest,System.Threading.CancellationToken)">
+            <summary>Initializes the application with its first administrator account.</summary>
+            <param name="request">The initial administrator credentials.</param>
+            <param name="cancellationToken">The token used to cancel the request.</param>
+            <returns>An HTTP response indicating whether initialization succeeded.</returns>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type)">
+            <summary>
+            Generates a documentation comment ID for a type.
+            Example: T:Namespace.Outer+Inner`1 becomes T:Namespace.Outer.Inner`1
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.PropertyInfo)">
+            <summary>
+            Generates a documentation comment ID for a property.
+            Example: P:Namespace.ContainingType.PropertyName or for an indexer P:Namespace.ContainingType.Item(System.Int32)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type,System.String)">
+            <summary>
+            Generates a documentation comment ID for a property given its container type and property name.
+            Example: P:Namespace.ContainingType.PropertyName
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.MethodInfo)">
+            <summary>
+            Generates a documentation comment ID for a method (or constructor).
+            For example:
+              M:Namespace.ContainingType.MethodName(ParamType1,ParamType2)~ReturnType
+              M:Namespace.ContainingType.#ctor(ParamType)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.GetTypeDocId(System.Type,System.Boolean,System.Boolean)">
+            <summary>
+            Generates a documentation ID string for a type.
+            This method handles nested types (replacing '+' with '.'),
+            generic types, arrays, pointers, by-ref types, and generic parameters.
+            The <paramref name="includeGenericArguments"/> flag controls whether
+            constructed generic type arguments are emitted, while <paramref name="omitGenericArity"/>
+            controls whether the generic arity marker (e.g. "`1") is appended.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.NormalizeDocId(System.String)">
+            <summary>
+            Normalizes a documentation comment ID to match the compiler-style format.
+            Strips the return type suffix for ordinary methods but retains it for conversion operators.
+            </summary>
+            <param name="docId">The documentation comment ID to normalize.</param>
+            <returns>The normalized documentation comment ID.</returns>
+        </member>
+    </members>
+</doc>

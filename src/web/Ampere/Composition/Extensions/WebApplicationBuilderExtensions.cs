@@ -206,10 +206,6 @@ public static class WebApplicationBuilderExtensions
             mediatorBuilder
                 .RegisterHandlers(
                     typeof(IdentityHandlers).Assembly)
-                .RegisterHandlers(
-                    typeof(
-                        Ampere.Application.MQTT.Handlers
-                            .MqttHandlers).Assembly)
                 .ConfigureCommandReceivePipe(pipe =>
                 {
                     pipe.UseValidation();
