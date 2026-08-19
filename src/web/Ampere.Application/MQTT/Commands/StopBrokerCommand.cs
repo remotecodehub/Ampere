@@ -1,6 +1,8 @@
-using Mediator.Net.Contracts;
+using Ampere.Application.Common.Abstractions;
+using Ampere.Application.MQTT.Responses;
 
 namespace Ampere.Application.MQTT.Commands;
 
-/// <summary>Command to stop the broker.</summary>
-public sealed record StopBrokerCommand() : IRequest;
+/// <summary>Stops the MQTT broker.</summary>
+public sealed record StopBrokerCommand
+    : ITransactionalRequest<BrokerStatusResponse>;
