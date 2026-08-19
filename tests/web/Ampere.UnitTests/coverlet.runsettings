@@ -7,12 +7,22 @@
         <Configuration>
           <Format>cobertura</Format>
           <Include>
-            [Ampere.Application]Ampere.Application.MQTT.*;
-            [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.*;
-            [Ampere.Infrastructure]Ampere.Infrastructure.Identity.*
+            [Ampere]Ampere.*;
+            [Ampere.Application]Ampere.Application.*;
+            [Ampere.Domain]Ampere.Domain.*;
+            [Ampere.Infrastructure]Ampere.Infrastructure.*;
+            [Ampere.Composition]Ampere.Composition.*
           </Include>
+          <Exclude>
+            [Ampere]Microsoft.AspNetCore.OpenApi.Generated.*;
+            [Ampere]Microsoft.AspNetCore.Components.Web.*.g__*;
+            [Ampere]Microsoft.AspNetCore.Routing.*.g__*;
+            [Ampere]Microsoft.Extensions.*.g__*;
+            [Ampere]System.*
+          </Exclude>
           <ExcludeByAttribute>
             CompilerGeneratedAttribute;
+            GeneratedCodeAttribute;
             ExcludeFromCodeCoverageAttribute
           </ExcludeByAttribute>
         </Configuration>
