@@ -32,6 +32,27 @@ public sealed class DomainModelTests
     }
 
     [Fact]
+    public void House_AddDevice_RejectsDuplicateNode()
+    {
+        House house = new("Home");
+        house.AddDevice("node-01", "mac-01");
+
+        Assert.Throws<InvalidOperationException>(
+            () => house.AddDevice(
+                "NODE-01",
+                "mac-02"));
+    }
+
+    [Fact]
+    public void Sonoff_RejectsMissingIdentity()
+    {
+        Assert.Throws<ArgumentException>(
+            () => new SonoffDevice("", "mac"));
+        Assert.Throws<ArgumentException>(
+            () => new SonoffDevice("node", ""));
+    }
+
+    [Fact]
     public void Room_AddEndpoint_AssignsSonoffAndKind()
     {
         Room room = new("Kitchen");
