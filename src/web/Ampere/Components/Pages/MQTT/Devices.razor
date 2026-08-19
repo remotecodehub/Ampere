@@ -23,7 +23,8 @@
                 <MudTh>Connected</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Client ID">
+                <MudTd DataLabel="Client ID"
+                       @onclick="ShowDetailsAsync">
                     @context.ClientId
                 </MudTd>
                 <MudTd DataLabel="User">
@@ -35,8 +36,6 @@
                 <MudTd DataLabel="Connected">
                     @context.ConnectedAt
                 </MudTd>
-                <RowTemplate>
-                </RowTemplate>
             </RowTemplate>
         </MudTable>
     </MudPaper>
