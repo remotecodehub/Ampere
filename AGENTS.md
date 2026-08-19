@@ -9,7 +9,7 @@ by power point.
 The platform has three stages:
 
 1. REST API, Blazor Interactive UI,
-   controllers and MQTT broker support.
+   controllers and SignalR notifications.
 2. .NET MAUI mobile application.
 3. Raspberry Pi OS customization for a
    local installation cloud.
@@ -80,11 +80,13 @@ Use the `Mediator` package by
 `Mediator.Net` is forbidden and must not be
 introduced or retained in source projects.
 
-Use source-generated handlers and pipelines.
+Use source-generated typed requests,
+commands, queries, notifications and streams.
 Use `IRequest<TResponse>` for requests.
 Use `IStreamRequest<TResponse>` for streams.
 Use `IRequestHandler` and
 `IStreamRequestHandler` as appropriate.
+Use `INotification` for application events.
 
 Do not use reflection to discover handlers.
 DI registration must use compile-time known
@@ -114,28 +116,38 @@ analyzer, or avoidable build warnings.
 Never suppress diagnostics just to hide a
 problem.
 
-## MQTT
+## REST and SignalR
 
-MQTTnet integration belongs in Infrastructure.
+REST is the transport for simple App-to-
+Raspberry requests and resource operations.
 
-Use the public strongly typed MQTTnet API.
-Do not inspect MQTTnet assemblies with
-reflection.
-Do not use `dynamic` with MQTTnet.
-Do not resolve MQTTnet types by reflection.
+SignalR is the transport for realtime app
+notifications and live telemetry.
 
-The broker runtime may be singleton state,
-but Services that consume repositories must
-remain compatible with scoped repository and
-DbContext lifetimes.
+SignalR entrypoints remain in Presentation.
+The SignalR service abstraction belongs to
+Application/Common/Abstractions.
+Its implementation belongs to
+Infrastructure/Common/Hubs.
 
-Use a singleton runtime state object when
-long-lived MQTT server state is required.
-The feature Service itself may be scoped and
-may inject `IRepository<TEntity>`.
+Controllers must remain thin and dispatch
+Mediator messages. They must not contain
+business rules or access Infrastructure.
 
-Persist broker configuration so a restart does
-not require reconfiguration.
+SignalR messages use explicit DTOs with the
+`Request` suffix for incoming transport data.
+Command, query, stream and notification
+responses are explicit application contracts.
+
+Do not use `dynamic` or reflection with
+SignalR. Use strongly typed application
+contracts and compile-time DI wiring.
+
+The Raspberry communicates with AmperEsp
+Sonoff devices through the radio boundary.
+Radio transport implementation belongs in
+Infrastructure and must be hidden behind an
+Application abstraction.
 
 ## Blazor and MudBlazor
 
@@ -145,21 +157,15 @@ Business logic belongs in Application.
 Use only MudBlazor components for page UI.
 Do not introduce another component library.
 
-MQTT pages belong under:
-
-`Components/Pages/MQTT`
-
-A page must be developed in this order:
+Pages must be developed in this order:
 
 1. create the Razor page structure;
 2. add the `@code { }` block;
 3. add a local `<style>` block only when
    styling is actually required.
 
-Do not create code-behind files for these
-pages.
-Do not create separate CSS files for these
-pages.
+Do not create code-behind files for pages.
+Do not create separate CSS files for pages.
 
 Styles, when necessary, stay below the
 `@code { }` block.
@@ -179,11 +185,18 @@ non-generic equivalent when no body exists.
 Stream endpoints must consume a
 `IStreamRequest<T>` through Mediator.
 
-## Documentation
+## Domain
 
-Document public and relevant internal APIs
-with XML documentation in en-US.
-Fill all applicable XML documentation fields.
+Domain contains only business concepts and
+rules. It must not reference ASP.NET Core,
+SignalR, EF Core, Mediator or controllers.
+
+Persisted Ampere entities inherit EntityBase
+and model houses, rooms, Sonoff devices,
+endpoints and energy telemetry.
+
+Energy consumption rules must remain in the
+Domain model or domain services.
 
 ## Testing
 
@@ -197,27 +210,40 @@ Feature tests are organized as:
 Common/
     Fixtures/
     Mocks/
+    Stubs/
 Feature_Name/
     UnitTests.cs
 ```
 
-Shared test fixtures and fakes belong under
-`Common`. Feature-specific tests belong under
-the feature directory.
-
 Tests must use explicit local types and the
 same C# rules as production code.
 
-MQTT changes must include unit tests for
-Application and Infrastructure behavior.
+**Every feature implementation must include
+tests for every business rule introduced by
+the feature.**
 
-Coverage is measured with
-`coverlet.collector` and must reach at least
-80% line and branch coverage for the feature
-under test.
+Every feature must achieve at least:
 
-The CI test job must publish the coverage
-summary and enforce the 80% threshold.
+- 80 percent line coverage;
+- 80 percent branch coverage.
+
+The CI test job must publish the TRX test
+summary and coverage summary and enforce the
+80 percent threshold.
+
+## IoT and radio
+
+The Raspberry Pi is the gateway between
+AmperEsp devices and the application.
+
+AmperEsp Sonoff devices communicate with
+the Raspberry through the radio boundary.
+
+Radio protocols, serial ports and HC-12
+specific code belong in Infrastructure or
+`src/iot`, according to the deployment
+boundary. Application and Domain must not
+reference radio libraries.
 
 ## Git
 
