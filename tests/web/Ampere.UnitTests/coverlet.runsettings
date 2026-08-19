@@ -14,17 +14,22 @@
             [Ampere.Composition]Ampere.Composition.*
           </Include>
           <Exclude>
-            [Ampere]Microsoft.AspNetCore.OpenApi.Generated.*;
-            [Ampere]Microsoft.AspNetCore.Components.Web.*.g__*;
-            [Ampere]Microsoft.AspNetCore.Routing.*.g__*;
+            [Ampere]Microsoft.AspNetCore.OpenApi.Generated*;
+            [Ampere]Microsoft.AspNetCore.Components.*.g__*;
             [Ampere]Microsoft.Extensions.*.g__*;
             [Ampere]System.*
           </Exclude>
           <ExcludeByAttribute>
-            CompilerGeneratedAttribute;
             GeneratedCodeAttribute;
             ExcludeFromCodeCoverageAttribute
           </ExcludeByAttribute>
+          <ExcludeByFile>
+            **/*.g.cs;
+            **/*.g.i.cs;
+            **/obj/**/*.cs
+          </ExcludeByFile>
+          <ExcludeAssembliesWithoutSources>MissingAll</ExcludeAssembliesWithoutSources>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
         </Configuration>
       </DataCollector>
     </DataCollectors>
