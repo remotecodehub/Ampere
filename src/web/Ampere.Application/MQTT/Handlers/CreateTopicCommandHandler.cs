@@ -2,7 +2,7 @@ using Ampere.Application.Common.Abstractions;
 using Ampere.Application.Common.Responses;
 using Ampere.Application.MQTT.Commands;
 using Ampere.Application.MQTT.Responses;
-using Ampere.Infrastructure.MQTT.Models;
+using Ampere.Domain.MQTT.Entities;
 using Mediator;
 
 namespace Ampere.Application.MQTT.Handlers;
@@ -10,7 +10,7 @@ namespace Ampere.Application.MQTT.Handlers;
 /// <summary>Creates configured MQTT topics.</summary>
 /// <param name="repository">The topic repository.</param>
 public sealed class CreateTopicCommandHandler(
-    IRepository<MqttTopicEntity> repository)
+    IRepository<MqttTopic> repository)
     : IRequestHandler<CreateTopicCommand,
         Response<MqttTopicResponse>>
 {
@@ -19,7 +19,7 @@ public sealed class CreateTopicCommandHandler(
         CreateTopicCommand request,
         CancellationToken cancellationToken)
     {
-        MqttTopicEntity? existing =
+        MqttTopic? existing =
             await repository.FirstOrDefaultAsync(
                 topic => topic.Name == request.Request.Name,
                 [],
@@ -31,7 +31,7 @@ public sealed class CreateTopicCommandHandler(
                 ["The MQTT topic already exists."]);
         }
 
-        MqttTopicEntity entity = new()
+        MqttTopic entity = new()
         {
             Name = request.Request.Name,
             Description = request.Request.Description
