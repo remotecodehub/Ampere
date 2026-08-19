@@ -153,10 +153,11 @@ the transaction pipeline in Infrastructure.
 
 ## SignalR
 
-SinalR is an Presentation dependency, but the
+SignalR is an Presentation dependency, but the
 service abstraction (Interface) belongs to
 `Application/Common/Abstractions` and its
-implementation goes to `Infrastructure/Common/Hubs/`.
+implementation (injecting hub)goes to `Infrastructure/Common/Hubs/`,
+with sinalR entrypoint remains in Presentation.
 
 Signal configuration is persisted through
 `IRepository<SignalRConfigurationEntity>`.
