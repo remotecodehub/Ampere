@@ -8,8 +8,11 @@
           <Format>cobertura</Format>
           <Include>
             [Ampere.Application]Ampere.Application.MQTT.*;
-            [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.*
+            [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.Services.*
           </Include>
+          <Exclude>
+            [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.Services.MqttBrokerHostedService
+          </Exclude>
           <ExcludeByAttribute>
             CompilerGeneratedAttribute;
             ExcludeFromCodeCoverageAttribute
