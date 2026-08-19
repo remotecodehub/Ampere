@@ -1,0 +1,112 @@
+@page "/mqtt/live"
+@using Ampere.Application.MQTT.Queries
+@using Ampere.Application.MQTT.Responses
+@using Mediator
+@using MudBlazor
+@implements IAsyncDisposable
+@inject IMediator Mediator
+
+<MudStack Spacing="3">
+    <MudText Typo="Typo.h4">
+        MQTT Live View
+    </MudText>
+
+    <MudStack Row="true">
+        <MudButton Variant="Variant.Filled"
+                   Disabled="_running"
+                   OnClick="StartAsync">
+            Start
+        </MudButton>
+        <MudButton Variant="Variant.Outlined"
+                   Disabled="!_running"
+                   OnClick="StopAsync">
+            Stop
+        </MudButton>
+    </MudStack>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudTable Items="_messages" Dense="true">
+            <HeaderContent>
+                <MudTh>Time</MudTh>
+                <MudTh>Topic</MudTh>
+                <MudTh>Client</MudTh>
+                <MudTh>Payload</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Time">
+                    @context.ReceivedAt
+                </MudTd>
+                <MudTd DataLabel="Topic">
+                    @context.Topic
+                </MudTd>
+                <MudTd DataLabel="Client">
+                    @context.ClientId
+                </MudTd>
+                <MudTd DataLabel="Payload">
+                    @context.Payload
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private readonly List<MqttTopicMessageResponse>
+        _messages = [];
+    private CancellationTokenSource? _cts;
+    private bool _running;
+
+    private async Task StartAsync()
+    {
+        if (_running)
+        {
+            return;
+        }
+
+        _cts = new CancellationTokenSource();
+        _running = true;
+
+        try
+        {
+            await foreach (MqttTopicMessageResponse message
+                in Mediator.CreateStream(
+                    new WatchTopicsQuery())
+                    .WithCancellation(_cts.Token))
+            {
+                _messages.Insert(0, message);
+                if (_messages.Count > 100)
+                {
+                    _messages.RemoveAt(_messages.Count - 1);
+                }
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            _running = false;
+        }
+    }
+
+    private async Task StopAsync()
+    {
+        if (_cts is not null)
+        {
+            await _cts.CancelAsync();
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (_cts is not null)
+        {
+            await _cts.CancelAsync();
+            _cts.Dispose();
+            _cts = null;
+        }
+    }
+}
