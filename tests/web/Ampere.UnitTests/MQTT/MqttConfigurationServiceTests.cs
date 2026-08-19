@@ -1,4 +1,5 @@
 using Ampere.Application.MQTT.Requests;
+using Ampere.Application.MQTT.Responses;
 using Ampere.Infrastructure.MQTT.Models;
 using Ampere.Infrastructure.MQTT.Services;
 using Ampere.UnitTests.Common.Mocks;
@@ -16,8 +17,8 @@ public sealed class MqttConfigurationServiceTests
         MqttConfigurationService service =
             new(repository);
 
-        object? result = await service
-            .GetConfigurationAsync(
+        BrokerConfigurationResponse? result =
+            await service.GetConfigurationAsync(
                 CancellationToken.None);
 
         Assert.Null(result);
@@ -36,9 +37,10 @@ public sealed class MqttConfigurationServiceTests
             true,
             false);
 
-        var result = await service.SaveConfigurationAsync(
-            request,
-            CancellationToken.None);
+        BrokerConfigurationResponse result =
+            await service.SaveConfigurationAsync(
+                request,
+                CancellationToken.None);
 
         Assert.Equal("127.0.0.1", result.BindAddress);
         Assert.Equal(1883, result.Port);
@@ -61,13 +63,14 @@ public sealed class MqttConfigurationServiceTests
         MqttConfigurationService service =
             new(repository);
 
-        var result = await service.SaveConfigurationAsync(
-            new ConfigureBrokerRequest(
-                "127.0.0.1",
-                1884,
-                false,
-                true),
-            CancellationToken.None);
+        BrokerConfigurationResponse result =
+            await service.SaveConfigurationAsync(
+                new ConfigureBrokerRequest(
+                    "127.0.0.1",
+                    1884,
+                    false,
+                    true),
+                CancellationToken.None);
 
         Assert.Equal("127.0.0.1", result.BindAddress);
         Assert.Equal(1884, result.Port);
