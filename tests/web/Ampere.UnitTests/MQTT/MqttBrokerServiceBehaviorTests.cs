@@ -60,7 +60,7 @@ public sealed class MqttBrokerServiceBehaviorTests
 
         Assert.True(result.IsRunning);
         Assert.NotNull(result.StartedAt);
-        Assert.Equal(0, result.ClientCount);
+        Assert.Equal(0, result.ConnectedClientsCount);
         await service.StopAsync(CancellationToken.None);
         await runtime.DisposeAsync();
     }
