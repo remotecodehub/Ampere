@@ -1,5 +1,4 @@
 using Ampere.Application.Identity.Abstractions;
-using Ampere.Application.Identity.Responses;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Services;
 using Ampere.Infrastructure.Persistence;
@@ -87,20 +86,6 @@ public sealed class IdentityTestFixture : IDisposable
             password);
         Assert.True(result.Succeeded);
         return user;
-    }
-
-    /// <summary>Creates a token pair for a synthetic user.</summary>
-    /// <param name="userId">The synthetic user identifier.</param>
-    /// <returns>The generated token pair.</returns>
-    public TokenResponse CreateTokensForTest(string userId)
-    {
-        IJwtTokenService tokenService =
-            provider.GetRequiredService<IJwtTokenService>();
-        return tokenService.CreateTokens(
-            userId,
-            "synthetic@example.com",
-            [],
-            []);
     }
 
     /// <inheritdoc />
