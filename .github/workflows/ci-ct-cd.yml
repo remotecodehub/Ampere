@@ -49,7 +49,7 @@ jobs:
 
       - name: Install .NET MAUI Workload
         working-directory: ${{ github.workspace }}/src/app/AmpereApp/
-        run: dotnet workload install ${{ matrix.workload }}
+        run: dotnet workload restore
 
       - name: Restore dependencies
         run: dotnet restore Ampere.App.slnx
@@ -76,7 +76,7 @@ jobs:
       - name: Build
         run: dotnet build Ampere.Web.slnx --configuration Release --no-restore
 
-  tests:
+  test_web:
     name: Web Continuous Testing
     runs-on: ubuntu-latest
     needs: build_web

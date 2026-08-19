@@ -12,17 +12,10 @@ public sealed class MqttBrokerRuntimeTests
     {
         MqttBrokerRuntime runtime = new();
         MqttTopicMessageResponse message =
-            new(
-                "energy/main",
-                "42",
-                "device-1",
-                DateTimeOffset.UtcNow);
-
+            new("energy/main","42","device-1",DateTimeOffset.UtcNow);
         runtime.Publish(message);
-
         MqttTopicMessageResponse result =
             await runtime.Messages.ReadAsync(TestContext.Current.CancellationToken);
-
         Assert.Equal(message, result);
         await runtime.DisposeAsync();
     }
