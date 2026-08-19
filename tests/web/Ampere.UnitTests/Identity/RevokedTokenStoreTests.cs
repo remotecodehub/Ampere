@@ -1,4 +1,5 @@
 using Ampere.Infrastructure.Identity.Services;
+using Xunit;
 
 namespace Ampere.UnitTests.Identity;
 
