@@ -1,17 +1,29 @@
+using Ampere.Application.Common.Responses;
 using Ampere.Application.MQTT.Abstractions;
 using Ampere.Application.MQTT.Queries;
 using Ampere.Application.MQTT.Responses;
-using Mediator.Net.Context;
-using Mediator.Net.Contracts;
+using Mediator;
 
 namespace Ampere.Application.MQTT.Handlers;
 
-/// <summary>Handles retrieval of the persisted broker configuration.</summary>
-public sealed class GetBrokerConfigurationQueryHandler(IMqttConfigurationService configService) : IRequestHandler<GetBrokerConfigurationQuery, Ampere.Application.Common.Responses.Response<Ampere.Application.MQTT.Responses.BrokerConfigurationResponse?>>
+/// <summary>Gets persisted broker configuration.</summary>
+/// <param name="configurationService">
+/// The configuration service.
+/// </param>
+public sealed class GetBrokerConfigurationQueryHandler(
+    IMqttConfigurationService configurationService)
+    : IRequestHandler<GetBrokerConfigurationQuery,
+        Response<BrokerConfigurationResponse?>>
 {
-    public async Task<Ampere.Application.Common.Responses.Response<Ampere.Application.MQTT.Responses.BrokerConfigurationResponse?>> Handle(IReceiveContext<GetBrokerConfigurationQuery> context, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async ValueTask<Response<BrokerConfigurationResponse?>>
+        Handle(
+            GetBrokerConfigurationQuery request,
+            CancellationToken cancellationToken)
     {
-        var cfg = await configService.GetConfigurationAsync(cancellationToken);
-        return Ampere.Application.Common.Responses.Response.Success(cfg);
+        BrokerConfigurationResponse? configuration =
+            await configurationService.GetConfigurationAsync(
+                cancellationToken);
+        return Response.Success(configuration);
     }
 }
