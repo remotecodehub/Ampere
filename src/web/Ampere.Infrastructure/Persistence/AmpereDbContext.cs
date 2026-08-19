@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Ampere.Domain.Common;
+using Ampere.Domain.MQTT.Entities;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.MQTT.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -131,7 +132,7 @@ public sealed class AmpereDbContext(
         MqttBrokerConfigurations { get; set; } = null!;
 
     /// <summary>Gets configured MQTT topics.</summary>
-    public DbSet<MqttTopicEntity> MqttTopics
+    public DbSet<MqttTopic> MqttTopics
     {
         get;
         set;
