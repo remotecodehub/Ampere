@@ -1,0 +1,145 @@
+@page "/mqtt/broker"
+@using Ampere.Application.Common.Responses
+@using Ampere.Application.MQTT.Commands
+@using Ampere.Application.MQTT.Queries
+@using Ampere.Application.MQTT.Requests
+@using Ampere.Application.MQTT.Responses
+@using Mediator
+@using MudBlazor
+@inject IMediator Mediator
+
+<MudStack Spacing="3">
+    <MudText Typo="Typo.h4">
+        MQTT Broker
+    </MudText>
+
+    @if (_error is not null)
+    {
+        <MudAlert Severity="Severity.Error">
+            @_error
+        </MudAlert>
+    }
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudTextField @bind-Value="_bindAddress"
+                          Label="Bind address"
+                          Variant="Variant.Outlined" />
+            <MudNumericField @bind-Value="_port"
+                             Label="Port"
+                             Variant="Variant.Outlined" />
+            <MudSwitch @bind-Value="_startOnBoot"
+                       Label="Start on boot" />
+            <MudSwitch @bind-Value="_useTls"
+                       Label="Use TLS" />
+            <MudButton Variant="Variant.Filled"
+                       Disabled="_saving"
+                       OnClick="SaveAsync">
+                Save configuration
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Elevation="1" Class="pa-4">
+        <MudStack Spacing="2">
+            <MudText>
+                Running: @_status?.Running
+            </MudText>
+            <MudText>
+                Port: @_status?.Port
+            </MudText>
+            <MudText>
+                Clients: @_status?.ConnectedClients
+            </MudText>
+            <MudStack Row="true">
+                <MudButton Variant="Variant.Filled"
+                           OnClick="StartAsync">
+                    Start
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           OnClick="StopAsync">
+                    Stop
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+</MudStack>
+
+@code {
+    private string _bindAddress = "0.0.0.0";
+    private int _port = 1883;
+    private bool _startOnBoot = true;
+    private bool _useTls;
+    private bool _saving;
+    private string? _error;
+    private BrokerStatusResponse? _status;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        Response<BrokerConfigurationResponse?> result =
+            await Mediator.Send(
+                new GetBrokerConfigurationQuery());
+
+        if (result.Data is not null)
+        {
+            _bindAddress = result.Data.BindAddress
+                ?? "0.0.0.0";
+            _port = result.Data.Port;
+            _startOnBoot = result.Data.StartOnBoot;
+            _useTls = result.Data.UseTls;
+        }
+
+        _status = await Mediator.Send(
+            new GetBrokerStatusQuery());
+    }
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+        _error = null;
+        try
+        {
+            ConfigureBrokerRequest request =
+                new(
+                    _bindAddress,
+                    _port,
+                    _startOnBoot,
+                    _useTls);
+
+            Response<BrokerConfigurationResponse> result =
+                await Mediator.Send(
+                    new ConfigureBrokerCommand(request));
+
+            if (!result.Succeeded)
+            {
+                _error = string.Join(
+                    ", ",
+                    result.Errors);
+            }
+
+            _status = await Mediator.Send(
+                new GetBrokerStatusQuery());
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private async Task StartAsync()
+    {
+        _status = await Mediator.Send(
+            new StartBrokerCommand());
+    }
+
+    private async Task StopAsync()
+    {
+        _status = await Mediator.Send(
+            new StopBrokerCommand());
+    }
+}
