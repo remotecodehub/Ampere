@@ -86,7 +86,7 @@ public static class WebApplicationBuilderExtensions
             builder.Services.AddScoped<IIdentityEmailSender, LoggingIdentityEmailSender>();
             builder.Services.AddScoped<ISystemSetupService, SystemSetupService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<ISignalRService, SignalRService>();
+            builder.Services.AddSingleton<ISignalRService, SignalRService>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
