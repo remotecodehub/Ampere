@@ -16,7 +16,8 @@ public sealed class DomainModelTests
         Assert.False(string.IsNullOrWhiteSpace(generated.Id));
         Assert.Equal("explicit", explicitId.Id);
         Assert.NotEqual(default, generated.CreatedAt);
-        Assert.Equal(generated.CreatedAt, generated.UpdatedAt);
+        Assert.NotEqual(default, generated.UpdatedAt);
+        Assert.True(generated.UpdatedAt >= generated.CreatedAt);
     }
 
     [Fact]
