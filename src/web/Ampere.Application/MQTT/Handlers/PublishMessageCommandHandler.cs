@@ -2,26 +2,36 @@ using Ampere.Application.Common.Responses;
 using Ampere.Application.MQTT.Abstractions;
 using Ampere.Application.MQTT.Commands;
 using Ampere.Application.MQTT.Requests;
-using Mediator.Net.Context;
-using Mediator.Net.Contracts;
+using Mediator;
 
 namespace Ampere.Application.MQTT.Handlers;
 
-/// <summary>Publishes a message through the MQTT broker service.</summary>
-public sealed class PublishMessageCommandHandler(IMqttBrokerService brokerService) : IRequestHandler<PublishMessageCommand, Response<bool>>
+/// <summary>Publishes a message through MQTT.</summary>
+/// <param name="brokerService">The broker service.</param>
+public sealed class PublishMessageCommandHandler(
+    IMqttBrokerService brokerService)
+    : IRequestHandler<PublishMessageCommand,
+        Response<bool>>
 {
-    public async Task<Response<bool>> Handle(IReceiveContext<PublishMessageCommand> context, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async ValueTask<Response<bool>> Handle(
+        PublishMessageCommand request,
+        CancellationToken cancellationToken)
     {
-        PublishMessageRequest req = context.Message.Request;
+        PublishMessageRequest publish = request.Request;
 
         try
         {
-            await brokerService.PublishAsync(req.Topic, req.Payload, cancellationToken);
+            await brokerService.PublishAsync(
+                publish.Topic,
+                publish.Payload,
+                cancellationToken);
             return Response.Success(true);
         }
-        catch (Exception ex)
+        catch (InvalidOperationException exception)
         {
-            return Response.Failure<bool>(ex.Message);
+            return Response.Failure<bool>(
+                [exception.Message]);
         }
     }
 }
