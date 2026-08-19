@@ -21,7 +21,9 @@
   <Folder Name="/Ampere/.github/skills/maui/">
     <File Path=".github/skills/maui/SKILL.md" />
   </Folder>
-  <Folder Name="/Ampere/.github/workflows/" />
+  <Folder Name="/Ampere/.github/workflows/">
+    <File Path=".github/workflows/ci-ct-cd.yml" />
+  </Folder>
   <Folder Name="/Ampere/docs/">
     <File Path="docs/architecture.md" />
     <File Path="docs/coding-standards.md" />
