@@ -1,9 +1,10 @@
 using Ampere.Application.Common.Abstractions;
 using Ampere.Application.Common.Responses;
 using Ampere.Application.MQTT.Commands;
-using Ampere.Application.MQTT.Responses;
 using Ampere.Application.MQTT.Requests;
+using Ampere.Application.MQTT.Responses;
 using Ampere.Infrastructure.Persistence.Middlewares;
+using Mediator;
 using Xunit;
 
 namespace Ampere.UnitTests.Common;
