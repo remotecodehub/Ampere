@@ -9,10 +9,22 @@ namespace Ampere.Infrastructure.Identity.Models;
 public class User(
     string? userName = null)
     : IdentityUser<string>(
-        Guid.CreateVersion7().ToString()) ,
+        Guid.CreateVersion7().ToString()),
       IEntityBase,
       ISoftDeletable
 {
+    /// <summary>
+    /// Gets or sets the identity identifier.
+    /// </summary>
+    public override string Id { get; set; } =
+        Guid.CreateVersion7().ToString();
+
+    /// <summary>
+    /// Gets or sets the user name.
+    /// </summary>
+    public override string? UserName { get; set; } =
+        userName ?? string.Empty;
+
     /// <summary>
     /// Gets or sets the display name.
     /// </summary>
