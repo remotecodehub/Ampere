@@ -1,9 +1,11 @@
 using Ampere.Application.Common.Abstractions;
+using Ampere.Application.Common.Contracts;
 using Ampere.Application.Common.Pipeline.Validation;
 using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Handlers;
 using Ampere.Application.Identity.Validators;
 using Ampere.Application.MQTT.Abstractions;
+using Ampere.Application.Setup.Abstractions;
 using Ampere.Infrastructure.Common.Repository;
 using Ampere.Infrastructure.Common.UnitOfWork;
 using Ampere.Infrastructure.Identity.Models;
@@ -20,6 +22,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MudBlazor.Services;
 using System.IdentityModel.Tokens.Jwt;
@@ -76,32 +80,15 @@ public static class WebApplicationBuilderExtensions
                 .AddSignInManager()
                 .AddDefaultTokenProviders();
 
-            builder.Services.AddScoped<
-                IIdentityService,
-                IdentityService>();
-            builder.Services.AddSingleton<
-                IRevokedTokenStore,
-                RevokedTokenStore>();
-            builder.Services.AddScoped<
-                IJwtTokenService,
-                JwtTokenService>();
-            builder.Services.AddScoped<
-                IIdentityEmailSender,
-                LoggingIdentityEmailSender>();
-            builder.Services.AddScoped<
-                ISystemSetupService,
-                SystemSetupService>();
-            builder.Services.AddScoped<
-                IUnitOfWork,
-                UnitOfWork>();
-            builder.Services.AddScoped(
-                typeof(IRepository<>),
-                typeof(Repository<>));
-            builder.Services.AddValidatorsFromAssemblyContaining<
-                RegisterCommandValidator>();
-
-            builder.Services.AddAuthentication(
-                JwtBearerDefaults.AuthenticationScheme)
+            builder.Services.AddScoped<IIdentityService, IdentityService>();
+            builder.Services.AddSingleton<IRevokedTokenStore, RevokedTokenStore>();
+            builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+            builder.Services.AddScoped<IIdentityEmailSender, LoggingIdentityEmailSender>();
+            builder.Services.AddScoped<ISystemSetupService, SystemSetupService>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     JwtOptions jwt = builder.Configuration
@@ -146,23 +133,17 @@ public static class WebApplicationBuilderExtensions
                                         JwtRegisteredClaimNames.Typ)
                                 ?.Value;
 
-                            if (!string.Equals(
-                                tokenType,
-                                "access",
-                                StringComparison.Ordinal))
+                            if (!string.Equals(tokenType, "access", StringComparison.Ordinal))
                             {
-                                context.Fail(
-                                    "The token is not an "
-                                    + "access token.");
+                                context.Fail("The token is not an access token.");
                                 return Task.CompletedTask;
                             }
 
-                            if (token is not null
-                                && context.HttpContext
-                                    .RequestServices
-                                    .GetRequiredService<
-                                        IRevokedTokenStore>()
-                                    .IsRevoked(token.Id))
+                            if (token is not null && 
+                                context.HttpContext
+                                .RequestServices
+                                .GetRequiredService<IRevokedTokenStore>()
+                                .IsRevoked(token.Id))
                             {
                                 context.Fail(
                                     "The access token "
@@ -192,15 +173,9 @@ public static class WebApplicationBuilderExtensions
                         "system.user"));
 
             builder.Services.AddSingleton<MqttBrokerRuntime>();
-            builder.Services.AddScoped<
-                IMqttBrokerService,
-                MqttBrokerService>();
-            builder.Services.AddScoped<
-                IMqttConfigurationService,
-                MqttConfigurationService>();
-            builder.Services.AddHostedService<
-                MqttBrokerHostedService>();
-
+            builder.Services.AddScoped<IMqttBrokerService, MqttBrokerService>();
+            builder.Services.AddScoped<IMqttConfigurationService, MqttConfigurationService>();
+            builder.Services.AddHostedService<MqttBrokerHostedService>();
             builder.Services.AddMediator(options =>
             {
                 options.ServiceLifetime =

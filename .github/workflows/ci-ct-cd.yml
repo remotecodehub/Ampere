@@ -12,25 +12,51 @@ permissions:
 
 jobs:
   build_App:
-    name: App Continuous Integration
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    name: Build MAUI (${{ matrix.target_framework }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target_framework: net10.0-android
+            os: macos-26
+            workload: android
+          - target_framework: net10.0-ios
+            os: macos-26
+            workload: ios
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Setup .NET
+      - name: Setup Xcode
+        if: matrix.target_framework == 'net10.0-ios' 
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.6'
+
+      - name: Setup Java JDK
+        if: matrix.target_framework == 'net10.0-android'
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'microsoft'
+          java-version: '17'
+
+      - name: Setup .NET 10 SDK
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.*
+          dotnet-version: '10.0.x'
 
-      - name: Restore
-        run: dotnet restore Ampere.slnx
+      - name: Install .NET MAUI Workload
+        run: dotnet workload install ${{ matrix.workload }}
 
-      - name: Build
-        run: dotnet build Ampere.slnx --configuration Release --no-restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-  build_web:
+      - name: Build MAUI Project
+        run: dotnet build -c Release -f ${{ matrix.target_framework }}
+
+ build_web:
     name: Web Continuous Integration
     runs-on: ubuntu-latest
     timeout-minutes: 15

@@ -43,13 +43,13 @@
     <MudPaper Elevation="1" Class="pa-4">
         <MudStack Spacing="2">
             <MudText>
-                Running: @_status?.Running
+                Running: @_status?.IsRunning
             </MudText>
             <MudText>
                 Port: @_status?.Port
             </MudText>
             <MudText>
-                Clients: @_status?.ConnectedClients
+                Clients: @_status?.ConnectedClientsCount
             </MudText>
             <MudStack Row="true">
                 <MudButton Variant="Variant.Filled"
@@ -132,14 +132,10 @@
     }
 
     private async Task StartAsync()
-    {
-        _status = await Mediator.Send(
-            new StartBrokerCommand());
-    }
+        => _status =
+        await Mediator.Send(new StartBrokerCommand());
 
-    private async Task StopAsync()
-    {
-        _status = await Mediator.Send(
-            new StopBrokerCommand());
-    }
+    private async Task StopAsync() 
+        => _status =
+        await Mediator.Send(new StopBrokerCommand());
 }
