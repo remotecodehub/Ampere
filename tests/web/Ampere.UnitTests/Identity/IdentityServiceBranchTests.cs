@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using Ampere.Infrastructure.Identity.Models;
+using Ampere.Infrastructure.Identity.Options;
+using Ampere.Infrastructure.Identity.Services;
 using Ampere.UnitTests.Common.Fixtures;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Ampere.UnitTests.Identity;
@@ -32,8 +35,19 @@ public sealed class IdentityServiceBranchTests
     public async Task RefreshAsync_MissingUser_ReturnsNull()
     {
         using IdentityTestFixture fixture = new();
-        var tokens = fixture.Service
-            .CreateTokensForTest("missing-user");
+        var tokens = new JwtTokenService(
+            Options.Create(new JwtOptions
+            {
+                Key = "...",
+                Issuer = "Ampere.Tests",
+                Audience = "Ampere.Tests"
+            }),
+            new RevokedTokenStore())
+            .CreateTokens(
+                "missing-user",
+                "missing@example.com",
+                [],
+                []);
 
         Assert.Null(await fixture.Service.RefreshAsync(
             tokens.RefreshToken, CancellationToken.None));
