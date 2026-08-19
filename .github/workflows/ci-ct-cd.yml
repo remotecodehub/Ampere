@@ -56,7 +56,7 @@ jobs:
       - name: Build MAUI Project
         run: dotnet build -c Release -f ${{ matrix.target_framework }}
 
- build_web:
+  build_web:
     name: Web Continuous Integration
     runs-on: ubuntu-latest
     timeout-minutes: 15
