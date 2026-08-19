@@ -18,7 +18,8 @@ public sealed class SignalRControllerTests
     public async Task StartDiscovery_DispatchesCommand()
     {
         Mock<IMediator> mediator = new();
-        DiscoveryResponse response = new("house", 60);
+        DiscoveryResponse response =
+            new("house", 60, true);
         mediator.Setup(item => item.Send(
                 It.IsAny<StartDiscoveryCommand>(),
                 It.IsAny<CancellationToken>()))
@@ -32,9 +33,9 @@ public sealed class SignalRControllerTests
             CancellationToken.None);
 
         OkObjectResult ok = Assert.IsType<OkObjectResult>(result);
-        Assert.Same(response,
-            Assert.IsType<Response<DiscoveryResponse>>(
-                ok.Value).Data);
+        Response<DiscoveryResponse> value =
+            Assert.IsType<Response<DiscoveryResponse>>(ok.Value);
+        Assert.Same(response, value.Data);
         mediator.Verify(item => item.Send(
                 It.Is<StartDiscoveryCommand>(command =>
                     command.HouseId == "house" &&
@@ -120,8 +121,8 @@ public sealed class SignalRControllerTests
             .Returns(new ValueTask<Response<FirmwareProgressResponse>>(
                 Response.Success(new FirmwareProgressResponse(
                     "node",
-                    "2.0.0",
-                    5))));
+                    5,
+                    "started"))));
         SignalRController controller =
             new(mediator.Object);
 
