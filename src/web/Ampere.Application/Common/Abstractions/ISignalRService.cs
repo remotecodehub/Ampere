@@ -25,6 +25,12 @@ public interface ISignalRService
         TelemetryResponse response,
         CancellationToken cancellationToken);
 
+    /// <summary>Gets the latest telemetry snapshot.</summary>
+    Task<IReadOnlyList<TelemetryResponse>>
+        GetTelemetrySnapshotAsync(
+            string? houseId,
+            CancellationToken cancellationToken);
+
     /// <summary>Reads the live telemetry stream.</summary>
     IAsyncEnumerable<TelemetryResponse> WatchTelemetryAsync(
         string? houseId,
