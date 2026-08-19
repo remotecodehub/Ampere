@@ -34,7 +34,8 @@ public sealed class IdentityTestFixture : IDisposable
             options.SignIn.RequireConfirmedEmail = false;
         }).AddRoles<Role>()
         .AddEntityFrameworkStores<AmpereDbContext>()
-        .AddSignInManager();
+        .AddSignInManager()
+        .AddDefaultTokenProviders();
         services.AddScoped<IIdentityEmailSender,
             TestIdentityEmailSender>();
         services.Configure<
