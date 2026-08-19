@@ -4,6 +4,8 @@ using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Handlers;
 using Ampere.Application.Identity.Validators;
 using Ampere.Application.Setup.Abstractions;
+using Ampere.Application.MQTT.Abstractions;
+using Ampere.Infrastructure.MQTT.Services;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
@@ -130,8 +132,13 @@ public static class WebApplicationBuilderExtensions
                 .AddPolicy(IdentityPolicies.User, policy =>
                     policy.RequireClaim(IdentityClaimTypes.Permission,
                     UserPermission));
+            // MQTT services registration
+            builder.Services.AddSingleton<IMqttBrokerService, MqttBrokerService>();
+            builder.Services.AddScoped<IMqttConfigurationService, MqttConfigurationService>();
+
             var mb = new Mediator.Net.MediatorBuilder();
             mb.RegisterHandlers(typeof(IdentityHandlers).Assembly)
+                .RegisterHandlers(typeof(Ampere.Application.MQTT.Handlers.MqttHandlers).Assembly)
                 .ConfigureCommandReceivePipe(pipe => pipe.UseValidation())
                 .ConfigureRequestPipe(pipe => pipe.UseValidation());
 

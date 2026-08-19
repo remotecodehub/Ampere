@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Ampere.Infrastructure.Persistence;
 
+using Ampere.Infrastructure.MQTT.Models;
+
 /// <summary>
 /// Represents the database context for the Ampere application.
 /// </summary>
@@ -77,5 +79,9 @@ IdentityDbContext<User, Role, string>(options)
             entry.Entity.IsDeleted = true;
             entry.Entity.DeletedAt = DateTimeOffset.UtcNow;
         }
-    }
+        }
+
+    /// <summary>Broker configurations persisted in the database.</summary>
+    public DbSet<MqttBrokerConfigurationEntity> MqttBrokerConfigurations { get; set; } = null!;
 }
+

@@ -79,19 +79,5 @@ public sealed class ValidationMiddleware<TContext>(IMessageValidator validator) 
     /// <param name="ex">The exception raised by the pipeline.</param>
     /// <param name="context">The pipeline context.</param>
     /// <returns>Re Throws the exception.</returns>
-    public Task OnException(Exception ex, TContext context) => throw ex;
-}
-
-/// <summary>Provides extension methods for adding validation to Mediator.Net pipelines.</summary>
-public static class ValidationMiddlewareExtensions
-{
-    /// <summary>Adds the validation middleware to a Mediator.Net pipeline.</summary>
-    /// <typeparam name="TContext">The pipeline context type.</typeparam>
-    /// <param name="configurator">The pipeline configurator.</param>
-    public static void UseValidation<TContext>(this IPipeConfigurator<TContext> configurator)
-        where TContext : IContext<IMessage>
-    {
-        configurator.AddPipeSpecification(
-            new ValidationMiddleware<TContext>(configurator.DependencyScope.Resolve<IMessageValidator>()));
-    }
+    public Task OnException(Exception ex, TContext context) => Task.CompletedTask;
 }
