@@ -10,10 +10,11 @@ mobile clients.
 ## Solution areas
 
 - `src/app`: .NET MAUI application.
-- `src/web`: Blazor and REST API.
+- `src/web`: Blazor, MQTT Broker and REST API.
 - `src/iot`: embedded IoT software.
 - `src/os`: Raspberry Pi OS work.
-- `tests`: tests for each area.
+- `tests/app`: tests for mobile maui app.
+- `tests/web`: tests for web projects.
 
 The repository may still contain only part
 of the target tree. Agents must extend the
@@ -22,21 +23,14 @@ existing structure without breaking code.
 ## Single-project DDD
 
 Each .NET application starts as one
-project. The project directory is the
-presentation boundary and contains:
+project. Both Blazor app and MAUI Apps
+are the Presentation layer, and there are
+4 more projects composing DDD architecture:
 
-- `Application`
-- `Composition`
-- `Domain`
-- `Infrastructure`
-
-Web also contains:
-
-- `Components`
-- `Controllers`
-
-MAUI may also contain platform code under
-`Platforms`.
+- `*.Application`
+- `*.Composition`
+- `*.Domain`
+- `*.Infrastructure`
 
 ## Application
 
