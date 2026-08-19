@@ -2,6 +2,7 @@ using Ampere.Infrastructure.MQTT.Models;
 using Ampere.Infrastructure.MQTT.Services;
 using Ampere.UnitTests.Common.Mocks;
 using MQTTnet;
+using MQTTnet.Server;
 
 namespace Ampere.UnitTests.MQTT;
 
@@ -87,8 +88,8 @@ public sealed class MqttBrokerServiceTests
 
         await service.StartAsync(CancellationToken.None);
 
-        Assert.NotNull(runtime.Server);
-        Assert.True(runtime.Server.IsStarted);
+        MqttServer server = runtime.Server!;
+        Assert.True(server.IsStarted);
         await service.StopAsync(CancellationToken.None);
         await runtime.DisposeAsync();
     }
@@ -127,8 +128,8 @@ public sealed class MqttBrokerServiceTests
         await service.RestartAsync(
             CancellationToken.None);
 
-        Assert.NotNull(runtime.Server);
-        Assert.True(runtime.Server.IsStarted);
+        MqttServer server = runtime.Server!;
+        Assert.True(server.IsStarted);
         await service.StopAsync(CancellationToken.None);
         await runtime.DisposeAsync();
     }
@@ -167,8 +168,9 @@ public sealed class MqttBrokerServiceTests
         MqttBrokerService service =
             new(repository, runtime);
 
-        var result = await service.GetStatusAsync(
-            CancellationToken.None);
+        BrokerStatusResponse result =
+            await service.GetStatusAsync(
+                CancellationToken.None);
 
         Assert.False(result.Running);
         Assert.Equal(1883, result.Port);
