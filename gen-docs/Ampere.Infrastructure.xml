@@ -572,5 +572,17 @@
             <param name="cancellationToken">The token used to cancel the operation.</param>
             <returns>The result of the setup operation.</returns>
         </member>
+        <member name="T:Ampere.Infrastructure.src.web.Ampere.Infrastructure.Persistence.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.src.web.Ampere.Infrastructure.Persistence.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.src.web.Ampere.Infrastructure.Persistence.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ampere.Infrastructure.src.web.Ampere.Infrastructure.Persistence.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>
