@@ -5,6 +5,7 @@ using Ampere.Application.MQTT.Requests;
 using Ampere.Application.MQTT.Responses;
 using Ampere.Domain.MQTT.Entities;
 using Ampere.UnitTests.Common.Mocks;
+using Xunit;
 
 namespace Ampere.UnitTests.MQTT;
 

@@ -5,6 +5,7 @@ using Ampere.UnitTests.Common.Fixtures;
 using Ampere.UnitTests.Common.Mocks;
 using MQTTnet;
 using MQTTnet.Server;
+using Xunit;
 
 namespace Ampere.UnitTests.MQTT;
 
@@ -174,7 +175,7 @@ public sealed class MqttBrokerServiceTests
             await service.GetStatusAsync(
                 CancellationToken.None);
 
-        Assert.False(result.Running);
+        Assert.False(result.IsRunning);
         Assert.Equal(1883, result.Port);
         Assert.Equal("0.0.0.0", result.BindAddress);
         await runtime.DisposeAsync();

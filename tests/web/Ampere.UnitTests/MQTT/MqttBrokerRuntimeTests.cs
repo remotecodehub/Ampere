@@ -1,5 +1,6 @@
 using Ampere.Application.MQTT.Responses;
 using Ampere.Infrastructure.MQTT.Services;
+using Xunit;
 
 namespace Ampere.UnitTests.MQTT;
 
@@ -20,7 +21,7 @@ public sealed class MqttBrokerRuntimeTests
         runtime.Publish(message);
 
         MqttTopicMessageResponse result =
-            await runtime.Messages.ReadAsync();
+            await runtime.Messages.ReadAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(message, result);
         await runtime.DisposeAsync();

@@ -3,6 +3,7 @@ using Ampere.Infrastructure.MQTT.Models;
 using Ampere.Infrastructure.MQTT.Services;
 using Ampere.UnitTests.Common.Fixtures;
 using Ampere.UnitTests.Common.Mocks;
+using Xunit;
 
 namespace Ampere.UnitTests.MQTT;
 
