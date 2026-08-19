@@ -12,7 +12,8 @@
     </CoverletOutput>
     <Include>
       [Ampere.Application]Ampere.Application.MQTT.*;
-      [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.*
+      [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.*;
+      [Ampere.Infrastructure]Ampere.Infrastructure.Identity.*
     </Include>
     <Threshold>80</Threshold>
     <ThresholdType>line,branch</ThresholdType>
