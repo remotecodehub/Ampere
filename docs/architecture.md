@@ -10,7 +10,7 @@ mobile clients.
 ## Solution areas
 
 - `src/app`: .NET MAUI application.
-- `src/web`: Blazor, MQTT and REST API.
+- `src/web`: Blazor, SignalR and REST API.
 - `src/iot`: embedded IoT software.
 - `src/os`: Raspberry Pi OS work.
 - `tests/app`: mobile tests.
@@ -130,8 +130,8 @@ base classes are fixed.
 
 ## Blazor
 
-MQTT pages belong under
-`Components/Pages/MQTT`.
+Each feature have their pages belong under
+`Components/Pages/FEATURE_NAME`.
 
 Use only MudBlazor components.
 Do not create code-behind or external CSS

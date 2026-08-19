@@ -10,7 +10,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Ampere.Infrastructure.Setup.Services;
 
-public sealed class SystemSetupService(
+/// <inheritdoc/>
+public sealed partial  class SystemSetupService(
     UserManager<User> userManager,
     RoleManager<Role> roleManager,
     ILogger<SystemSetupService> logger)
@@ -79,9 +80,15 @@ public sealed class SystemSetupService(
             return Failure(membershipResult);
         }
 
-        logger.LogInformation("Initial system setup completed for user {UserId}.", user.Id);
+        LogSystemSetupComplete(logger, user.Id);
         return IdentityResultResponse.Success();
     }
+
+    [LoggerMessage(
+        EventId = 1001,
+        Level = LogLevel.Information,
+        Message = "Initial system setup completed for user {UserId}.")]
+    public static partial void LogSystemSetupComplete(ILogger logger, string UserId);
     private static IdentityResultResponse Failure(IdentityResult result) => IdentityResultResponse.Failure(result.Errors.Select(error => error.Description));
 
 }

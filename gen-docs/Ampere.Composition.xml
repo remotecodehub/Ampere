@@ -159,153 +159,9 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>Awaitable task</returns>
         </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Queries.GetTopicsQuery,System.Threading.CancellationToken)">
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.LoginCommand,System.Threading.CancellationToken)">
             <summary>
-            Send a request of type global::Ampere.Application.MQTT.Queries.GetTopicsQuery.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Queries.GetConnectedClientsQuery,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.MQTT.Queries.GetConnectedClientsQuery.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Queries.GetBrokerStatusQuery,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.MQTT.Queries.GetBrokerStatusQuery.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Queries.GetBrokerConfigurationQuery,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.MQTT.Queries.GetBrokerConfigurationQuery.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.StopBrokerCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.MQTT.Commands.StopBrokerCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.StartBrokerCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.MQTT.Commands.StartBrokerCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.PublishMessageCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.MQTT.Commands.PublishMessageCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.CreateTopicCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.MQTT.Commands.CreateTopicCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Setup.Commands.InitializeSetupCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.Setup.Commands.InitializeSetupCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.MQTT.Commands.ConfigureBrokerCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.MQTT.Commands.ConfigureBrokerCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ResetPasswordCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.Identity.Commands.ResetPasswordCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ForgotPasswordCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.Identity.Commands.ForgotPasswordCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ConfirmEmailCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.Identity.Commands.ConfirmEmailCommand.
-            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
-            </summary>
-            <param name="request">Incoming request</param>
-            <param name="cancellationToken">Cancellation token</param>
-            <returns>Awaitable task</returns>
-        </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.RevokeTokenCommand,System.Threading.CancellationToken)">
-            <summary>
-            Send a request of type global::Ampere.Application.Identity.Commands.RevokeTokenCommand.
+            Send a request of type global::Ampere.Application.Identity.Commands.LoginCommand.
             Throws <see cref="T:System.ArgumentNullException"/> if request is null.
             </summary>
             <param name="request">Incoming request</param>
@@ -321,9 +177,63 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>Awaitable task</returns>
         </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.LoginCommand,System.Threading.CancellationToken)">
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.RevokeTokenCommand,System.Threading.CancellationToken)">
             <summary>
-            Send a request of type global::Ampere.Application.Identity.Commands.LoginCommand.
+            Send a request of type global::Ampere.Application.Identity.Commands.RevokeTokenCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ConfirmEmailCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ConfirmEmailCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ResendConfirmationEmailCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ForgotPasswordCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ForgotPasswordCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ResetPasswordCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ResetPasswordCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.UpdateIdentityInfoCommand.
+            Throws <see cref="T:System.ArgumentNullException"/> if request is null.
+            </summary>
+            <param name="request">Incoming request</param>
+            <param name="cancellationToken">Cancellation token</param>
+            <returns>Awaitable task</returns>
+        </member>
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand,System.Threading.CancellationToken)">
+            <summary>
+            Send a request of type global::Ampere.Application.Identity.Commands.ConfigureTwoFactorCommand.
             Throws <see cref="T:System.ArgumentNullException"/> if request is null.
             </summary>
             <param name="request">Incoming request</param>
@@ -339,18 +249,18 @@
             <param name="cancellationToken">Cancellation token</param>
             <returns>Awaitable task</returns>
         </member>
-        <member name="M:Mediator.Mediator.Send(Ampere.Application.Setup.Queries.GetSetupStatusQuery,System.Threading.CancellationToken)">
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Setup.Commands.InitializeSetupCommand,System.Threading.CancellationToken)">
             <summary>
-            Send a request of type global::Ampere.Application.Setup.Queries.GetSetupStatusQuery.
+            Send a request of type global::Ampere.Application.Setup.Commands.InitializeSetupCommand.
             Throws <see cref="T:System.ArgumentNullException"/> if request is null.
             </summary>
             <param name="request">Incoming request</param>
             <param name="cancellationToken">Cancellation token</param>
             <returns>Awaitable task</returns>
         </member>
-        <member name="M:Mediator.Mediator.CreateStream(Ampere.Application.MQTT.Queries.WatchTopicsQuery,System.Threading.CancellationToken)">
+        <member name="M:Mediator.Mediator.Send(Ampere.Application.Setup.Queries.GetSetupStatusQuery,System.Threading.CancellationToken)">
             <summary>
-            Create a stream from request type global::Ampere.Application.MQTT.Queries.WatchTopicsQuery.
+            Send a request of type global::Ampere.Application.Setup.Queries.GetSetupStatusQuery.
             Throws <see cref="T:System.ArgumentNullException"/> if request is null.
             </summary>
             <param name="request">Incoming request</param>

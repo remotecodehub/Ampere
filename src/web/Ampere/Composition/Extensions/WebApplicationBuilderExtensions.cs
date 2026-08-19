@@ -5,10 +5,8 @@ using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Handlers;
 using Ampere.Application.Identity.Validators;
 using Ampere.Application.Setup.Abstractions;
-using Ampere.Application.MQTT.Abstractions;
 using Ampere.Infrastructure.Common.Repository;
 using Ampere.Infrastructure.Common.UnitOfWork;
-using Ampere.Infrastructure.MQTT.Services;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
@@ -174,34 +172,33 @@ public static class WebApplicationBuilderExtensions
                     };
                 });
 
-            builder.Services.AddAuthorizationBuilder()
+            builder
+                .Services
+                .AddAuthorizationBuilder()
                 .AddPolicy(
                     IdentityPolicies.Administrator,
-                    policy => policy.RequireClaim(
-                        IdentityClaimTypes.Permission,
+                    policy => policy.RequireRole(
+                        IdentityRoles.Administrator)
+                        .RequireClaim(IdentityClaimTypes.Permission,
                         AdministratorPermission))
                 .AddPolicy(
-                    IdentityPolicies.Manager,
-                    policy => policy.RequireClaim(
-                        IdentityClaimTypes.Permission,
-                        ManagerPermission))
-                .AddPolicy(
                     IdentityPolicies.User,
-                    policy => policy.RequireClaim(
-                        IdentityClaimTypes.Permission,
-                        UserPermission));
-
-            builder.Services.AddSingleton<IMqttBrokerService, MqttBrokerService>();
-            builder.Services.AddScoped<IMqttConfigurationService, MqttConfigurationService>();
-
+                    policy => policy.RequireRole(
+                        IdentityRoles.User, 
+                        IdentityRoles.Administrator)
+                        .RequireClaim(
+                            IdentityClaimTypes.Permission,
+                            AdministratorPermission)
+                        .RequireClaim(
+                            IdentityClaimTypes.Permission,
+                            UserPermission));
+ 
             await builder.Build().RunAmpereAsync<T>();
         }
     }
 
     private const string AdministratorPermission =
         "system.admin";
-    private const string ManagerPermission =
-        "system.manager";
     private const string UserPermission =
         "system.user";
 }

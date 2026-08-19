@@ -1,8 +1,6 @@
 using System.Linq.Expressions;
 using Ampere.Domain.Common;
-using Ampere.Domain.MQTT.Entities;
 using Ampere.Infrastructure.Identity.Models;
-using Ampere.Infrastructure.MQTT.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -126,15 +124,4 @@ public sealed class AmpereDbContext(
                 DateTimeOffset.UtcNow;
         }
     }
-
-    /// <summary>Gets broker configurations.</summary>
-    public DbSet<MqttBrokerConfigurationEntity>
-        MqttBrokerConfigurations { get; set; } = null!;
-
-    /// <summary>Gets configured MQTT topics.</summary>
-    public DbSet<MqttTopic> MqttTopics
-    {
-        get;
-        set;
-    } = null!;
 }

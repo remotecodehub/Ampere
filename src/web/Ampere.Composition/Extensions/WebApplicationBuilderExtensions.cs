@@ -4,14 +4,12 @@ using Ampere.Application.Common.Pipeline.Validation;
 using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Handlers;
 using Ampere.Application.Identity.Validators;
-using Ampere.Application.MQTT.Abstractions;
 using Ampere.Application.Setup.Abstractions;
 using Ampere.Infrastructure.Common.Repository;
 using Ampere.Infrastructure.Common.UnitOfWork;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
-using Ampere.Infrastructure.MQTT.Services;
 using Ampere.Infrastructure.Persistence;
 using Ampere.Infrastructure.Persistence.Middlewares;
 using Ampere.Infrastructure.Setup.Services;
@@ -162,20 +160,11 @@ public static class WebApplicationBuilderExtensions
                         IdentityClaimTypes.Permission,
                         "system.admin"))
                 .AddPolicy(
-                    IdentityPolicies.Manager,
-                    policy => policy.RequireClaim(
-                        IdentityClaimTypes.Permission,
-                        "system.manager"))
-                .AddPolicy(
                     IdentityPolicies.User,
                     policy => policy.RequireClaim(
                         IdentityClaimTypes.Permission,
                         "system.user"));
 
-            builder.Services.AddSingleton<MqttBrokerRuntime>();
-            builder.Services.AddScoped<IMqttBrokerService, MqttBrokerService>();
-            builder.Services.AddScoped<IMqttConfigurationService, MqttConfigurationService>();
-            builder.Services.AddHostedService<MqttBrokerHostedService>();
             builder.Services.AddMediator(options =>
             {
                 options.ServiceLifetime =

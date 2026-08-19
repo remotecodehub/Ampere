@@ -64,56 +64,6 @@
         <member name="M:Ampere.Controllers.v1.IdentityController.ConfigureTwoFactor(Ampere.Application.Identity.Requests.TwoFactorRequest,System.Threading.CancellationToken)">
             <summary>Configures two-factor authentication.</summary>
         </member>
-        <member name="T:Ampere.Controllers.v1.MqttController">
-            <summary>Exposes MQTT broker operations.</summary>
-            <param name="mediator">The application mediator.</param>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.#ctor(Mediator.IMediator)">
-            <summary>Exposes MQTT broker operations.</summary>
-            <param name="mediator">The application mediator.</param>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.GetStatus(System.Threading.CancellationToken)">
-            <summary>Gets broker status.</summary>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>The broker status.</returns>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.GetConfiguration(System.Threading.CancellationToken)">
-            <summary>Gets persisted broker configuration.</summary>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>The broker configuration.</returns>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.Configure(Ampere.Application.MQTT.Requests.ConfigureBrokerRequest,System.Threading.CancellationToken)">
-            <summary>Saves and applies broker configuration.</summary>
-            <param name="request">The broker configuration.</param>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>The saved configuration.</returns>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.Start(System.Threading.CancellationToken)">
-            <summary>Starts the broker.</summary>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>The broker status.</returns>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.Stop(System.Threading.CancellationToken)">
-            <summary>Stops the broker.</summary>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>The broker status.</returns>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.GetClients(System.Threading.CancellationToken)">
-            <summary>Gets connected MQTT clients.</summary>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>The connected clients.</returns>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.Publish(Ampere.Application.MQTT.Requests.PublishMessageRequest,System.Threading.CancellationToken)">
-            <summary>Publishes a message to a topic.</summary>
-            <param name="request">The publish request.</param>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>The publish result.</returns>
-        </member>
-        <member name="M:Ampere.Controllers.v1.MqttController.Stream(System.Threading.CancellationToken)">
-            <summary>Streams live MQTT messages.</summary>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>The live MQTT message stream.</returns>
-        </member>
         <member name="T:Ampere.Controllers.v1.SetupController">
             <summary>Exposes first-time setup endpoints.</summary>
             <param name="mediator">The application mediator.</param>
@@ -132,9 +82,6 @@
             <param name="request">The setup credentials.</param>
             <param name="cancellationToken">The cancellation token.</param>
             <returns>The setup result.</returns>
-        </member>
-        <member name="M:Ampere.Components.Pages.MQTT.Live.DisposeAsync">
-            <inheritdoc />
         </member>
         <member name="T:Program">
             <summary>

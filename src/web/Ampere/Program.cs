@@ -1,6 +1,4 @@
-using Ampere.Components;
 using Ampere.Composition.Extensions;
 await WebApplication
     .CreateBuilder(args)
-    .RunAmpereAsync<Program, App>();
-
+    .RunAmpereAsync<Program, Ampere.Components.App>();

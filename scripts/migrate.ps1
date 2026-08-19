@@ -7,7 +7,7 @@ param(
     [Parameter(Mandatory=$false, Position=2, HelpMessage="Migration Project")]
     [Alias("p")][string]$Project = "src/web/Ampere.Infrastructure",
     [Parameter(Mandatory=$false, Position=3, HelpMessage="Migration Output Folder")]
-    [Alias("d")][string]$MigrationsFolder = "src/web/Ampere.Infrastructure/Persistence/Migrations"
+    [Alias("d")][string]$MigrationsFolder = "Persistence/Migrations"
 )
 $RepoRoot = (Get-Item "$PSScriptRoot\..").FullName
 Push-Location $RepoRoot

@@ -3,6 +3,10 @@ using Ampere.Application.Setup.Responses;
 
 namespace Ampere.Application.Setup.Abstractions;
 
+
+/// <summary>
+/// Contract for system setup service
+/// </summary>
 public interface ISystemSetupService
 {
  

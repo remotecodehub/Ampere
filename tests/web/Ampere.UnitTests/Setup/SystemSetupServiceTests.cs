@@ -24,10 +24,10 @@ public sealed class SystemSetupServiceTests
             loggerFactory.CreateLogger<SystemSetupService>());
 
         SetupStatusResponse empty = 
-            await service.GetSetupStatusAsync(CancellationToken.None);
+            await service.GetSetupStatusAsync(TestContext.Current.CancellationToken);
         await fixture.CreateUserAsync("existing@example.com");
         SetupStatusResponse initialized =
-            await service.GetSetupStatusAsync(CancellationToken.None);
+            await service.GetSetupStatusAsync(TestContext.Current.CancellationToken);
 
         Assert.True(empty.IsSetupRequired);
         Assert.False(empty.IsSetupComplete);
@@ -49,7 +49,7 @@ public sealed class SystemSetupServiceTests
         IdentityResultResponse result =
             await service.InitializeSetupAsync(
                 "admin@example.com", "Password1!",
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
 
         Assert.True(result.Succeeded);
         Assert.True(await fixture.RoleManager
@@ -73,7 +73,7 @@ public sealed class SystemSetupServiceTests
         IdentityResultResponse result =
             await service.InitializeSetupAsync(
                 "admin@example.com", "Password1!",
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
 
         Assert.False(result.Succeeded);
     }
@@ -95,7 +95,7 @@ public sealed class SystemSetupServiceTests
         IdentityResultResponse result =
             await service.InitializeSetupAsync(
                 "admin@example.com", "Password1!",
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
 
         Assert.True(result.Succeeded);
     }
@@ -114,7 +114,7 @@ public sealed class SystemSetupServiceTests
         IdentityResultResponse result =
             await service.InitializeSetupAsync(
                 "admin@example.com", "x",
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
 
         Assert.False(result.Succeeded);
     }

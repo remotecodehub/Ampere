@@ -392,6 +392,7 @@ public sealed class IdentityService(
 
     private static IdentityResultResponse Failure(IdentityResult result) => IdentityResultResponse.Failure(result.Errors.Select(error => error.Description));
  
+    /// <inheritdoc/>
     public async Task<bool> EmailExistsAsync(
         string email, 
         CancellationToken cancellationToken)
@@ -407,7 +408,7 @@ public sealed class IdentityService(
 /// Logs identity email messages instead of delivering them through an external email provider.
 /// </summary>
 /// <param name="logger">The logger used to record email messages.</param>
-public sealed class LoggingIdentityEmailSender(ILogger<LoggingIdentityEmailSender> logger) : IIdentityEmailSender
+public sealed partial class LoggingIdentityEmailSender(ILogger<LoggingIdentityEmailSender> logger) : IIdentityEmailSender
 {
     /// <summary>
     /// Logs an email confirmation message.
@@ -418,7 +419,7 @@ public sealed class LoggingIdentityEmailSender(ILogger<LoggingIdentityEmailSende
     /// <returns>A completed task.</returns>
     public Task SendConfirmationAsync(string email, string confirmationLink, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Identity confirmation link for {Email}: {Link}", email, confirmationLink);
+        LogSendConfirmation(logger, email, confirmationLink);
         return Task.CompletedTask;
     }
 
@@ -431,7 +432,13 @@ public sealed class LoggingIdentityEmailSender(ILogger<LoggingIdentityEmailSende
     /// <returns>A completed task.</returns>
     public Task SendPasswordResetAsync(string email, string resetLink, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Identity password reset link for {Email}: {Link}", email, resetLink);
+        LogSendPassword(logger, email, resetLink);
         return Task.CompletedTask;
     }
+
+    [LoggerMessage(0420, LogLevel.Information, "Identity confirmation link for {Email}: {Link}")]
+    internal static partial void LogSendConfirmation(ILogger logger, string email, string link);
+
+    [LoggerMessage(0240, LogLevel.Information, "Identity password reset link for {Email}: {Link}")]
+    internal static partial void LogSendPassword(ILogger logger, string email, string link);
 }

@@ -1,14 +1,54 @@
 <Solution>
-  <Folder Name="/src/" />
-  <Folder Name="/src/web/">
+  <Folder Name="/Ampere/">
+    <Project Path="docker-compose.dcproj">
+      <Build />
+    </Project>
+  </Folder>
+  <Folder Name="/Ampere/.github/" />
+  <Folder Name="/Ampere/.github/ISSUE_TEMPLATES/">
+    <File Path=".github/ISSUE_TEMPLATES/bug.yml" />
+    <File Path=".github/ISSUE_TEMPLATES/feature.yml" />
+    <File Path=".github/ISSUE_TEMPLATES/task.yml" />
+    <File Path=".github/ISSUE_TEMPLATES/test.yml" />
+  </Folder>
+  <Folder Name="/Ampere/.github/skills/" />
+  <Folder Name="/Ampere/.github/skills/documentation/">
+    <File Path=".github/skills/documentation/SKILL.md" />
+  </Folder>
+  <Folder Name="/Ampere/.github/skills/dotnet-ddd/">
+    <File Path=".github/skills/dotnet-ddd/SKILL.md" />
+  </Folder>
+  <Folder Name="/Ampere/.github/skills/iot-mqtt/">
+    <File Path=".github/skills/iot-mqtt/SKILL.md" />
+  </Folder>
+  <Folder Name="/Ampere/.github/skills/maui/">
+    <File Path=".github/skills/maui/SKILL.md" />
+  </Folder>
+  <Folder Name="/Ampere/.github/workflows/">
+    <File Path=".github/workflows/ci-ct-cd.yml" />
+  </Folder>
+  <Folder Name="/Ampere/docs/">
+    <File Path="docs/architecture.md" />
+    <File Path="docs/coding-standards.md" />
+    <File Path="docs/development-stages.md" />
+    <File Path="docs/project-architecture.md" />
+    <File Path="docs/testing-architecture.md" />
+  </Folder>
+  <Folder Name="/Ampere/scripts/">
+    <File Path="scripts/gen-cert.ps1" />
+    <File Path="scripts/migrate.ps1" />
+    <File Path="scripts/rollback.ps1" />
+  </Folder>
+  <Folder Name="/Ampere/src/" />
+  <Folder Name="/Ampere/src/web/">
     <Project Path="src/web/Ampere.Application/Ampere.Application.csproj" />
     <Project Path="src/web/Ampere.Composition/Ampere.Composition.csproj" />
     <Project Path="src/web/Ampere.Domain/Ampere.Domain.csproj" />
     <Project Path="src/web/Ampere.Infrastructure/Ampere.Infrastructure.csproj" />
     <Project Path="src/web/Ampere/Ampere.csproj" />
   </Folder>
-  <Folder Name="/tests/" />
-  <Folder Name="/tests/web/">
+  <Folder Name="/Ampere/tests/" />
+  <Folder Name="/Ampere/tests/web/">
     <Project Path="tests/web/Ampere.UnitTests/Ampere.UnitTests.csproj" />
   </Folder>
 </Solution>

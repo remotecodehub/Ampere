@@ -1,5 +1,4 @@
 using Ampere.Domain.Common;
-using Ampere.Domain.MQTT.Entities;
 using Xunit;
 
 namespace Ampere.UnitTests.Common;
@@ -19,26 +18,5 @@ public sealed class DomainModelTests
         Assert.NotEqual(default, generated.UpdatedAt);
         Assert.True(generated.UpdatedAt >= generated.CreatedAt);
     }
-
-    [Fact]
-    public void BrokerConfiguration_StoresBrokerSettings()
-    {
-        BrokerConfiguration configuration = new()
-        {
-            BindAddress = "127.0.0.1",
-            Port = 1883,
-            StartOnBoot = true,
-            UseTls = false,
-            CreatedAt = DateTimeOffset.UtcNow,
-            UpdatedAt = DateTimeOffset.UtcNow
-        };
-
-        Assert.False(string.IsNullOrWhiteSpace(
-            configuration.Id));
-        Assert.Equal(1883, configuration.Port);
-        Assert.True(configuration.StartOnBoot);
-        Assert.False(configuration.UseTls);
-    }
-
     private sealed class TestEntity(string id = "") : EntityBase(id);
 }

@@ -58,43 +58,5 @@
         <member name="P:Ampere.Domain.Common.ISoftDeletable.DeletedAt">
             <summary>Gets or sets the time at which the entity was logically deleted.</summary>
         </member>
-        <member name="T:Ampere.Domain.MQTT.Entities.BrokerConfiguration">
-            <summary>
-            Represents persisted configuration for the MQTT broker.
-            </summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.BrokerConfiguration.Id">
-            <summary>Primary identifier.</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.BrokerConfiguration.BindAddress">
-            <summary>The network address to bind the broker to (e.g. 0.0.0.0).</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.BrokerConfiguration.Port">
-            <summary>The TCP port the broker listens on.</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.BrokerConfiguration.StartOnBoot">
-            <summary>Whether to start the broker automatically on app start.</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.BrokerConfiguration.UseTls">
-            <summary>Whether to enable TLS for the broker.</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.BrokerConfiguration.CreatedAt">
-            <summary>When the configuration was created.</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.BrokerConfiguration.UpdatedAt">
-            <summary>When the configuration was last updated.</summary>
-        </member>
-        <member name="T:Ampere.Domain.MQTT.Entities.MqttTopic">
-            <summary>Represents a configured MQTT topic.</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.MqttTopic.Name">
-            <summary>Gets or sets the topic name.</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.MqttTopic.Description">
-            <summary>Gets or sets the topic description.</summary>
-        </member>
-        <member name="P:Ampere.Domain.MQTT.Entities.MqttTopic.Enabled">
-            <summary>Gets or sets whether the topic is enabled.</summary>
-        </member>
     </members>
 </doc>

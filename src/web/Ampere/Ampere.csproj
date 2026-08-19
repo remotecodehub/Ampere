@@ -9,31 +9,26 @@
     <UserSecretsId>
       b9164704-a9b8-4a4d-a6f1-e778d870653c
     </UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+    <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Mediator.Abstractions"
-      Version="3.0.2" />
-    <PackageReference
-      Include="Microsoft.EntityFrameworkCore.Design"
-      Version="10.0.11">
+    <PackageReference Include="Mediator.Abstractions" Version="3.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
       <IncludeAssets>
         runtime; build; native; contentfiles;
         analyzers; buildtransitive
       </IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference
-      Include="Microsoft.AspNetCore.OpenApi"
-      Version="10.0.11" />
-    <PackageReference Include="MudBlazor"
-      Version="9.8.0" />
-    <PackageReference Include="Scalar.AspNetCore"
-      Version="2.16.20" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.24.1-preview.1" />
+    <PackageReference Include="MudBlazor" Version="9.8.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.16.20" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference
-      Include="..\Ampere.Application\Ampere.Application.csproj" />
-    <ProjectReference
-      Include="..\Ampere.Composition\Ampere.Composition.csproj" />
+    <ProjectReference Include="..\Ampere.Application\Ampere.Application.csproj" />
+    <ProjectReference Include="..\Ampere.Composition\Ampere.Composition.csproj" />
   </ItemGroup>
 </Project>

@@ -11,9 +11,9 @@
       $(MSBuildProjectDirectory)/TestResults/
     </CoverletOutput>
     <Include>
-      [Ampere.Application]Ampere.Application.MQTT.*;
-      [Ampere.Infrastructure]Ampere.Infrastructure.MQTT.*;
-      [Ampere.Infrastructure]Ampere.Infrastructure.Identity.*
+      [Ampere]Ampere.Controllers.*
+      [Ampere.Application]Ampere.Application.*
+      [Ampere.Infrastructure]Ampere.Infrastructure.*;
     </Include>
     <Threshold>80</Threshold>
     <ThresholdType>line,branch</ThresholdType>
@@ -49,6 +49,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference
+      Include="..\..\..\src\web\Ampere\Ampere.csproj" />
     <ProjectReference
       Include="..\..\..\src\web\Ampere.Application\Ampere.Application.csproj" />
     <ProjectReference
