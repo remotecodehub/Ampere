@@ -29,12 +29,11 @@ public sealed class AmpereDbContextTests
 
         Assert.True(user.IsDeleted);
         Assert.NotNull(user.DeletedAt);
-        Assert.Null(await context.Users
+        User? persisted = await context.Users
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(x => x.Id == user.Id)
-            .ContinueWith(task => task.Result is null
-                ? null
-                : task.Result.Id));
+            .FirstOrDefaultAsync(x => x.Id == user.Id);
+        Assert.NotNull(persisted);
+        Assert.True(persisted.IsDeleted);
     }
 
     [Fact]
