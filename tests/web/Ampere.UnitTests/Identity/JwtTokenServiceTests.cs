@@ -25,32 +25,51 @@ public sealed class JwtTokenServiceTests
     }
 
     [Fact]
-    public void CreateTokens_CreatesAccessAndRefreshTokens()
+    public void CreateTokens_CreatesExpectedClaims()
     {
         JwtTokenService service = Create();
         var result = service.CreateTokens(
-            "user-1", "user@example.com", ["User"],
+            "user-1",
+            "user@example.com",
+            ["User", "Admin"],
             [new Claim("permission", "read")]);
 
         Assert.Equal("Bearer", result.TokenType);
         Assert.NotEmpty(result.AccessToken);
         Assert.NotEmpty(result.RefreshToken);
+
+        ClaimsPrincipal? principal = service.ValidateToken(
+            result.AccessToken);
+
+        Assert.NotNull(principal);
+        Assert.Equal("user-1",
+            principal.FindFirstValue("sub"));
+        Assert.Equal("user@example.com",
+            principal.FindFirstValue("email"));
+        Assert.Equal("Access",
+            principal.FindFirstValue("token_type"));
+        Assert.Equal("read",
+            principal.FindFirstValue("permission"));
+        Assert.Equal(2,
+            principal.FindAll(ClaimTypes.Role).Count());
     }
 
     [Fact]
-    public void ValidateToken_ValidToken_ReturnsPrincipal()
+    public void RefreshToken_HasRefreshType()
     {
         JwtTokenService service = Create();
-        var tokens = service.CreateTokens(
-            "user-1", "user@example.com", [], []);
+        var result = service.CreateTokens(
+            "user-1",
+            "user@example.com",
+            [],
+            []);
 
         ClaimsPrincipal? principal = service.ValidateToken(
-            tokens.AccessToken);
+            result.RefreshToken);
 
         Assert.NotNull(principal);
-        Assert.Equal("user-1", principal.FindFirstValue(
-            ClaimTypes.NameIdentifier)
-            ?? principal.FindFirstValue("sub"));
+        Assert.Equal("Refresh",
+            principal.FindFirstValue("token_type"));
     }
 
     [Fact]
@@ -65,9 +84,7 @@ public sealed class JwtTokenServiceTests
     [Fact]
     public void ValidateToken_InvalidToken_ReturnsNull()
     {
-        JwtTokenService service = Create();
-
-        Assert.Null(service.ValidateToken("invalid-token"));
+        Assert.Null(Create().ValidateToken("invalid-token"));
     }
 
     [Fact]
@@ -81,6 +98,7 @@ public sealed class JwtTokenServiceTests
             tokens.AccessToken)!;
         DateTimeOffset expiration = service.GetExpiration(
             tokens.AccessToken)!.Value;
+
         store.Revoke(tokenId, expiration);
 
         Assert.Null(service.ValidateToken(
@@ -88,7 +106,7 @@ public sealed class JwtTokenServiceTests
     }
 
     [Fact]
-    public void ValidateToken_ExpiredTokenWithoutLifetimeValidation_ReturnsPrincipal()
+    public void ValidateToken_ExpiredWithoutLifetime_ReturnsPrincipal()
     {
         JwtOptions options = new()
         {
@@ -103,26 +121,51 @@ public sealed class JwtTokenServiceTests
         var tokens = service.CreateTokens(
             "user-1", "user@example.com", [], []);
 
-        ClaimsPrincipal? principal = service.ValidateToken(
-            tokens.AccessToken, false);
+        Assert.NotNull(service.ValidateToken(
+            tokens.AccessToken, false));
+    }
 
-        Assert.NotNull(principal);
+    [Fact]
+    public void ValidateToken_ExpiredWithLifetime_ReturnsNull()
+    {
+        JwtOptions options = new()
+        {
+            Key = "01234567890123456789012345678901",
+            Issuer = "Ampere.Tests",
+            Audience = "Ampere.Tests",
+            AccessTokenLifetime = TimeSpan.FromSeconds(-1)
+        };
+        JwtTokenService service = new(
+            Options.Create(options),
+            new RevokedTokenStore());
+        var tokens = service.CreateTokens(
+            "user-1", "user@example.com", [], []);
+
+        Assert.Null(service.ValidateToken(
+            tokens.AccessToken));
     }
 
     [Fact]
     public void GetTokenId_InvalidToken_ReturnsNull()
     {
-        JwtTokenService service = Create();
+        Assert.Null(Create().GetTokenId("invalid"));
+    }
 
-        Assert.Null(service.GetTokenId("invalid"));
+    [Fact]
+    public void GetTokenId_ValidToken_ReturnsIdentifier()
+    {
+        JwtTokenService service = Create();
+        var tokens = service.CreateTokens(
+            "user-1", "user@example.com", [], []);
+
+        Assert.False(string.IsNullOrWhiteSpace(
+            service.GetTokenId(tokens.AccessToken)));
     }
 
     [Fact]
     public void GetExpiration_InvalidToken_ReturnsNull()
     {
-        JwtTokenService service = Create();
-
-        Assert.Null(service.GetExpiration("invalid"));
+        Assert.Null(Create().GetExpiration("invalid"));
     }
 
     [Fact]
