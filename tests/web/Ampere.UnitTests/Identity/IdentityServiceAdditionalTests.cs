@@ -32,10 +32,7 @@ public sealed class IdentityServiceAdditionalTests
         using IdentityTestFixture fixture = new();
         User user = await fixture.CreateUserAsync(
             "2fa-valid@example.com");
-        await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
-        string code = await fixture.UserManager
-            .GenerateTwoFactorTokenAsync(user,
-                TokenOptions.DefaultAuthenticatorProvider);
+        string code = await fixture.GenerateValidAuthenticatorCodeAsync(user);
 
         var result = await fixture.Service
             .ConfigureTwoFactorAsync(
