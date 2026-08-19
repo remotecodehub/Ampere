@@ -74,6 +74,22 @@ public sealed class SignalRController(
             : BadRequest(result);
     }
 
+    /// <summary>Gets the latest telemetry.</summary>
+    [HttpGet("telemetry/snapshot")]
+    [ProducesResponseType<
+        Response<TelemetrySnapshotResponse>>(200)]
+    public async Task<IActionResult> GetSnapshot(
+        [FromQuery] GetTelemetrySnapshotRequest request,
+        CancellationToken cancellationToken)
+    {
+        Response<TelemetrySnapshotResponse> result =
+            await mediator.Send(
+                new GetTelemetrySnapshotQuery(
+                    request.HouseId),
+                cancellationToken);
+        return Ok(result);
+    }
+
     /// <summary>Streams live telemetry.</summary>
     [HttpGet("telemetry")]
     [Produces("application/x-ndjson")]
