@@ -1,56 +1,51 @@
 using Ampere.Application.Common.Abstractions;
-using Mediator.Net.Context;
-using Mediator.Net.Contracts;
-using Mediator.Net.Pipeline;
+using Mediator;
 
 namespace Ampere.Infrastructure.Persistence.Middlewares;
 
 /// <summary>
-/// Executes marked requests in a database transaction.
+/// Executes transactional Mediator requests atomically.
 /// </summary>
-/// <typeparam name="TContext">
-/// The Mediator pipeline context type.
-/// </typeparam>
-public sealed class TransactionMiddleware<TContext>(
-    IUnitOfWork unitOfWork) : IPipeSpecification<TContext>
-    where TContext : IContext<IMessage>
+/// <typeparam name="TMessage">The message type.</typeparam>
+/// <typeparam name="TResponse">The response type.</typeparam>
+public sealed class TransactionMiddleware<TMessage,
+    TResponse>(IUnitOfWork unitOfWork)
+    : IPipelineBehavior<TMessage, TResponse>
+    where TMessage : IMessage
 {
-    /// <inheritdoc />
-    public bool ShouldExecute(
-        TContext context,
+    /// <summary>
+    /// Executes the request inside a database transaction
+    /// when the message is transactional.
+    /// </summary>
+    /// <param name="message">The message.</param>
+    /// <param name="next">The next pipeline stage.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The handler response.</returns>
+    public async ValueTask<TResponse> Handle(
+        TMessage message,
+        MessageHandlerDelegate<TMessage, TResponse> next,
         CancellationToken cancellationToken)
     {
-        return context.Message is ITransactionalRequest;
-    }
+        if (message is not ITransactionalRequest)
+        {
+            return await next(message, cancellationToken);
+        }
 
-    /// <inheritdoc />
-    public Task BeforeExecute(
-        TContext context,
-        CancellationToken cancellationToken)
-    {
-        return unitOfWork.BeginTransactionAsync(
+        await unitOfWork.BeginTransactionAsync(
             cancellationToken);
-    }
 
-    /// <inheritdoc />
-    public Task Execute(
-        TContext context,
-        CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc />
-    public async Task AfterExecute(
-        TContext context,
-        CancellationToken cancellationToken)
-    {
         try
         {
+            TResponse response = await next(
+                message,
+                cancellationToken);
+
             await unitOfWork.SaveChangesAsync(
                 cancellationToken);
             await unitOfWork.CommitTransactionAsync(
                 cancellationToken);
+
+            return response;
         }
         catch
         {
@@ -58,14 +53,5 @@ public sealed class TransactionMiddleware<TContext>(
                 CancellationToken.None);
             throw;
         }
-    }
-
-    /// <inheritdoc />
-    public Task OnException(
-        Exception ex,
-        TContext context)
-    {
-        return unitOfWork.RollbackTransactionAsync(
-            CancellationToken.None);
     }
 }
