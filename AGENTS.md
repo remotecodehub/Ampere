@@ -6,200 +6,222 @@ Ampere is a local-first IoT platform for
 measuring electrical energy consumption
 by power point.
 
-The platform has three main stages:
+The platform has three stages:
 
 1. REST API, Blazor Interactive UI,
    controllers and MQTT broker support.
 2. .NET MAUI mobile application.
-3. Raspberry Pi OS customization for
-a local installation cloud.
+3. Raspberry Pi OS customization for a
+   local installation cloud.
 
-The system must not require a private
-external cloud for normal operation.
+Normal operation must not require a
+private external cloud.
 
-## Repository rules
+## Architecture
 
-- Read the applicable skill before work.
-- Preserve the repository architecture.
-- Use .NET 10.0 for .NET projects.
-- Follow current .NET 10 best practices.
-- Prefer DDD boundaries.
-- Keep the current single-project model.
-- Treat each project root as presentation.
-- Put Application, Domain and
-  Infrastructure below that root.
-- Keep one data type per source file.
+The repository uses separate projects for
+DDD layers. Do not recreate the former
+single-project DDD layout.
+
+The web solution contains:
+
+- `Ampere` presentation;
+- `Ampere.Application` application;
+- `Ampere.Domain` domain;
+- `Ampere.Infrastructure` infrastructure;
+- `Ampere.Composition` composition root.
+
+The mobile solution follows the same layer
+project model. Mobile is not the current
+feature focus, but its boundaries must be
+preserved.
+
+Dependency direction is:
+
+Presentation
+    -> Composition
+    -> Application
+    -> Domain
+
+Infrastructure implements Application
+abstractions and may depend on Application
+and Domain.
+
+Composition is the only DI composition root.
+
+## Repository and database
+
+Application services consume
+`IRepository<TEntity>` and `IUnitOfWork`.
+
+A Service must never inject `DbContext`.
+A Service must never use `DbSet<T>`.
+A Service must never reference EF Core.
+A Service must never execute SQL directly.
+
+`DbContext` may only be injected into the
+Infrastructure Repository or a dedicated
+Infrastructure repository whose abstraction
+is defined outside Infrastructure.
+
+Repositories do not call SaveChangesAsync.
+The Unit of Work owns persistence changes.
+Transactional Mediator requests use the
+transaction pipeline.
+
+Do not introduce a direct database shortcut
+to solve a Service problem.
+
+## Mediator
+
+Use the `Mediator` package by
+`martinothamar/Mediator`.
+
+`Mediator.Net` is forbidden and must not be
+introduced or retained in source projects.
+
+Use source-generated handlers and pipelines.
+Use `IRequest<TResponse>` for requests.
+Use `IStreamRequest<TResponse>` for streams.
+Use `IRequestHandler` and
+`IStreamRequestHandler` as appropriate.
+
+Do not use reflection to discover handlers.
+DI registration must use compile-time known
+assemblies and types.
+
+## C# rules
+
+- Use .NET 10.0.
+- Follow .NET 10 best practices.
+- Never use `dynamic`.
+- Never use implicit local types.
+- Always use explicit local types.
+- Always use primary constructors.
+- Never inject types through reflection.
 - Use file-scoped namespaces.
+- Keep one type per source file.
 - Keep source lines at 45 characters
   or fewer.
 - Prefer async and await.
 - Propagate CancellationToken.
-- Dispose resources when appropriate.
+- Dispose owned resources.
 - Use IDisposable or IAsyncDisposable
-  when the implementation owns resources.
+  where appropriate.
 
-## C# language rules
-
-- Never use dynamic.
-- Never use implicit local typing.
-- Declare local variables explicitly.
-- Always use primary constructors.
-- Do not inject types through reflection.
-- Prefer compile-time dependency wiring.
-- Use explicit generic type arguments when
-  inference harms clarity.
-- Follow current .NET 10 best practices.
-
-Dependency injection must use explicit
-registrations and known service types.
-Do not discover or register services by
-scanning assemblies or types through
-reflection.
-
-## Service and persistence flow
-
-Feature handlers call feature services.
-Feature services own application use cases
-that require infrastructure services.
-
-A feature service may inject:
-
-- feature abstractions;
-- IRepository<TEntity>;
-- IUnitOfWork;
-- other application abstractions.
-
-A feature service must not inject DbContext.
-A feature service must not access DbSet<T>.
-A feature service must not reference EF Core.
-A feature service must not access SQL directly.
-
-The persistence flow is:
-
-Presentation
-    -> Mediator.NET
-    -> Application Handler
-    -> IService
-    -> IRepository<TEntity>
-    -> Infrastructure Repository
-    -> DbContext
-    -> EF Core
-    -> SQL database
-
-IUnitOfWork is coordinated by the
-transaction middleware. Repositories do
-not call SaveChangesAsync().
-
-Transactional Mediator requests implement
-ITransactionalRequest. The transaction
-middleware begins a transaction before the
-handler, saves changes after the handler,
-and commits or rolls back the transaction.
-
-Queries must not open database transactions
-unless a specific consistency requirement
-justifies one.
-
-## Entity persistence
-
-Persisted application entities must
-implement IEntityBase. Domain entities
-should inherit EntityBase when possible.
-
-EntityBase provides:
-
-- Id;
-- CreatedAt;
-- CreatedBy;
-- UpdatedAt;
-- UpdatedBy.
-
-Id values use Guid.CreateVersion7().
-Identity entities may implement
-IEntityBase directly because ASP.NET Identity
-already provides their base classes.
-
-## Build quality
-
-Code must not introduce compiler warnings.
-Code must not introduce analyzer warnings.
-Code must not introduce avoidable build
-messages.
-
-Do not suppress warnings merely to hide a
+Code must not introduce compiler,
+analyzer, or avoidable build warnings.
+Never suppress diagnostics just to hide a
 problem.
 
-If a warning or analyzer diagnostic is
-caused by the change, fix the root cause.
+## MQTT
 
-Do not use pragma suppression unless the
-suppression is technically required,
-scoped to the smallest possible location,
-and documented.
+MQTTnet integration belongs in Infrastructure.
 
-The final affected build must be clean.
+Use the public strongly typed MQTTnet API.
+Do not inspect MQTTnet assemblies with
+reflection.
+Do not use `dynamic` with MQTTnet.
+Do not resolve MQTTnet types by reflection.
 
-## Application organization
+The broker runtime may be singleton state,
+but Services that consume repositories must
+remain compatible with scoped repository and
+DbContext lifetimes.
 
-Application code is organized by feature.
-Each feature may contain:
+Use a singleton runtime state object when
+long-lived MQTT server state is required.
+The feature Service itself may be scoped and
+may inject `IRepository<TEntity>`.
 
-- Abstractions
-- Commands
-- Handlers
-- Queries
-- Requests
-- Responses
-- Validators
+Persist broker configuration so a restart does
+not require reconfiguration.
 
-Domain code is organized by feature.
-Each feature may contain:
+## Blazor and MudBlazor
 
-- Entities
-- Enums
-- Events
-- Models
+Blazor pages are presentation only.
+Business logic belongs in Application.
 
-Infrastructure is also organized by
-feature. External-library-specific models
-belong there when they cannot belong in
-Domain.
+Use only MudBlazor components for page UI.
+Do not introduce another component library.
+
+MQTT pages belong under:
+
+`Components/Pages/MQTT`
+
+A page must be developed in this order:
+
+1. create the Razor page structure;
+2. add the `@code { }` block;
+3. add a local `<style>` block only when
+   styling is actually required.
+
+Do not create code-behind files for these
+pages.
+Do not create separate CSS files for these
+pages.
+
+Styles, when necessary, stay below the
+`@code { }` block.
+
+Dialogs must use MudBlazor dialog APIs.
 
 ## Web API
 
-The web project contains Controllers.
-Every endpoint must declare all possible
-HTTP responses with
-ProducesResponseType<T>(StatusCode).
+Controllers must remain thin.
+They dispatch Mediator requests and map
+application results to HTTP responses.
 
-Controllers must remain thin. Business
-rules belong to Application or Domain.
+Every possible endpoint response must use
+`ProducesResponseType<T>(StatusCode)` or the
+non-generic equivalent when no body exists.
+
+Stream endpoints must consume a
+`IStreamRequest<T>` through Mediator.
 
 ## Documentation
 
 Document public and relevant internal APIs
 with XML documentation in en-US.
-Fill every applicable XML documentation
-field.
+Fill all applicable XML documentation fields.
 
-Documentation must be factual and must
-not invent behavior that is not implemented.
+## Testing
 
-## Validation
+Web unit tests live under:
 
-Build affected .NET projects after changes.
-Run tests when they exist and are relevant.
-Do not hide build or test failures.
+`tests/web/Ampere.UnitTests`
 
-The build must finish without warnings or
-avoidable informational diagnostics.
+Feature tests are organized as:
+
+```text
+Common/
+    Fixtures/
+    Mocks/
+Feature_Name/
+    UnitTests.cs
+```
+
+Shared test fixtures and fakes belong under
+`Common`. Feature-specific tests belong under
+the feature directory.
+
+Tests must use explicit local types and the
+same C# rules as production code.
+
+MQTT changes must include unit tests for
+Application and Infrastructure behavior.
+
+Coverage is measured with
+`coverlet.collector` and must reach at least
+80% line and branch coverage for the feature
+under test.
+
+The CI test job must publish the coverage
+summary and enforce the 80% threshold.
 
 ## Git
 
 Do not create branches unless requested.
-For this foundation task, changes go to
-main in a focused commit.
-
-Do not rewrite unrelated files.
-Do not introduce dependencies without a
-clear architectural reason.
+Keep changes focused.
+Do not rewrite unrelated code.
+Do not merge draft pull requests.
