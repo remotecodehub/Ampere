@@ -137,7 +137,7 @@ public sealed class MqttBrokerService(
         return clients
             .Select(client => new MqttClientResponse(
                 client.Id,
-                client.Session.UserName,
+                null,
                 client.ConnectedTimestamp,
                 client.RemoteEndPoint?.ToString()))
             .ToArray();
