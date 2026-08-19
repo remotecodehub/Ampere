@@ -1,76 +1,99 @@
-using Mediator.Net.Contracts;
+using Ampere.Application.Common.Responses;
+using Ampere.Application.Identity.Responses;
+using Mediator;
 
 namespace Ampere.Application.Identity.Commands;
-/// <summary>Requests registration of a new user.</summary>
-/// <param name="Email">The user's email address.</param>
-/// <param name="Password">The user's password.</param>
-public sealed record RegisterCommand(string Email, string Password) : IRequest;
 
-/// <summary>Requests authentication using a password and optional second factor.</summary>
-/// <param name="Email">The user's email address.</param>
-/// <param name="Password">The user's password.</param>
-/// <param name="TwoFactorCode">The authenticator code, when required.</param>
-/// <param name="TwoFactorRecoveryCode">The recovery code, when used instead of an authenticator code.</param>
+/// <summary>Requests registration of a user.</summary>
+/// <param name="Email">The user email.</param>
+/// <param name="Password">The user password.</param>
+public sealed record RegisterCommand(
+    string Email,
+    string Password)
+    : IRequest<IdentityResultResponse>;
+
+/// <summary>Requests user authentication.</summary>
+/// <param name="Email">The user email.</param>
+/// <param name="Password">The password.</param>
+/// <param name="TwoFactorCode">The 2FA code.</param>
+/// <param name="TwoFactorRecoveryCode">
+/// The 2FA recovery code.
+/// </param>
 public sealed record LoginCommand(
     string Email,
     string Password,
     string? TwoFactorCode = null,
-    string? TwoFactorRecoveryCode = null) : IRequest;
+    string? TwoFactorRecoveryCode = null)
+    : IRequest<Response<TokenResponse>>;
 
-/// <summary>Requests exchange of a refresh token.</summary>
-/// <param name="RefreshToken">The refresh token to exchange.</param>
-public sealed record RefreshTokenCommand(string RefreshToken) : IRequest;
+/// <summary>Requests a refresh token exchange.</summary>
+/// <param name="RefreshToken">The refresh token.</param>
+public sealed record RefreshTokenCommand(
+    string RefreshToken)
+    : IRequest<Response<TokenResponse>>;
 
-/// <summary>Requests revocation of an access token.</summary>
-/// <param name="AccessToken">The access token to revoke.</param>
-public sealed record RevokeTokenCommand(string AccessToken) : IRequest;
+/// <summary>Requests access token revocation.</summary>
+/// <param name="AccessToken">The access token.</param>
+public sealed record RevokeTokenCommand(
+    string AccessToken)
+    : IRequest<Response<bool>>;
 
-/// <summary>Requests confirmation of a user's email address.</summary>
+/// <summary>Requests email confirmation.</summary>
 /// <param name="UserId">The user identifier.</param>
-/// <param name="Code">The confirmation token.</param>
-/// <param name="ChangedEmail">The replacement email address when confirming an email change.</param>
-public sealed record ConfirmEmailCommand(string UserId, string Code, string? ChangedEmail = null) : IRequest;
+/// <param name="Code">The confirmation code.</param>
+/// <param name="ChangedEmail">The changed email.</param>
+public sealed record ConfirmEmailCommand(
+    string UserId,
+    string Code,
+    string? ChangedEmail = null)
+    : IRequest<Response<bool>>;
 
-/// <summary>Requests that an email confirmation link be sent again.</summary>
-/// <param name="Email">The user's email address.</param>
-public sealed record ResendConfirmationEmailCommand(string Email) : IRequest;
+/// <summary>Requests confirmation email resend.</summary>
+/// <param name="Email">The user email.</param>
+public sealed record ResendConfirmationEmailCommand(
+    string Email)
+    : IRequest<IdentityResultResponse>;
 
-/// <summary>Starts password recovery for an email address.</summary>
-/// <param name="Email">The email address to recover.</param>
-public sealed record ForgotPasswordCommand(string Email) : IRequest;
+/// <summary>Starts password recovery.</summary>
+/// <param name="Email">The user email.</param>
+public sealed record ForgotPasswordCommand(
+    string Email)
+    : IRequest<IdentityResultResponse>;
 
 /// <summary>Requests a password reset.</summary>
-/// <param name="Email">The user's email address.</param>
-/// <param name="ResetCode">The password reset token.</param>
-/// <param name="NewPassword">The replacement password.</param>
-public sealed record ResetPasswordCommand(string Email, string ResetCode, string NewPassword) : IRequest;
+/// <param name="Email">The user email.</param>
+/// <param name="ResetCode">The reset code.</param>
+/// <param name="NewPassword">The new password.</param>
+public sealed record ResetPasswordCommand(
+    string Email,
+    string ResetCode,
+    string NewPassword)
+    : IRequest<IdentityResultResponse>;
 
-/// <summary>Requests an update to identity information.</summary>
+/// <summary>Requests identity information update.</summary>
 /// <param name="UserId">The user identifier.</param>
-/// <param name="NewEmail">The replacement email address, or <see langword="null"/> to keep the current address.</param>
-/// <param name="NewPassword">The replacement password, or <see langword="null"/> to keep the current password.</param>
-/// <param name="OldPassword">The current password used to authorize the change.</param>
+/// <param name="NewEmail">The new email.</param>
+/// <param name="NewPassword">The new password.</param>
+/// <param name="OldPassword">The current password.</param>
 public sealed record UpdateIdentityInfoCommand(
     string UserId,
     string? NewEmail,
     string? NewPassword,
-    string OldPassword) : IRequest;
+    string OldPassword)
+    : IRequest<IdentityResultResponse>;
 
-/// <summary>Requests a change to authenticator-based two-factor authentication.</summary>
+/// <summary>Requests 2FA configuration.</summary>
 /// <param name="UserId">The user identifier.</param>
-/// <param name="Enable">Whether to enable or disable two-factor authentication.</param>
-/// <param name="TwoFactorCode">The authenticator code used when enabling two-factor authentication.</param>
-/// <param name="ResetRecoveryCodes">Whether recovery codes should be regenerated.</param>
-/// <param name="ResetSharedKey">Whether the authenticator shared key should be regenerated.</param>
-/// <param name="ForgetMachine">Whether the remembered machine state should be cleared.</param>
+/// <param name="Enable">Whether 2FA is enabled.</param>
+/// <param name="TwoFactorCode">The authenticator code.</param>
+/// <param name="ResetRecoveryCodes">Whether codes reset.</param>
+/// <param name="ResetSharedKey">Whether the key resets.</param>
+/// <param name="ForgetMachine">Whether machine state resets.</param>
 public sealed record ConfigureTwoFactorCommand(
     string UserId,
     bool? Enable,
     string? TwoFactorCode,
     bool ResetRecoveryCodes,
     bool ResetSharedKey,
-    bool ForgetMachine) : IRequest;
-
-
-
-
+    bool ForgetMachine)
+    : IRequest<Response<TwoFactorResponse>>;
