@@ -8,10 +8,17 @@ namespace Ampere.Infrastructure.Identity.Models;
 /// </summary>
 public class Role(
     string? name = null)
-    : IdentityRole<string>(name ?? string.Empty),
+    : IdentityRole<string>(
+        name ?? string.Empty),
       IEntityBase,
       ISoftDeletable
 {
+    /// <summary>
+    /// Gets or sets the identity identifier.
+    /// </summary>
+    public override string Id { get; set; } =
+        Guid.CreateVersion7().ToString();
+
     /// <summary>
     /// Gets or sets whether the role is deleted.
     /// </summary>
