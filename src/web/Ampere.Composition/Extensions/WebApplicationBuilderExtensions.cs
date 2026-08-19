@@ -4,8 +4,6 @@ using Ampere.Application.Identity.Abstractions;
 using Ampere.Application.Identity.Handlers;
 using Ampere.Application.Identity.Validators;
 using Ampere.Application.MQTT.Abstractions;
-using Ampere.Application.MQTT.Handlers;
-using Ampere.Application.Setup.Abstractions;
 using Ampere.Infrastructure.Common.Repository;
 using Ampere.Infrastructure.Common.UnitOfWork;
 using Ampere.Infrastructure.Identity.Models;
@@ -200,6 +198,8 @@ public static class WebApplicationBuilderExtensions
             builder.Services.AddScoped<
                 IMqttConfigurationService,
                 MqttConfigurationService>();
+            builder.Services.AddHostedService<
+                MqttBrokerHostedService>();
 
             builder.Services.AddMediator(options =>
             {
