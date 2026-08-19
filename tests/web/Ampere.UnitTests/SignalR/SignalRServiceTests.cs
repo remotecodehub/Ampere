@@ -118,7 +118,7 @@ public sealed class SignalRServiceTests
         using CancellationTokenSource cancellation = new();
         cancellation.Cancel();
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
+        await Assert.ThrowsAsync<TaskCanceledException>(
             async () => await service.PublishTelemetryAsync(
                 CreateTelemetry("house", "endpoint"),
                 cancellation.Token));
@@ -259,9 +259,7 @@ public sealed class SignalRServiceTests
         context.Setup(item => item.Clients)
             .Returns(clients.Object);
 
-        return (
-            new SignalRService(context.Object),
-            client);
+        return (new SignalRService(context.Object), client);
     }
 
     private static TelemetryResponse CreateTelemetry(

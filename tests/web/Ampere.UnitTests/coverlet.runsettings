@@ -17,6 +17,7 @@
             [Ampere]Microsoft.AspNetCore.Components.*.g__*,
             [Ampere]Microsoft.Extensions.*.g__*,
             [Ampere]System.*
+            [Mediator.SourceGenerator]Mediator.*
           </Exclude>
           <ExcludeByAttribute>
             GeneratedCodeAttribute,

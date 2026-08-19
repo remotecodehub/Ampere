@@ -25,7 +25,7 @@ public sealed class SignalRDispatchTests
         Response<DiscoveryResponse> result =
             await mediator.Send(
                 new StartDiscoveryCommand("house", 30),
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
 
         Assert.True(result.Succeeded);
         Assert.Equal("house", result.Data?.HouseId);
@@ -40,7 +40,7 @@ public sealed class SignalRDispatchTests
         Response<RelayStateResponse> result =
             await mediator.Send(
                 new SetRelayCommand("endpoint", true),
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
 
         Assert.True(result.Succeeded);
         Assert.True(result.Data?.State);
@@ -57,7 +57,7 @@ public sealed class SignalRDispatchTests
                 new StartFirmwareUpdateCommand(
                     "node",
                     "2.0.0"),
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
 
         Assert.True(result.Succeeded);
         Assert.Equal("node", result.Data?.NodeId);
@@ -72,7 +72,7 @@ public sealed class SignalRDispatchTests
         Response<TelemetrySnapshotResponse> result =
             await mediator.Send(
                 new GetTelemetrySnapshotQuery("house"),
-                CancellationToken.None);
+                TestContext.Current.CancellationToken);
 
         Assert.True(result.Succeeded);
         Assert.Empty(result.Data!.Items);
@@ -88,7 +88,7 @@ public sealed class SignalRDispatchTests
 
         await mediator.Publish(
             new TelemetryUpdatedNotification(telemetry),
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         FakeSignalRService service =
             provider.GetRequiredService<FakeSignalRService>();
@@ -109,7 +109,7 @@ public sealed class SignalRDispatchTests
         List<TelemetryResponse> items = [];
         await foreach (TelemetryResponse item in mediator.CreateStream(
             new WatchTelemetryQuery("house"),
-            CancellationToken.None))
+            TestContext.Current.CancellationToken))
         {
             items.Add(item);
         }
@@ -127,7 +127,7 @@ public sealed class SignalRDispatchTests
         await Assert.ThrowsAsync<ValidationException>(
             async () => await mediator.Send(
                 new SetRelayCommand(string.Empty, true),
-                CancellationToken.None));
+                TestContext.Current.CancellationToken));
     }
 
     private static ServiceProvider CreateProvider()
@@ -146,6 +146,7 @@ public sealed class SignalRDispatchTests
             [typeof(StartDiscoveryCommand).Assembly];
             options.PipelineBehaviors =
             [typeof(ValidationMiddleware<,>)];
+            options.ServiceLifetime = ServiceLifetime.Scoped;
         });
         return services.BuildServiceProvider();
     }

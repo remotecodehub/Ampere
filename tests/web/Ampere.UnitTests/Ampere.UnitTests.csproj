@@ -16,6 +16,13 @@
       [Ampere.Domain]Ampere.Domain.*;
       [Ampere.Infrastructure]Ampere.Infrastructure.*
     </Include>
+    <Exclude>
+      [Ampere]Microsoft.AspNetCore.OpenApi.Generated*,
+      [Ampere]Microsoft.AspNetCore.Components.*.g__*,
+      [Ampere]Microsoft.Extensions.*.g__*,
+      [Ampere]System.*
+      [Mediator.SourceGenerator]Mediator.*
+    </Exclude>
     <Threshold>80</Threshold>
     <ThresholdType>line,branch</ThresholdType>
     <ThresholdStat>Total</ThresholdStat>

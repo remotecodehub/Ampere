@@ -343,6 +343,14 @@
             <param name="cancellationToken">The token used to cancel the operation.</param>
             <returns>The registration result.</returns>
         </member>
+        <member name="M:Ampere.Application.Identity.Abstractions.IIdentityService.EmailExistsAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks if an email is already registered
+            </summary>
+            <param name="email">The email to check if it exists</param>
+            <param name="cancellationToken">An cancellation token for the operation.</param>
+            <returns>true if email exists; otherwise, false</returns>
+        </member>
         <member name="M:Ampere.Application.Identity.Abstractions.IIdentityService.LoginAsync(System.String,System.String,System.String,System.String,System.Threading.CancellationToken)">
             <summary>Authenticates a user and issues JWT tokens when all required factors are valid.</summary>
             <param name="email">The user's email address.</param>
