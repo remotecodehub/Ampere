@@ -3,6 +3,7 @@ using Ampere.Application.Setup.Responses;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Setup.Services;
 using Ampere.UnitTests.Common.ConfiguredFixtures;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
@@ -22,18 +23,16 @@ public sealed class SystemSetupServiceTests
             fixture.RoleManager,
             loggerFactory.CreateLogger<SystemSetupService>());
 
-        SetupStatusResponse empty =
-            await service.GetSetupStatusAsync(
-                CancellationToken.None);
+        SetupStatusResponse empty = 
+            await service.GetSetupStatusAsync(CancellationToken.None);
         await fixture.CreateUserAsync("existing@example.com");
         SetupStatusResponse initialized =
-            await service.GetSetupStatusAsync(
-                CancellationToken.None);
+            await service.GetSetupStatusAsync(CancellationToken.None);
 
-        Assert.True(empty.RequiresSetup);
-        Assert.False(empty.IsInitialized);
-        Assert.False(initialized.RequiresSetup);
-        Assert.True(initialized.IsInitialized);
+        Assert.True(empty.IsSetupRequired);
+        Assert.False(empty.IsSetupComplete);
+        Assert.False(initialized.IsSetupRequired);
+        Assert.True(initialized.IsSetupComplete);
     }
 
     [Fact]

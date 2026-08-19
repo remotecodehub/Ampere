@@ -19,7 +19,7 @@ public sealed class RepositoryTests
 
         await repository.AddAsync(first, CancellationToken.None);
         await repository.AddAsync(second, CancellationToken.None);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         MqttTopic? byId = await repository.GetByIdAsync(
             first.Id, [], CancellationToken.None);
@@ -50,10 +50,10 @@ public sealed class RepositoryTests
 
         first.Description = "Updated";
         repository.Update(first);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         repository.Remove(second);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         Assert.Single(await repository.ListAsync(
             null, [], CancellationToken.None));
 
@@ -61,14 +61,12 @@ public sealed class RepositoryTests
         {
             Name = "energy/replacement"
         };
-        await repository.AddAsync(
-            replacement, CancellationToken.None);
-        await context.SaveChangesAsync();
+        await repository.AddAsync(replacement, CancellationToken.None);
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         repository.RemoveRange([first, replacement]);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        Assert.Empty(await repository.ListAsync(
-            null, [], CancellationToken.None));
+        Assert.Empty(await repository.ListAsync(null, [], CancellationToken.None));
     }
 
     private static AmpereDbContext CreateContext()

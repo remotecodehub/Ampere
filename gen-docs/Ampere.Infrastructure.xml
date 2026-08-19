@@ -78,6 +78,11 @@
             Represents an Ampere application role.
             </summary>
         </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.Role.Id">
+            <summary>
+            Gets or sets the identity identifier.
+            </summary>
+        </member>
         <member name="P:Ampere.Infrastructure.Identity.Models.Role.IsDeleted">
             <summary>
             Gets or sets whether the role is deleted.
@@ -116,6 +121,11 @@
         <member name="M:Ampere.Infrastructure.Identity.Models.User.#ctor(System.String)">
             <summary>
             Represents an Ampere application user.
+            </summary>
+        </member>
+        <member name="P:Ampere.Infrastructure.Identity.Models.User.Id">
+            <summary>
+            Gets or sets the identity identifier.
             </summary>
         </member>
         <member name="P:Ampere.Infrastructure.Identity.Models.User.DisplayName">

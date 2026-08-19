@@ -14,33 +14,33 @@ public sealed class UnitOfWorkTests
     {
         await using SqliteConnection connection =
             new("Data Source=:memory:");
-        await connection.OpenAsync();
+        await connection.OpenAsync(TestContext.Current.CancellationToken);
         DbContextOptions<AmpereDbContext> options =
             new DbContextOptionsBuilder<AmpereDbContext>()
                 .UseSqlite(connection)
                 .Options;
         await using AmpereDbContext context =
             new(options);
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
         await using UnitOfWork unitOfWork =
             new(context);
 
         await unitOfWork.CommitTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
         await unitOfWork.RollbackTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
         Assert.Equal(0, await unitOfWork.SaveChangesAsync(
-            CancellationToken.None));
+            TestContext.Current.CancellationToken));
 
         await unitOfWork.BeginTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
         await unitOfWork.CommitTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
 
         await unitOfWork.BeginTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
         await unitOfWork.RollbackTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -48,23 +48,23 @@ public sealed class UnitOfWorkTests
     {
         await using SqliteConnection connection =
             new("Data Source=:memory:");
-        await connection.OpenAsync();
+        await connection.OpenAsync(TestContext.Current.CancellationToken);
         DbContextOptions<AmpereDbContext> options =
             new DbContextOptionsBuilder<AmpereDbContext>()
                 .UseSqlite(connection)
                 .Options;
         await using AmpereDbContext context =
             new(options);
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
         await using UnitOfWork unitOfWork =
             new(context);
 
         await unitOfWork.BeginTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
         await unitOfWork.BeginTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
         await unitOfWork.RollbackTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -72,18 +72,18 @@ public sealed class UnitOfWorkTests
     {
         await using SqliteConnection connection =
             new("Data Source=:memory:");
-        await connection.OpenAsync();
+        await connection.OpenAsync(TestContext.Current.CancellationToken);
         DbContextOptions<AmpereDbContext> options =
             new DbContextOptionsBuilder<AmpereDbContext>()
                 .UseSqlite(connection)
                 .Options;
         await using AmpereDbContext context =
             new(options);
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
         UnitOfWork unitOfWork = new(context);
 
         await unitOfWork.BeginTransactionAsync(
-            CancellationToken.None);
+            TestContext.Current.CancellationToken);
         await unitOfWork.DisposeAsync();
     }
 }

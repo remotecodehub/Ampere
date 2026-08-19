@@ -19,19 +19,19 @@ public sealed class AmpereDbContextTests
         context.Users.Add(user);
         context.Roles.Add(role);
 
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         Assert.NotEqual(userId, user.Id);
         Assert.NotEqual(roleId, role.Id);
 
         context.Users.Remove(user);
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         Assert.True(user.IsDeleted);
         Assert.NotNull(user.DeletedAt);
         User? persisted = await context.Users
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(x => x.Id == user.Id);
+            .FirstOrDefaultAsync(x => x.Id == user.Id, TestContext.Current.CancellationToken);
         Assert.NotNull(persisted);
         Assert.True(persisted.IsDeleted);
     }
