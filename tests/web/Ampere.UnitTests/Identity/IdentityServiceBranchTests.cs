@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Ampere.Application.Identity.Responses;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
@@ -18,13 +19,14 @@ public sealed class IdentityServiceBranchTests
         User user = await fixture.CreateUserAsync(
             "recovery@example.com");
         await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
-        string[]? codes = (string[]?)await fixture.UserManager
-            .GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+        string[]? codes = (await fixture.UserManager
+            .GenerateNewTwoFactorRecoveryCodesAsync(user, 10))
+            ?.ToArray();
         await fixture.UserManager.SetTwoFactorEnabledAsync(
             user, true);
 
         string recoveryCode = codes![0];
-        var result = await fixture.Service.LoginAsync(
+        TokenResponse? result = await fixture.Service.LoginAsync(
             user.Email!, "Password1!", null, recoveryCode,
             CancellationToken.None);
 
@@ -32,22 +34,92 @@ public sealed class IdentityServiceBranchTests
     }
 
     [Fact]
+    public async Task LoginAsync_TwoFactorInvalidCode_ReturnsNull()
+    {
+        using IdentityTestFixture fixture = new();
+        User user = await fixture.CreateUserAsync(
+            "invalid-code@example.com");
+        await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
+        await fixture.UserManager.SetTwoFactorEnabledAsync(
+            user, true);
+
+        TokenResponse? result = await fixture.Service.LoginAsync(
+            user.Email!, "Password1!", "000000", null,
+            CancellationToken.None);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task LoginAsync_TwoFactorMissingCode_ReturnsNull()
+    {
+        using IdentityTestFixture fixture = new();
+        User user = await fixture.CreateUserAsync(
+            "missing-code@example.com");
+        await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
+        await fixture.UserManager.SetTwoFactorEnabledAsync(
+            user, true);
+
+        TokenResponse? result = await fixture.Service.LoginAsync(
+            user.Email!, "Password1!", null, null,
+            CancellationToken.None);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task LoginAsync_LockedOutUser_ReturnsNull()
+    {
+        using IdentityTestFixture fixture = new();
+        User user = await fixture.CreateUserAsync(
+            "locked@example.com");
+        await fixture.UserManager.SetLockoutEnabledAsync(
+            user, true);
+        await fixture.UserManager.SetLockoutEndDateAsync(
+            user, DateTimeOffset.UtcNow.AddMinutes(5));
+
+        TokenResponse? result = await fixture.Service.LoginAsync(
+            user.Email!, "Password1!", null, null,
+            CancellationToken.None);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task LoginAsync_NotAllowedUser_ReturnsNull()
+    {
+        using IdentityTestFixture fixture = new();
+        User user = await fixture.CreateUserAsync(
+            "not-allowed@example.com");
+        user.EmailConfirmed = false;
+        await fixture.UserManager.UpdateAsync(user);
+        fixture.UserManager.Options.SignIn.RequireConfirmedEmail =
+            true;
+
+        TokenResponse? result = await fixture.Service.LoginAsync(
+            user.Email!, "Password1!", null, null,
+            CancellationToken.None);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
     public async Task RefreshAsync_MissingUser_ReturnsNull()
     {
         using IdentityTestFixture fixture = new();
-        var tokens = new JwtTokenService(
+        JwtTokenService tokenService = new(
             Options.Create(new JwtOptions
             {
-                Key = "...",
+                Key = "01234567890123456789012345678901",
                 Issuer = "Ampere.Tests",
                 Audience = "Ampere.Tests"
             }),
-            new RevokedTokenStore())
-            .CreateTokens(
-                "missing-user",
-                "missing@example.com",
-                [],
-                []);
+            new RevokedTokenStore());
+        TokenResponse tokens = tokenService.CreateTokens(
+            "missing-user",
+            "missing@example.com",
+            [],
+            []);
 
         Assert.Null(await fixture.Service.RefreshAsync(
             tokens.RefreshToken, CancellationToken.None));
@@ -66,10 +138,9 @@ public sealed class IdentityServiceBranchTests
             role,
             new Claim("permission", "read"))).Succeeded);
         Assert.True((await fixture.UserManager.AddToRoleAsync(
-            user,
-            role.Name!)).Succeeded);
+            user, role.Name!)).Succeeded);
 
-        var result = await fixture.Service.LoginAsync(
+        TokenResponse? result = await fixture.Service.LoginAsync(
             user.Email!, "Password1!", null, null,
             CancellationToken.None);
 
@@ -84,9 +155,10 @@ public sealed class IdentityServiceBranchTests
             "owner@example.com");
         await fixture.CreateUserAsync("taken@example.com");
 
-        var result = await fixture.Service.UpdateInfoAsync(
-            user.Id, "taken@example.com", null,
-            "Password1!", CancellationToken.None);
+        IdentityResultResponse result =
+            await fixture.Service.UpdateInfoAsync(
+                user.Id, "taken@example.com", null,
+                "Password1!", CancellationToken.None);
 
         Assert.False(result.Succeeded);
     }
@@ -98,11 +170,83 @@ public sealed class IdentityServiceBranchTests
         User user = await fixture.CreateUserAsync(
             "bad-password@example.com");
 
-        var result = await fixture.Service.UpdateInfoAsync(
-            user.Id, null, "x", "Password1!",
-            CancellationToken.None);
+        IdentityResultResponse result =
+            await fixture.Service.UpdateInfoAsync(
+                user.Id, null, "x", "Password1!",
+                CancellationToken.None);
 
         Assert.False(result.Succeeded);
+    }
+
+    [Fact]
+    public async Task ForgotPasswordAsync_UserWithoutPassword_Succeeds()
+    {
+        using IdentityTestFixture fixture = new();
+        User user = new("external@example.com")
+        {
+            Email = "external@example.com",
+            EmailConfirmed = true
+        };
+        Assert.True((await fixture.UserManager.CreateAsync(user))
+            .Succeeded);
+
+        IdentityResultResponse result =
+            await fixture.Service.ForgotPasswordAsync(
+                user.Email!, CancellationToken.None);
+
+        Assert.True(result.Succeeded);
+    }
+
+    [Fact]
+    public async Task ConfigureTwoFactorAsync_EnableWithValidCode_Succeeds()
+    {
+        using IdentityTestFixture fixture = new();
+        User user = await fixture.CreateUserAsync(
+            "enable-2fa@example.com");
+        await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
+        string code = await fixture.UserManager
+            .GenerateTwoFactorTokenAsync(
+                user,
+                fixture.UserManager.Options.Tokens
+                    .AuthenticatorTokenProvider);
+
+        TwoFactorResponse? result = await fixture.Service
+            .ConfigureTwoFactorAsync(
+                user.Id, true, code, false, false, false,
+                CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.True(result.IsTwoFactorEnabled);
+    }
+
+    [Fact]
+    public async Task ConfigureTwoFactorAsync_EnableWithoutCode_ReturnsNull()
+    {
+        using IdentityTestFixture fixture = new();
+        User user = await fixture.CreateUserAsync(
+            "enable-no-code@example.com");
+
+        TwoFactorResponse? result = await fixture.Service
+            .ConfigureTwoFactorAsync(
+                user.Id, true, null, false, false, false,
+                CancellationToken.None);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task ConfigureTwoFactorAsync_EnableInvalidCode_ReturnsNull()
+    {
+        using IdentityTestFixture fixture = new();
+        User user = await fixture.CreateUserAsync(
+            "enable-bad-code@example.com");
+
+        TwoFactorResponse? result = await fixture.Service
+            .ConfigureTwoFactorAsync(
+                user.Id, true, "000000", false, false, false,
+                CancellationToken.None);
+
+        Assert.Null(result);
     }
 
     [Fact]
@@ -112,7 +256,7 @@ public sealed class IdentityServiceBranchTests
         User user = await fixture.CreateUserAsync(
             "reset-key@example.com");
 
-        var result = await fixture.Service
+        TwoFactorResponse? result = await fixture.Service
             .ConfigureTwoFactorAsync(
                 user.Id, false, null, false, true, false,
                 CancellationToken.None);
@@ -129,7 +273,7 @@ public sealed class IdentityServiceBranchTests
         User user = await fixture.CreateUserAsync(
             "reset-codes@example.com");
 
-        var result = await fixture.Service
+        TwoFactorResponse? result = await fixture.Service
             .ConfigureTwoFactorAsync(
                 user.Id, false, null, true, false, false,
                 CancellationToken.None);
@@ -140,12 +284,14 @@ public sealed class IdentityServiceBranchTests
     }
 
     [Fact]
-    public async Task EmailExistsAsync_IsCaseSensitiveByStoreRules()
+    public async Task EmailExistsAsync_ReturnsTrueForExistingEmail()
     {
         using IdentityTestFixture fixture = new();
         await fixture.CreateUserAsync("case@example.com");
 
-        Assert.True(await fixture.Service.EmailExistsAsync(
-            "case@example.com", CancellationToken.None));
+        bool exists = await fixture.Service.EmailExistsAsync(
+            "case@example.com", CancellationToken.None);
+
+        Assert.True(exists);
     }
 }
