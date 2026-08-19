@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Ampere.Application.Common.Responses;
 using Ampere.Application.Identity.Commands;
@@ -320,8 +321,8 @@ public sealed class IdentityControllerTests
     [Fact]
     public async Task GetInfo_MissingIdentity_ReturnsUnauthorized()
     {
-        Mock<IMediator> mediator = new();
-        IdentityController controller = CreateController(mediator);
+        IdentityController controller = CreateController(
+            new Mock<IMediator>());
 
         IActionResult result = await controller.GetInfo(
             CancellationToken.None);
@@ -376,11 +377,11 @@ public sealed class IdentityControllerTests
     [Fact]
     public async Task UpdateInfo_MissingIdentity_ReturnsUnauthorized()
     {
-        IdentityController controller =
-            CreateController(new Mock<IMediator>());
+        IdentityController controller = CreateController(
+            new Mock<IMediator>());
 
         IActionResult result = await controller.UpdateInfo(
-            new InfoRequest("new@b.com", null, null),
+            new InfoRequest("new@b.com", null, "old"),
             CancellationToken.None);
 
         Assert.IsType<UnauthorizedResult>(result);
@@ -409,8 +410,8 @@ public sealed class IdentityControllerTests
     [Fact]
     public async Task ConfigureTwoFactor_MissingIdentity_ReturnsUnauthorized()
     {
-        IdentityController controller =
-            CreateController(new Mock<IMediator>());
+        IdentityController controller = CreateController(
+            new Mock<IMediator>());
 
         IActionResult result = await controller.ConfigureTwoFactor(
             new TwoFactorRequest(true, "123456", false, false, false),
