@@ -22,6 +22,7 @@ external cloud for normal operation.
 - Read the applicable skill before work.
 - Preserve the repository architecture.
 - Use .NET 10.0 for .NET projects.
+- Follow current .NET 10 best practices.
 - Prefer DDD boundaries.
 - Keep the current single-project model.
 - Treat each project root as presentation.
@@ -36,6 +37,44 @@ external cloud for normal operation.
 - Dispose resources when appropriate.
 - Use IDisposable or IAsyncDisposable
   when the implementation owns resources.
+
+## C# language rules
+
+- Never use dynamic.
+- Never use implicit local typing.
+- Declare local variables explicitly.
+- Always use primary constructors.
+- Do not inject types through reflection.
+- Prefer compile-time dependency wiring.
+- Use explicit generic type arguments when
+  inference harms clarity.
+- Follow current .NET 10 best practices.
+
+Dependency injection must use explicit
+registrations and known service types.
+Do not discover or register services by
+scanning assemblies or types through
+reflection.
+
+## Build quality
+
+Code must not introduce compiler warnings.
+Code must not introduce analyzer warnings.
+Code must not introduce avoidable build
+messages.
+
+Do not suppress warnings merely to hide a
+problem.
+
+If a warning or analyzer diagnostic is
+caused by the change, fix the root cause.
+
+Do not use pragma suppression unless the
+suppression is technically required,
+scoped to the smallest possible location,
+and documented.
+
+The final affected build must be clean.
 
 ## Application organization
 
@@ -88,6 +127,9 @@ not invent behavior that is not implemented.
 Build affected .NET projects after changes.
 Run tests when they exist and are relevant.
 Do not hide build or test failures.
+
+The build must finish without warnings or
+avoidable informational diagnostics.
 
 ## Git
 
