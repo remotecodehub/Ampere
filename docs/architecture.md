@@ -10,27 +10,37 @@ mobile clients.
 ## Solution areas
 
 - `src/app`: .NET MAUI application.
-- `src/web`: Blazor, MQTT Broker and REST API.
+- `src/web`: Blazor, MQTT and REST API.
 - `src/iot`: embedded IoT software.
 - `src/os`: Raspberry Pi OS work.
-- `tests/app`: tests for mobile maui app.
-- `tests/web`: tests for web projects.
+- `tests/app`: mobile tests.
+- `tests/web`: web tests.
 
-The repository may still contain only part
-of the target tree. Agents must extend the
-existing structure without breaking code.
+## DDD projects
 
-## Single-project DDD
+Each .NET application uses one project per
+DDD layer. The presentation project is
+separate from Application, Domain,
+Infrastructure and Composition.
 
-Each .NET application starts as one
-project. Both Blazor app and MAUI Apps
-are the Presentation layer, and there are
-4 more projects composing DDD architecture:
+Web projects:
 
-- `*.Application`
-- `*.Composition`
-- `*.Domain`
-- `*.Infrastructure`
+- `Ampere`
+- `Ampere.Application`
+- `Ampere.Domain`
+- `Ampere.Infrastructure`
+- `Ampere.Composition`
+
+The MAUI application follows the same
+layer-project model.
+
+## Dependency direction
+
+Presentation consumes Application and the
+Composition root. Application depends on
+Domain. Infrastructure implements
+Application abstractions and may depend on
+Domain. Composition wires all implementations.
 
 ## Application
 
@@ -45,19 +55,28 @@ contain:
 - `Responses`
 - `Validators`
 
-Handlers invoke feature services. Services
-may use application abstractions such as
-repositories and unit of work.
+Handlers invoke feature Services.
+Services consume `IRepository<TEntity>` and
+`IUnitOfWork` when persistence is required.
 
-Services must not depend on DbContext,
-DbSet<T>, EF Core, or SQL directly.
+Services must never depend on DbContext,
+DbSet<T>, EF Core or SQL.
+
+## Mediator
+
+Use `Mediator` from martinothamar/Mediator.
+`Mediator.Net` is not allowed.
+
+Use source-generated request handlers and
+stream handlers. Do not discover handlers
+through reflection.
 
 ## Persistence flow
 
 The persistence flow is:
 
 Presentation
-    -> Mediator.NET
+    -> Mediator
     -> Application Handler
     -> IService
     -> IRepository<TEntity>
@@ -70,22 +89,31 @@ Presentation
 Application and implemented in Infrastructure.
 
 Repositories do not call SaveChangesAsync.
+`IUnitOfWork` owns persistence changes.
+Transaction middleware coordinates
+transactional requests.
 
-`IUnitOfWork` coordinates persistence and
-is implemented in Infrastructure. Transaction
-middleware controls its transaction lifecycle.
+## MQTT runtime
 
-A state-changing Mediator request can
-implement `ITransactionalRequest`.
-The middleware then begins a transaction,
-executes the handler, saves changes, and
-commits or rolls back.
+MQTTnet belongs in Infrastructure.
+The broker runtime may be singleton state,
+but the feature Service that consumes the
+repository is scoped.
+
+Broker configuration is persisted through the
+repository. A hosted startup service creates
+a scope and starts the broker when
+`StartOnBoot` is enabled.
+
+MQTT messages are exposed to the Application
+through typed contracts. Live messages use
+Mediator stream requests.
 
 ## Entities
 
 Persisted application entities implement
-`IEntityBase`. Domain entities should
-inherit `EntityBase` when possible.
+`IEntityBase`. Domain entities should inherit
+`EntityBase` when possible.
 
 `EntityBase` provides:
 
@@ -100,68 +128,48 @@ ASP.NET Identity entities implement the
 interface directly because their framework
 base classes are fixed.
 
-## Domain
+## Blazor
 
-Organize domain code by feature. Use:
+MQTT pages belong under
+`Components/Pages/MQTT`.
 
-- `Entities`
-- `Enums`
-- `Events`
-- `Models`
+Use only MudBlazor components.
+Do not create code-behind or external CSS
+for these pages. Keep page code inside the
+Razor `@code` block and local styles below it
+when required.
 
-Domain code must not depend on UI or
-external infrastructure.
+## Web API
 
-## Infrastructure
-
-Organize external implementations by
-feature. Keep adapter models here when
-they require external dependencies.
-
-EF Core and external NuGet dependencies
-must remain in Infrastructure.
-
-## Composition
-
-Dependency injection composition belongs
-in `Composition`. Keep registration out
-of domain code.
-
-Use explicit registrations. Do not discover
-or inject types through reflection.
-
-## Web
-
-Controllers expose REST endpoints.
-Business logic belongs in Application or
-Domain, not controllers.
+Controllers expose REST endpoints and remain
+thin. They dispatch Mediator requests.
 
 Every possible endpoint response must be
-listed with `ProducesResponseType<T>` and
-its HTTP status code.
+listed with `ProducesResponseType<T>` or its
+non-generic equivalent.
 
-Blazor components are presentation only.
+Stream endpoints consume Mediator
+`IStreamRequest<T>` messages.
 
-## IoT
+## Testing
 
-IoT software is isolated from web and mobile.
-Device protocols and measurement logic have
-explicit boundaries.
+Web unit tests live under
+`tests/web/Ampere.UnitTests`.
 
-MQTT is an integration transport, not a
-Domain model.
+Tests are organized by feature, with shared
+fixtures and fakes under `Common`.
+
+MQTT tests use no external broker. Runtime
+tests use ephemeral ports.
+
+Coverage for the MQTT executable feature
+scope must be at least 80 percent for both
+lines and branches.
 
 ## Local-first
 
 Normal operation must not require a
 private external cloud. Local networking,
-data storage, authentication, and device
+data storage, authentication and device
 communication remain viable without an
 internet service.
-
-## Evolution
-
-The first stage favors a single project.
-Future work may split Application, Domain,
-and Infrastructure when a real dependency
-boundary justifies it.
