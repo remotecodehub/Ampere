@@ -13,7 +13,12 @@ public interface IIdentityService
     /// <returns>The registration result.</returns>
     Task<IdentityResultResponse> RegisterAsync(string email, string password, CancellationToken cancellationToken);
 
-
+   /// <summary>
+   /// Checks if an email is already registered
+   /// </summary>
+   /// <param name="email">The email to check if it exists</param>
+   /// <param name="cancellationToken">An cancellation token for the operation.</param>
+   /// <returns>true if email exists; otherwise, false</returns>
     Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken);
 
     /// <summary>Authenticates a user and issues JWT tokens when all required factors are valid.</summary>
