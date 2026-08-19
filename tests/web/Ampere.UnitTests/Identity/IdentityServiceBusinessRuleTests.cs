@@ -13,13 +13,9 @@ public sealed class IdentityServiceBusinessRuleTests
         using IdentityTestFixture fixture = new();
         User user = await fixture.CreateUserAsync(
             "authenticator@example.com");
-        await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
-        string provider = fixture.UserManager.Options
-            .Tokens.AuthenticatorTokenProvider;
         await fixture.UserManager.SetTwoFactorEnabledAsync(
             user, true);
-        string code = await fixture.UserManager
-            .GenerateTwoFactorTokenAsync(user, provider);
+        string code = await fixture.GenerateValidAuthenticatorCodeAsync(user);
 
         var result = await fixture.Service.LoginAsync(
             user.Email!, "Password1!", code, null,
@@ -109,11 +105,7 @@ public sealed class IdentityServiceBusinessRuleTests
         using IdentityTestFixture fixture = new();
         User user = await fixture.CreateUserAsync(
             "enable2fa@example.com");
-        await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
-        string provider = fixture.UserManager.Options
-            .Tokens.AuthenticatorTokenProvider;
-        string code = await fixture.UserManager
-            .GenerateTwoFactorTokenAsync(user, provider);
+        string code = await fixture.GenerateValidAuthenticatorCodeAsync(user);
 
         var result = await fixture.Service
             .ConfigureTwoFactorAsync(
@@ -145,11 +137,7 @@ public sealed class IdentityServiceBusinessRuleTests
         using IdentityTestFixture fixture = new();
         User user = await fixture.CreateUserAsync(
             "enable-codes@example.com");
-        await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
-        string provider = fixture.UserManager.Options
-            .Tokens.AuthenticatorTokenProvider;
-        string code = await fixture.UserManager
-            .GenerateTwoFactorTokenAsync(user, provider);
+        string code = await fixture.GenerateValidAuthenticatorCodeAsync(user);
 
         var result = await fixture.Service
             .ConfigureTwoFactorAsync(
