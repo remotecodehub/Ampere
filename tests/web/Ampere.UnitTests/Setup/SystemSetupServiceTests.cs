@@ -1,4 +1,6 @@
 using Ampere.Application.Identity.Responses;
+using Ampere.Application.Setup.Responses;
+using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Setup.Services;
 using Ampere.UnitTests.Common.Fixtures;
 using Microsoft.Extensions.Logging;
@@ -20,11 +22,13 @@ public sealed class SystemSetupServiceTests
             fixture.RoleManager,
             loggerFactory.CreateLogger<SystemSetupService>());
 
-        var empty = await service.GetSetupStatusAsync(
-            CancellationToken.None);
+        SetupStatusResponse empty =
+            await service.GetSetupStatusAsync(
+                CancellationToken.None);
         await fixture.CreateUserAsync("existing@example.com");
-        var initialized = await service.GetSetupStatusAsync(
-            CancellationToken.None);
+        SetupStatusResponse initialized =
+            await service.GetSetupStatusAsync(
+                CancellationToken.None);
 
         Assert.True(empty.RequiresSetup);
         Assert.False(empty.IsInitialized);
@@ -79,9 +83,9 @@ public sealed class SystemSetupServiceTests
     public async Task InitializeSetup_ExistingRole_ReusesRole()
     {
         using IdentityTestFixture fixture = new();
-        Assert.True((await fixture.RoleManager
-            .CreateAsync(new Ampere.Infrastructure.Identity.Models.Role(
-                "Administrator"))).Succeeded);
+        IdentityResult roleResult = await fixture.RoleManager
+            .CreateAsync(new Role("Administrator"));
+        Assert.True(roleResult.Succeeded);
         using ILoggerFactory loggerFactory =
             LoggerFactory.Create(builder => { });
         SystemSetupService service = new(
