@@ -2,7 +2,6 @@ using Ampere.Application.Identity.Abstractions;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Services;
 using Ampere.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,11 +20,11 @@ public sealed class IdentityTestFixture : IDisposable
         ServiceCollection services = new();
         services.AddLogging();
         services.AddHttpContextAccessor();
-        services.AddAuthentication();
         services.AddDbContext<AmpereDbContext>(options =>
             options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
         services.AddIdentityCore<User>(options =>
         {
+            options.User.RequireUniqueEmail = true;
             options.Password.RequireDigit = false;
             options.Password.RequireLowercase = false;
             options.Password.RequireUppercase = false;
