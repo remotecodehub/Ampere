@@ -47,6 +47,18 @@ public sealed class House(string name) : EntityBase
         string nodeId,
         string macAddress)
     {
+        bool exists = _devices.Any(
+            device => string.Equals(
+                device.NodeId,
+                nodeId,
+                StringComparison.OrdinalIgnoreCase));
+
+        if (exists)
+        {
+            throw new InvalidOperationException(
+                "A device with the same node exists.");
+        }
+
         SonoffDevice device = new(nodeId, macAddress);
         _devices.Add(device);
         return device;
