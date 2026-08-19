@@ -1,0 +1,16 @@
+<Solution>
+  <Folder>
+    <Folder Name="/src/" />
+    <Folder Name="/src/web/">
+      <Project Path="src/web/Ampere.Application/Ampere.Application.csproj" />
+      <Project Path="src/web/Ampere.Composition/Ampere.Composition.csproj" />
+      <Project Path="src/web/Ampere.Domain/Ampere.Domain.csproj" />
+      <Project Path="src/web/Ampere.Infrastructure/Ampere.Infrastructure.csproj" />
+      <Project Path="src/web/Ampere/Ampere.csproj" />
+    </Folder>
+    <Folder Name="/tests/" />
+    <Folder Name="/tests/web/">
+      <Project Path="tests/web/Ampere.UnitTests/Ampere.UnitTests.csproj" />
+    </Folder>
+  </Folder>
+</Solution>

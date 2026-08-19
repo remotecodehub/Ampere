@@ -1,0 +1,17 @@
+<Project>
+  <!-- <Target Name="ValidateGlobalUsings" BeforeTargets="CoreCompile" Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <Error
+      Condition="!Exists('$(MSBuildProjectDirectory)/GlobalUsings.cs')"
+      Text="$(MSBuildProjectName): GlobalUsings.cs is required at the project root. Add all project-wide using directives there and do not add using directives to individual source files." />
+  </Target> -->
+
+  <Target Name="GenerateXmlDocumentation"
+          AfterTargets="CoreCompile"
+          Condition="'$(IsTestProject)' != 'true' and '$(GenerateDocumentationFile)' == 'true'">
+    <MakeDir Directories="$(MSBuildThisFileDirectory)../docs-gen" />
+    <Copy SourceFiles="$(DocumentationFile)"
+          DestinationFiles="$(MSBuildThisFileDirectory)../../gen-docs/$(AssemblyName).xml"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

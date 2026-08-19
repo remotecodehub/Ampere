@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/app/">
+    <Project Path="src/app/AmpereApp.Application/AmpereApp.Application.csproj" />
+    <Project Path="src/app/AmpereApp.Composition/AmpereApp.Composition.csproj" />
+    <Project Path="src/app/AmpereApp.Domain/AmpereApp.Domain.csproj" />
+    <Project Path="src/app/AmpereApp.Infrastructure/AmpereApp.Infrastructure.csproj" />
+    <Project Path="src/app/AmpereApp/AmpereApp.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/app/" />
+  <Folder Name="/tests/app/AmpereApp.UITests/">
+    <Project Path="tests/app/AmpereApp.UITests/UITests.Android/UITests.Android.csproj" />
+    <Project Path="tests/app/AmpereApp.UITests/UITests.iOS/UITests.iOS.csproj" />
+    <Project Path="tests/app/AmpereApp.UITests/UITests.macOS/UITests.macOS.csproj" />
+    <Project Path="tests/app/AmpereApp.UITests/UITests.Shared/UITests.Shared.csproj" />
+    <Project Path="tests/app/AmpereApp.UITests/UITests.Windows/UITests.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/app/AmpereApp.UnitTests/">
+    <Project Path="tests/app/AmpereApp.UnitTests/AmpereApp.UnitTests/AmpereApp.UnitTests.csproj" />
+  </Folder>
+   
+</Solution>

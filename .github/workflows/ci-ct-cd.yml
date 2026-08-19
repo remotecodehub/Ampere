@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Continuous Integration
+  build_App:
+    name: App Continuous Integration
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -30,10 +30,29 @@ jobs:
       - name: Build
         run: dotnet build Ampere.slnx --configuration Release --no-restore
 
-  tests:
-    name: Continuous Testing
+  build_web:
+    name: Web Continuous Integration
     runs-on: ubuntu-latest
-    needs: build
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.*
+
+      - name: Restore
+        run: dotnet restore Ampere.Web.slnx
+
+      - name: Build
+        run: dotnet build Ampere.Web.slnx --configuration Release --no-restore
+
+  tests:
+    name: Web Continuous Testing
+    runs-on: ubuntu-latest
+    needs: build_web
     timeout-minutes: 20
     steps:
       - name: Checkout
