@@ -2,23 +2,47 @@ using Ampere.Domain.Common;
 using Microsoft.AspNetCore.Identity;
 
 namespace Ampere.Infrastructure.Identity.Models;
+
 /// <summary>
-/// Represents a role in the InvisibleSP application.
+/// Represents an Ampere application role.
 /// </summary>
-public class Role : IdentityRole<string>, ISoftDeletable
+public class Role(
+    string? name = null)
+    : IdentityRole<string>(name ?? string.Empty),
+      IEntityBase,
+      ISoftDeletable
 {
-    /// <summary>Indicates whether the role is deleted.</summary>
+    /// <summary>
+    /// Gets or sets whether the role is deleted.
+    /// </summary>
     public bool IsDeleted { get; set; }
-    /// <summary>Gets or sets the date and time when the role was deleted.</summary>
+
+    /// <summary>
+    /// Gets or sets the deletion timestamp.
+    /// </summary>
     public DateTimeOffset? DeletedAt { get; set; }
-    /// <summary>Role parameterless constructor.</summary>
-    public Role() : base()
-    {
-        Id = Guid.CreateVersion7().ToString();
-    }
-    /// <summary>Role constructor.</summary>
-    public Role(string name) : base(name)
-    {
-        Id = Guid.CreateVersion7().ToString();
-    }
+
+    /// <summary>
+    /// Gets or sets the creation timestamp.
+    /// </summary>
+    public DateTimeOffset CreatedAt { get; set; } =
+        DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// Gets or sets the creator identifier.
+    /// </summary>
+    public string CreatedBy { get; set; } =
+        string.Empty;
+
+    /// <summary>
+    /// Gets or sets the last update timestamp.
+    /// </summary>
+    public DateTimeOffset UpdatedAt { get; set; } =
+        DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// Gets or sets the last updater identifier.
+    /// </summary>
+    public string UpdatedBy { get; set; } =
+        string.Empty;
 }

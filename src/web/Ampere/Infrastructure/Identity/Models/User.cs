@@ -4,31 +4,63 @@ using Microsoft.AspNetCore.Identity;
 namespace Ampere.Infrastructure.Identity.Models;
 
 /// <summary>
-/// Represents a user in the InvisibleSP application.
+/// Represents an Ampere application user.
 /// </summary>
-public class User : IdentityUser<string>, ISoftDeletable
+public class User(
+    string? userName = null)
+    : IdentityUser<string>(userName ?? string.Empty),
+      IEntityBase,
+      ISoftDeletable
 {
-    /// <summary>User name displayed in the application.</summary>
-    public string? DisplayName { get; set; } = string.Empty;
-    /// <summary>First name of the user.</summary>
-    public string? FirstName { get; set; } = string.Empty;
-    /// <summary>Surname of the user.</summary>
-    public string? SurName { get; set; } = string.Empty;
-    /// <summary>Indicates whether the user is deleted.</summary>
-    public bool IsDeleted { get; set; } 
-    /// <summary>Gets or sets the date and time when the user was deleted.</summary>
-    public DateTimeOffset? DeletedAt { get; set; } = null!;
+    /// <summary>
+    /// Gets or sets the display name.
+    /// </summary>
+    public string? DisplayName { get; set; } =
+        string.Empty;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="User"/> class.
+    /// Gets or sets the first name.
     /// </summary>
-    public User() : base()
-    {
-        Id = Guid.CreateVersion7().ToString();
-    }
-    /// <inheritdoc />
-    public User(string name) : base(name)
-    {
-        Id = Guid.CreateVersion7().ToString();
-    }
+    public string? FirstName { get; set; } =
+        string.Empty;
+
+    /// <summary>
+    /// Gets or sets the surname.
+    /// </summary>
+    public string? SurName { get; set; } =
+        string.Empty;
+
+    /// <summary>
+    /// Gets or sets whether the user is deleted.
+    /// </summary>
+    public bool IsDeleted { get; set; }
+
+    /// <summary>
+    /// Gets or sets the deletion timestamp.
+    /// </summary>
+    public DateTimeOffset? DeletedAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets the creation timestamp.
+    /// </summary>
+    public DateTimeOffset CreatedAt { get; set; } =
+        DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// Gets or sets the creator identifier.
+    /// </summary>
+    public string CreatedBy { get; set; } =
+        string.Empty;
+
+    /// <summary>
+    /// Gets or sets the last update timestamp.
+    /// </summary>
+    public DateTimeOffset UpdatedAt { get; set; } =
+        DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// Gets or sets the last updater identifier.
+    /// </summary>
+    public string UpdatedBy { get; set; } =
+        string.Empty;
 }
