@@ -1,6 +1,6 @@
-using Ampere.Application.Common.Abstractions;
 using Ampere.Application.Common.Responses;
 using Ampere.Application.MQTT.Requests;
+using Mediator;
 
 namespace Ampere.Application.MQTT.Commands;
 
@@ -8,4 +8,4 @@ namespace Ampere.Application.MQTT.Commands;
 /// <param name="Request">The publish request.</param>
 public sealed record PublishMessageCommand(
     PublishMessageRequest Request)
-    : ITransactionalRequest<Response<bool>>;
+    : IRequest<Response<bool>>;
