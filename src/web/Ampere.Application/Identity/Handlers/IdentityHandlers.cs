@@ -37,14 +37,15 @@ public sealed class IdentityHandlers(
         Response<TwoFactorResponse>>
 {
     /// <inheritdoc />
-    public Task<IdentityResultResponse> Handle(
+    public ValueTask<IdentityResultResponse> Handle(
         RegisterCommand request,
         CancellationToken cancellationToken)
     {
-        return identityService.RegisterAsync(
-            request.Email,
-            request.Password,
-            cancellationToken);
+        return new ValueTask<IdentityResultResponse>(
+            identityService.RegisterAsync(
+                request.Email,
+                request.Password,
+                cancellationToken));
     }
 
     /// <inheritdoc />
@@ -110,36 +111,38 @@ public sealed class IdentityHandlers(
     }
 
     /// <inheritdoc />
-    public Task<IdentityResultResponse> Handle(
+    public ValueTask<IdentityResultResponse> Handle(
         ResendConfirmationEmailCommand request,
         CancellationToken cancellationToken)
     {
-        return identityService
-            .ResendConfirmationEmailAsync(
+        return new ValueTask<IdentityResultResponse>(
+            identityService.ResendConfirmationEmailAsync(
                 request.Email,
-                cancellationToken);
+                cancellationToken));
     }
 
     /// <inheritdoc />
-    public Task<IdentityResultResponse> Handle(
+    public ValueTask<IdentityResultResponse> Handle(
         ForgotPasswordCommand request,
         CancellationToken cancellationToken)
     {
-        return identityService.ForgotPasswordAsync(
-            request.Email,
-            cancellationToken);
+        return new ValueTask<IdentityResultResponse>(
+            identityService.ForgotPasswordAsync(
+                request.Email,
+                cancellationToken));
     }
 
     /// <inheritdoc />
-    public Task<IdentityResultResponse> Handle(
+    public ValueTask<IdentityResultResponse> Handle(
         ResetPasswordCommand request,
         CancellationToken cancellationToken)
     {
-        return identityService.ResetPasswordAsync(
-            request.Email,
-            request.ResetCode,
-            request.NewPassword,
-            cancellationToken);
+        return new ValueTask<IdentityResultResponse>(
+            identityService.ResetPasswordAsync(
+                request.Email,
+                request.ResetCode,
+                request.NewPassword,
+                cancellationToken));
     }
 
     /// <inheritdoc />
@@ -160,16 +163,17 @@ public sealed class IdentityHandlers(
     }
 
     /// <inheritdoc />
-    public Task<IdentityResultResponse> Handle(
+    public ValueTask<IdentityResultResponse> Handle(
         UpdateIdentityInfoCommand request,
         CancellationToken cancellationToken)
     {
-        return identityService.UpdateInfoAsync(
-            request.UserId,
-            request.NewEmail,
-            request.NewPassword,
-            request.OldPassword,
-            cancellationToken);
+        return new ValueTask<IdentityResultResponse>(
+            identityService.UpdateInfoAsync(
+                request.UserId,
+                request.NewEmail,
+                request.NewPassword,
+                request.OldPassword,
+                cancellationToken));
     }
 
     /// <inheritdoc />
