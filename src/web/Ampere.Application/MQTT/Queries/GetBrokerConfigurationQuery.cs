@@ -1,7 +1,9 @@
+using Ampere.Application.Common.Responses;
 using Ampere.Application.MQTT.Responses;
-using Mediator.Net.Contracts;
+using Mediator;
 
 namespace Ampere.Application.MQTT.Queries;
 
-/// <summary>Query for the last saved broker configuration.</summary>
-public sealed record GetBrokerConfigurationQuery() : IRequest;
+/// <summary>Gets persisted broker configuration.</summary>
+public sealed record GetBrokerConfigurationQuery
+    : IRequest<Response<BrokerConfigurationResponse?>>;
