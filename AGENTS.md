@@ -56,6 +56,69 @@ Do not discover or register services by
 scanning assemblies or types through
 reflection.
 
+## Service and persistence flow
+
+Feature handlers call feature services.
+Feature services own application use cases
+that require infrastructure services.
+
+A feature service may inject:
+
+- feature abstractions;
+- IRepository<TEntity>;
+- IUnitOfWork;
+- other application abstractions.
+
+A feature service must not inject DbContext.
+A feature service must not access DbSet<T>.
+A feature service must not reference EF Core.
+A feature service must not access SQL directly.
+
+The persistence flow is:
+
+Presentation
+    -> Mediator.NET
+    -> Application Handler
+    -> IService
+    -> IRepository<TEntity>
+    -> Infrastructure Repository
+    -> DbContext
+    -> EF Core
+    -> SQL database
+
+IUnitOfWork is coordinated by the
+transaction middleware. Repositories do
+not call SaveChangesAsync().
+
+Transactional Mediator requests implement
+ITransactionalRequest. The transaction
+middleware begins a transaction before the
+handler, saves changes after the handler,
+and commits or rolls back the transaction.
+
+Queries must not open database transactions
+unless a specific consistency requirement
+justifies one.
+
+## Entity persistence
+
+Persisted application entities must
+implement IEntityBase. Domain entities
+should inherit EntityBase when possible.
+
+EntityBase provides:
+
+- Id;
+- CreatedAt;
+- CreatedBy;
+- UpdatedAt;
+- UpdatedBy.
+
+Id values use Guid.CreateVersion7().
+Identity entities may implement
+IEntityBase directly because ASP.NET Identity
+already provides their base classes.
+
 ## Build quality
 
 Code must not introduce compiler warnings.
