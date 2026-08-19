@@ -7,7 +7,7 @@ Build the local server experience:
 - ASP.NET Core REST API.
 - Blazor Interactive frontend.
 - Controllers for app clients.
-- MQTT integration for devices.
+- MQTT broker (server) for devices.
 - Local persistence and services.
 
 The server is the local authority for

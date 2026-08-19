@@ -2,7 +2,7 @@
 
 ## Use when
 
-Use for REST controllers and web API work.
+Use for REST controllers, razor pages, web API and mqtt broker work.
 
 ## Rules
 
@@ -31,5 +31,5 @@ components.
 
 ## Validation
 
-Build the web project.
-Run API tests when available.
+Build the web project or check CI build-web job status.
+Run API tests when available or check CI test-web job status.
