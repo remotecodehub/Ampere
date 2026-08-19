@@ -6,6 +6,8 @@ using Ampere.Application.SignalR.Notifications;
 using Ampere.Application.SignalR.Queries;
 using Ampere.Application.SignalR.Responses;
 using Ampere.Application.SignalR.Validators;
+using Ampere.UnitTests.Common.Fixtures;
+using Ampere.UnitTests.Common.Mocks;
 using FluentValidation;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,12 +18,15 @@ namespace Ampere.UnitTests.SignalR;
 /// <summary>Validates end-to-end Mediator dispatch.</summary>
 public sealed class SignalRDispatchTests
 {
+    private readonly AmpereTestFixture _fixture; 
+    public SignalRDispatchTests()
+    {
+        _fixture = new();
+    }
     [Fact]
     public async Task DiscoveryCommand_DispatchesToHandler()
     {
-        IMediator mediator = CreateProvider()
-            .GetRequiredService<IMediator>();
-
+        IMediator mediator =  _fixture.Mediator;
         Response<DiscoveryResponse> result =
             await mediator.Send(
                 new StartDiscoveryCommand("house", 30),
@@ -34,8 +39,7 @@ public sealed class SignalRDispatchTests
     [Fact]
     public async Task RelayCommand_DispatchesToHandler()
     {
-        IMediator mediator = CreateProvider()
-            .GetRequiredService<IMediator>();
+        IMediator mediator =  _fixture.Mediator;
 
         Response<RelayStateResponse> result =
             await mediator.Send(
@@ -49,8 +53,7 @@ public sealed class SignalRDispatchTests
     [Fact]
     public async Task FirmwareCommand_DispatchesToHandler()
     {
-        IMediator mediator = CreateProvider()
-            .GetRequiredService<IMediator>();
+        IMediator mediator = _fixture.Mediator;
 
         Response<FirmwareProgressResponse> result =
             await mediator.Send(
@@ -66,9 +69,7 @@ public sealed class SignalRDispatchTests
     [Fact]
     public async Task Query_DispatchesToHandler()
     {
-        IMediator mediator = CreateProvider()
-            .GetRequiredService<IMediator>();
-
+        IMediator mediator = _fixture.Mediator;
         Response<TelemetrySnapshotResponse> result =
             await mediator.Send(
                 new GetTelemetrySnapshotQuery("house"),
@@ -81,28 +82,24 @@ public sealed class SignalRDispatchTests
     [Fact]
     public async Task Notification_DispatchesToHandler()
     {
-        ServiceProvider provider = CreateProvider();
-        IMediator mediator =
-            provider.GetRequiredService<IMediator>();
+        
+        IMediator mediator =  _fixture.Mediator;
         TelemetryResponse telemetry = CreateTelemetry();
 
-        await mediator.Publish(
-            new TelemetryUpdatedNotification(telemetry),
+        await mediator.Publish(new TelemetryUpdatedNotification(telemetry),
             TestContext.Current.CancellationToken);
 
-        FakeSignalRService service =
-            provider.GetRequiredService<FakeSignalRService>();
+        FakeSignalRService service = _fixture.FSignalR;
         Assert.Same(telemetry, service.Telemetry);
     }
 
     [Fact]
     public async Task Stream_DispatchesToHandler()
     {
-        ServiceProvider provider = CreateProvider();
-        IMediator mediator =
-            provider.GetRequiredService<IMediator>();
-        FakeSignalRService service =
-            provider.GetRequiredService<FakeSignalRService>();
+        IMediator mediator =  _fixture.Mediator;
+
+        FakeSignalRService service =  _fixture.FSignalR;
+
         TelemetryResponse telemetry = CreateTelemetry();
         service.StreamItems.Add(telemetry);
 
@@ -121,36 +118,14 @@ public sealed class SignalRDispatchTests
     [Fact]
     public async Task Command_InvalidInput_IsRejectedByPipeline()
     {
-        IMediator mediator = CreateProvider()
-            .GetRequiredService<IMediator>();
+        IMediator mediator =  _fixture.Mediator;
 
         await Assert.ThrowsAsync<ValidationException>(
             async () => await mediator.Send(
                 new SetRelayCommand(string.Empty, true),
                 TestContext.Current.CancellationToken));
     }
-
-    private static ServiceProvider CreateProvider()
-    {
-        ServiceCollection services = new();
-        services.AddSingleton<FakeSignalRService>();
-        services.AddSingleton<ISignalRService>(
-            provider => provider.GetRequiredService<
-                FakeSignalRService>());
-        services.AddSingleton<
-            IValidator<SetRelayCommand>,
-            SetRelayCommandValidator>();
-        services.AddMediator(options =>
-        {
-            options.Assemblies =
-            [typeof(StartDiscoveryCommand).Assembly];
-            options.PipelineBehaviors =
-            [typeof(ValidationMiddleware<,>)];
-            options.ServiceLifetime = ServiceLifetime.Scoped;
-        });
-        return services.BuildServiceProvider();
-    }
-
+ 
     private static TelemetryResponse CreateTelemetry()
     {
         return new TelemetryResponse(
@@ -165,63 +140,5 @@ public sealed class SignalRDispatchTests
             true);
     }
 
-    private sealed class FakeSignalRService
-        : ISignalRService
-    {
-        public TelemetryResponse? Telemetry { get; private set; }
-
-        public List<TelemetryResponse> StreamItems { get; } = [];
-
-        public Task NotifyDiscoveryAsync(
-            DiscoveryResponse response,
-            CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task NotifyRelayStateAsync(
-            RelayStateResponse response,
-            CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task NotifyFirmwareProgressAsync(
-            FirmwareProgressResponse response,
-            CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task PublishTelemetryAsync(
-            TelemetryResponse response,
-            CancellationToken cancellationToken)
-        {
-            Telemetry = response;
-            return Task.CompletedTask;
-        }
-
-        public Task<IReadOnlyList<TelemetryResponse>>
-            GetTelemetrySnapshotAsync(
-                string? houseId,
-                CancellationToken cancellationToken)
-        {
-            return Task.FromResult(
-                (IReadOnlyList<TelemetryResponse>)[]);
-        }
-
-        public async IAsyncEnumerable<TelemetryResponse>
-            WatchTelemetryAsync(
-                string? houseId,
-                [System.Runtime.CompilerServices.EnumeratorCancellation]
-                CancellationToken cancellationToken)
-        {
-            foreach (TelemetryResponse item in StreamItems)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                await Task.Yield();
-                yield return item;
-            }
-        }
-    }
+   
 }

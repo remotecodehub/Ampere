@@ -1,5 +1,8 @@
 using Ampere.Application.Common.Abstractions;
+using Ampere.Application.Common.Pipeline.Validation;
 using Ampere.Application.Identity.Abstractions;
+using Ampere.Application.Identity.Handlers;
+using Ampere.Application.SignalR.Handlers;
 using Ampere.Infrastructure.Common.Hubs;
 using Ampere.Infrastructure.Common.Repository;
 using Ampere.Infrastructure.Common.UnitOfWork;
@@ -7,6 +10,9 @@ using Ampere.Infrastructure.Identity.Models;
 using Ampere.Infrastructure.Identity.Options;
 using Ampere.Infrastructure.Identity.Services;
 using Ampere.Infrastructure.Persistence;
+using Ampere.Infrastructure.Persistence.Middlewares;
+using Ampere.UnitTests.Common.Mocks;
+using Mediator;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,8 +23,8 @@ namespace Ampere.UnitTests.Common.Fixtures;
 /// <summary>Builds an in-memory SignalR service.</summary>
 public sealed class AmpereTestFixture : IDisposable
 {
-    private readonly ServiceProvider provider;
-
+    private readonly ServiceProvider _provider;
+    public ServiceProvider Services { get; init; }
     /// <summary>Initializes the Identity test fixture.</summary>
     public AmpereTestFixture()
     {
@@ -55,31 +61,50 @@ public sealed class AmpereTestFixture : IDisposable
             JwtTokenService>();
         services.AddScoped<IdentityService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddSingleton<ISignalRService, SignalRService>();
-        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        provider = services.BuildServiceProvider();
+        services.AddScoped<FakeSignalRService>();
+        services.AddScoped<ISignalRService, SignalRService>();
+        services.AddScoped(typeof(IRepository<>), typeof(FakeRepository<>));
+        services.AddScoped(sp 
+            => new SignalRHandlers(
+                sp.GetRequiredService<ISignalRService>()));
+        services.AddMediator(options =>
+        {
+            options.ServiceLifetime =
+                ServiceLifetime.Scoped;
+            options.Assemblies =
+                [typeof(IdentityHandlers).Assembly];
+            options.PipelineBehaviors =
+            [
+                typeof(ValidationMiddleware<,>),
+                typeof(TransactionMiddleware<,>)
+            ];
+        });
+        _provider = services.BuildServiceProvider();
+        Services = _provider;
     }
+    /// <summary>Gets the IMediator service under test.</summary>
+    public IMediator Mediator => _provider.GetRequiredService<IMediator>();
 
     /// <summary>Gets the UnitOfWork service under test.</summary>
-    public IUnitOfWork UnitOfWork => provider.GetRequiredService<IUnitOfWork>();
+    public IUnitOfWork UnitOfWork => _provider.GetRequiredService<IUnitOfWork>();
 
     /// <summary>Gets the SignalR service under test.</summary>
-    public ISignalRService SignalR => provider.GetRequiredService<ISignalRService>();
+    public FakeSignalRService FSignalR => _provider.GetRequiredService<FakeSignalRService>();
 
     /// <summary>Gets the Identity service under test.</summary>
-    public IdentityService Service => provider.GetRequiredService<IdentityService>();
+    public IdentityService Identity => _provider.GetRequiredService<IdentityService>();
 
     /// <summary>Gets the database context.</summary>
     public AmpereDbContext DbContext =>
-        provider.GetRequiredService<AmpereDbContext>();
+        _provider.GetRequiredService<AmpereDbContext>();
 
     /// <summary>Gets the user manager.</summary>
     public UserManager<User> UserManager =>
-        provider.GetRequiredService<UserManager<User>>();
+        _provider.GetRequiredService<UserManager<User>>();
 
     /// <summary>Gets the role manager.</summary>
     public RoleManager<Role> RoleManager =>
-        provider.GetRequiredService<RoleManager<Role>>();
+        _provider.GetRequiredService<RoleManager<Role>>();
 
     /// <summary>Creates and stores a user.</summary>
     /// <param name="email">The user's email.</param>
@@ -104,7 +129,7 @@ public sealed class AmpereTestFixture : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        provider.Dispose();
+        _provider.Dispose();
     }
 
     private sealed class TestIdentityEmailSender :
