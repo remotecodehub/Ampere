@@ -1,3 +1,4 @@
+using Ampere.Application.Identity.Responses;
 using Ampere.Infrastructure.Identity.Models;
 using Ampere.UnitTests.Common.Fixtures;
 using Xunit;
@@ -13,7 +14,7 @@ public sealed class IdentityServiceEdgeCaseTests
         using IdentityTestFixture fixture = new();
         await fixture.CreateUserAsync("confirmed@example.com");
 
-        var result = await fixture.Service
+        IdentityResultResponse result = await fixture.Service
             .ResendConfirmationEmailAsync(
                 "confirmed@example.com",
                 CancellationToken.None);
@@ -28,7 +29,7 @@ public sealed class IdentityServiceEdgeCaseTests
         User user = await fixture.CreateUserAsync(
             "twofactor-null@example.com");
 
-        var result = await fixture.Service
+        TwoFactorResponse? result = await fixture.Service
             .ConfigureTwoFactorAsync(
                 user.Id, null, null, false, false,
                 false, CancellationToken.None);
@@ -47,7 +48,7 @@ public sealed class IdentityServiceEdgeCaseTests
         await fixture.UserManager.SetTwoFactorEnabledAsync(
             user, true);
 
-        var result = await fixture.Service
+        TwoFactorResponse? result = await fixture.Service
             .ConfigureTwoFactorAsync(
                 user.Id, null, null, false, true,
                 false, CancellationToken.None);
@@ -65,7 +66,7 @@ public sealed class IdentityServiceEdgeCaseTests
         User user = await fixture.CreateUserAsync(
             "twofactor-codes@example.com");
 
-        var result = await fixture.Service
+        TwoFactorResponse? result = await fixture.Service
             .ConfigureTwoFactorAsync(
                 user.Id, null, null, true, false,
                 false, CancellationToken.None);
@@ -85,7 +86,7 @@ public sealed class IdentityServiceEdgeCaseTests
         await fixture.UserManager.SetTwoFactorEnabledAsync(
             user, true);
 
-        var result = await fixture.Service.LoginAsync(
+        TokenResponse? result = await fixture.Service.LoginAsync(
             user.Email!, "Password1!", " ", null,
             CancellationToken.None);
 
