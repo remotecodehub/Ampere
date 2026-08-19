@@ -7,6 +7,7 @@ using Ampere.UnitTests.Common.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Cryptography;
 using Xunit;
 
 namespace Ampere.UnitTests.Common.ConfiguredFixtures;
@@ -85,43 +86,70 @@ public sealed class IdentityTestFixture : IDisposable
     }
 
     /// <summary>
-    /// Generates an authenticator code and verifies it through the same
-    /// configured Identity token provider used by the service under test.
+    /// Generates a TOTP from the user's authenticator key.
     /// </summary>
     /// <param name="user">The user for whom the code is generated.</param>
-    /// <returns>A code accepted by the configured authenticator provider.</returns>
+    /// <returns>A code accepted by Identity's authenticator provider.</returns>
     public async Task<string> GenerateValidAuthenticatorCodeAsync(User user)
     {
         string? key = await UserManager.GetAuthenticatorKeyAsync(user);
         if (string.IsNullOrWhiteSpace(key))
         {
-            IdentityResult resetResult =
+            IdentityResult result =
                 await UserManager.ResetAuthenticatorKeyAsync(user);
-            Assert.True(resetResult.Succeeded);
+            Assert.True(result.Succeeded);
+            key = await UserManager.GetAuthenticatorKeyAsync(user);
         }
 
-        string providerName = UserManager.Options.Tokens
-            .AuthenticatorTokenProvider;
-
-        for (int attempt = 0; attempt < 5; attempt++)
+        Assert.False(string.IsNullOrWhiteSpace(key));
+        byte[] secret = DecodeBase32(key!);
+        long timestep = DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 30;
+        byte[] counter = new byte[8];
+        for (int index = 7; index >= 0; index--)
         {
-            string code = await UserManager.GenerateTwoFactorTokenAsync(
-                user,
-                providerName);
+            counter[index] = (byte)(timestep & 0xff);
+            timestep >>= 8;
+        }
 
-            if (await UserManager.VerifyTwoFactorTokenAsync(
-                    user,
-                    providerName,
-                    code))
+        using HMACSHA1 hmac = new(secret);
+        byte[] hash = hmac.ComputeHash(counter);
+        int offset = hash[^1] & 0x0f;
+        int binaryCode =
+            ((hash[offset] & 0x7f) << 24)
+            | (hash[offset + 1] << 16)
+            | (hash[offset + 2] << 8)
+            | hash[offset + 3];
+
+        return (binaryCode % 1_000_000).ToString("D6");
+    }
+
+    private static byte[] DecodeBase32(string value)
+    {
+        const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        List<byte> bytes = [];
+        int buffer = 0;
+        int bits = 0;
+        foreach (char character in value.Trim().ToUpperInvariant())
+        {
+            int digit = alphabet.IndexOf(character);
+            if (digit < 0)
             {
-                return code;
+                continue;
             }
 
-            await Task.Delay(50);
+            buffer = (buffer << 5) | digit;
+            bits += 5;
+            if (bits < 8)
+            {
+                continue;
+            }
+
+            bits -= 8;
+            bytes.Add((byte)(buffer >> bits));
+            buffer &= (1 << bits) - 1;
         }
 
-        throw new InvalidOperationException(
-            "The configured Identity authenticator token provider did not accept a token it generated.");
+        return [.. bytes];
     }
 
     /// <inheritdoc />
