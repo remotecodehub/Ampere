@@ -48,13 +48,14 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Install .NET MAUI Workload
+        working-directory: ${{ github.workspace }}/src/app/AmpereApp/
         run: dotnet workload install ${{ matrix.workload }}
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore Ampere.App.slnx
 
       - name: Build MAUI Project
-        run: dotnet build -c Release -f ${{ matrix.target_framework }}
+        run: dotnet build Ampere.App.slnx -c Release -f ${{ matrix.target_framework }}
 
   build_web:
     name: Web Continuous Integration
