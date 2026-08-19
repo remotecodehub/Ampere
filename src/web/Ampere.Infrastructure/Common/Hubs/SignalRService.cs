@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Threading.Channels;
 using Ampere.Application.Common.Abstractions;
 using Ampere.Application.Common.Contracts;
@@ -15,6 +16,9 @@ public sealed class SignalRService(
 {
     private readonly Channel<TelemetryResponse> _telemetry =
         Channel.CreateUnbounded<TelemetryResponse>();
+    private readonly ConcurrentDictionary<
+        string,
+        TelemetryResponse> _latest = [];
 
     /// <inheritdoc />
     public Task NotifyDiscoveryAsync(
@@ -48,12 +52,35 @@ public sealed class SignalRService(
         TelemetryResponse response,
         CancellationToken cancellationToken)
     {
+        _latest[response.EndpointId] = response;
         await _telemetry.Writer.WriteAsync(
             response,
             cancellationToken);
-
         await hubContext.Clients.All
             .TelemetryUpdated(response);
+    }
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<TelemetryResponse>>
+        GetTelemetrySnapshotAsync(
+            string? houseId,
+            CancellationToken cancellationToken)
+    {
+        IEnumerable<TelemetryResponse> items =
+            _latest.Values;
+
+        if (houseId is not null)
+        {
+            items = items.Where(item =>
+                string.Equals(
+                    item.HouseId,
+                    houseId,
+                    StringComparison.OrdinalIgnoreCase));
+        }
+
+        IReadOnlyList<TelemetryResponse> result =
+            items.ToArray();
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc />
