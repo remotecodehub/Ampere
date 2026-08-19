@@ -20,17 +20,18 @@ using Xunit;
 
 namespace Ampere.UnitTests.Common.Fixtures;
 
-/// <summary>Builds an in-memory SignalR service.</summary>
+/// <summary>Builds an in-memory application service provider for integration-style unit tests.</summary>
 public sealed class AmpereTestFixture : IDisposable
 {
     private readonly ServiceProvider _provider;
-    public ServiceProvider Services { get; init; }
-    /// <summary>Initializes the Identity test fixture.</summary>
+
+    /// <summary>Initializes the test fixture and its dependency injection container.</summary>
     public AmpereTestFixture()
     {
         ServiceCollection services = new();
         services.AddLogging();
         services.AddHttpContextAccessor();
+        services.AddSignalR();
         services.AddDbContext<AmpereDbContext>(options =>
             options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
         services.AddIdentityCore<User>(options =>
@@ -46,50 +47,59 @@ public sealed class AmpereTestFixture : IDisposable
         .AddSignInManager();
         services.AddScoped<IIdentityEmailSender,
             TestIdentityEmailSender>();
-        services.Configure<
-            JwtOptions>(
-            options =>
-            {
-                options.Key =
-                    "01234567890123456789012345678901";
-                options.Issuer = "Ampere.Tests";
-                options.Audience = "Ampere.Tests";
-            });
-        services.AddSingleton<IRevokedTokenStore,
-            RevokedTokenStore>();
-        services.AddScoped<IJwtTokenService,
-            JwtTokenService>();
+        services.Configure<JwtOptions>(options =>
+        {
+            options.Key = "01234567890123456789012345678901";
+            options.Issuer = "Ampere.Tests";
+            options.Audience = "Ampere.Tests";
+        });
+        services.AddSingleton<IRevokedTokenStore, RevokedTokenStore>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IdentityService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Dispatch tests intentionally use a deterministic fake at the application boundary.
+        // The concrete SignalR implementation is also registered so it can be resolved and tested
+        // independently with the real IHubContext supplied by AddSignalR().
         services.AddScoped<FakeSignalRService>();
-        services.AddScoped<ISignalRService, SignalRService>();
+        services.AddScoped<ISignalRService>(sp =>
+            sp.GetRequiredService<FakeSignalRService>());
+        services.AddScoped<SignalRService>();
+
         services.AddScoped(typeof(IRepository<>), typeof(FakeRepository<>));
-        services.AddScoped(sp 
-            => new SignalRHandlers(
+        services.AddScoped(sp =>
+            new SignalRHandlers(
                 sp.GetRequiredService<ISignalRService>()));
         services.AddMediator(options =>
         {
-            options.ServiceLifetime =
-                ServiceLifetime.Scoped;
-            options.Assemblies =
-                [typeof(IdentityHandlers).Assembly];
+            options.ServiceLifetime = ServiceLifetime.Scoped;
+            options.Assemblies = [typeof(IdentityHandlers).Assembly];
             options.PipelineBehaviors =
             [
                 typeof(ValidationMiddleware<,>),
                 typeof(TransactionMiddleware<,>)
             ];
         });
+
         _provider = services.BuildServiceProvider();
-        Services = _provider;
     }
+
+    /// <summary>Gets the service provider used by the fixture.</summary>
+    public ServiceProvider Services => _provider;
+
     /// <summary>Gets the IMediator service under test.</summary>
     public IMediator Mediator => _provider.GetRequiredService<IMediator>();
 
     /// <summary>Gets the UnitOfWork service under test.</summary>
     public IUnitOfWork UnitOfWork => _provider.GetRequiredService<IUnitOfWork>();
 
-    /// <summary>Gets the SignalR service under test.</summary>
-    public FakeSignalRService FSignalR => _provider.GetRequiredService<FakeSignalRService>();
+    /// <summary>Gets the fake SignalR boundary used by dispatch tests.</summary>
+    public FakeSignalRService FSignalR =>
+        _provider.GetRequiredService<FakeSignalRService>();
+
+    /// <summary>Gets the concrete SignalR service used by implementation tests.</summary>
+    public SignalRService SignalR =>
+        _provider.GetRequiredService<SignalRService>();
 
     /// <summary>Gets the Identity service under test.</summary>
     public IdentityService Identity => _provider.GetRequiredService<IdentityService>();
@@ -119,9 +129,7 @@ public sealed class AmpereTestFixture : IDisposable
             Email = email,
             EmailConfirmed = true
         };
-        IdentityResult result = await UserManager.CreateAsync(
-            user,
-            password);
+        IdentityResult result = await UserManager.CreateAsync(user, password);
         Assert.True(result.Succeeded);
         return user;
     }
@@ -132,23 +140,18 @@ public sealed class AmpereTestFixture : IDisposable
         _provider.Dispose();
     }
 
-    private sealed class TestIdentityEmailSender :
-        IIdentityEmailSender
+    private sealed class TestIdentityEmailSender : IIdentityEmailSender
     {
         public Task SendConfirmationAsync(
             string email,
             string confirmationLink,
-            CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+            CancellationToken cancellationToken) =>
+            Task.CompletedTask;
 
         public Task SendPasswordResetAsync(
             string email,
             string resetLink,
-            CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+            CancellationToken cancellationToken) =>
+            Task.CompletedTask;
     }
 }
