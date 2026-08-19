@@ -1,12 +1,13 @@
 using Ampere.Application.Common.Abstractions;
 using Ampere.Application.Common.Responses;
 using Ampere.Application.SignalR.Commands;
+using Ampere.Application.SignalR.Queries;
 using Ampere.Application.SignalR.Responses;
 using Mediator;
 
 namespace Ampere.Application.SignalR.Handlers;
 
-/// <summary>Handles SignalR commands.</summary>
+/// <summary>Handles SignalR commands and queries.</summary>
 /// <param name="signalRService">The hub service.</param>
 public sealed class SignalRHandlers(
     ISignalRService signalRService)
@@ -15,7 +16,9 @@ public sealed class SignalRHandlers(
       IRequestHandler<SetRelayCommand,
         Response<RelayStateResponse>>,
       IRequestHandler<StartFirmwareUpdateCommand,
-        Response<FirmwareProgressResponse>>
+        Response<FirmwareProgressResponse>>,
+      IRequestHandler<GetTelemetrySnapshotQuery,
+        Response<TelemetrySnapshotResponse>>
 {
     /// <inheritdoc />
     public async ValueTask<
@@ -65,5 +68,20 @@ public sealed class SignalRHandlers(
             response,
             cancellationToken);
         return Response.Success(response);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<
+        Response<TelemetrySnapshotResponse>> Handle(
+            GetTelemetrySnapshotQuery request,
+            CancellationToken cancellationToken)
+    {
+        IReadOnlyList<TelemetryResponse> items =
+            await signalRService.GetTelemetrySnapshotAsync(
+                request.HouseId,
+                cancellationToken);
+
+        return Response.Success(
+            new TelemetrySnapshotResponse(items));
     }
 }
