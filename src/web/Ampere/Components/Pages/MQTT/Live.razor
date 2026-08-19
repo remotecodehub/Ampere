@@ -54,29 +54,37 @@
     private readonly List<MqttTopicMessageResponse>
         _messages = [];
     private CancellationTokenSource? _cts;
+    private Task? _streamTask;
     private bool _running;
 
-    private async Task StartAsync()
+    private Task StartAsync()
     {
         if (_running)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         _cts = new CancellationTokenSource();
         _running = true;
+        _streamTask = ConsumeAsync(_cts.Token);
+        return Task.CompletedTask;
+    }
 
+    private async Task ConsumeAsync(
+        CancellationToken cancellationToken)
+    {
         try
         {
             await foreach (MqttTopicMessageResponse message
                 in Mediator.CreateStream(
                     new WatchTopicsQuery())
-                    .WithCancellation(_cts.Token))
+                    .WithCancellation(cancellationToken))
             {
                 _messages.Insert(0, message);
                 if (_messages.Count > 100)
                 {
-                    _messages.RemoveAt(_messages.Count - 1);
+                    _messages.RemoveAt(
+                        _messages.Count - 1);
                 }
 
                 await InvokeAsync(StateHasChanged);
@@ -88,14 +96,21 @@
         finally
         {
             _running = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
     private async Task StopAsync()
     {
-        if (_cts is not null)
+        if (_cts is null)
         {
-            await _cts.CancelAsync();
+            return;
+        }
+
+        await _cts.CancelAsync();
+        if (_streamTask is not null)
+        {
+            await _streamTask;
         }
     }
 
@@ -105,8 +120,14 @@
         if (_cts is not null)
         {
             await _cts.CancelAsync();
-            _cts.Dispose();
-            _cts = null;
         }
+
+        if (_streamTask is not null)
+        {
+            await _streamTask;
+        }
+
+        _cts?.Dispose();
+        _cts = null;
     }
 }
