@@ -66,4 +66,24 @@ public sealed class UnitOfWorkTests
         await unitOfWork.RollbackTransactionAsync(
             CancellationToken.None);
     }
+
+    [Fact]
+    public async Task UnitOfWork_DisposeRollsBackActiveTransaction()
+    {
+        await using SqliteConnection connection =
+            new("Data Source=:memory:");
+        await connection.OpenAsync();
+        DbContextOptions<AmpereDbContext> options =
+            new DbContextOptionsBuilder<AmpereDbContext>()
+                .UseSqlite(connection)
+                .Options;
+        await using AmpereDbContext context =
+            new(options);
+        await context.Database.EnsureCreatedAsync();
+        UnitOfWork unitOfWork = new(context);
+
+        await unitOfWork.BeginTransactionAsync(
+            CancellationToken.None);
+        await unitOfWork.DisposeAsync();
+    }
 }
