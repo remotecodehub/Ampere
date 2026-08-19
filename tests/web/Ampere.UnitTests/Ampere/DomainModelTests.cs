@@ -19,6 +19,19 @@ public sealed class DomainModelTests
     }
 
     [Fact]
+    public void House_AddDevice_RegistersNode()
+    {
+        House house = new("Home");
+
+        SonoffDevice device = house.AddDevice(
+            "node-01",
+            "AA:BB:CC:DD:EE:01");
+
+        Assert.Single(house.Devices);
+        Assert.Equal("node-01", device.NodeId);
+    }
+
+    [Fact]
     public void Room_AddEndpoint_AssignsSonoffAndKind()
     {
         Room room = new("Kitchen");
@@ -30,6 +43,34 @@ public sealed class DomainModelTests
 
         Assert.Equal("sonoff-01", endpoint.SonoffId);
         Assert.Equal(EndpointKind.Outlet, endpoint.Kind);
+    }
+
+    [Fact]
+    public void Endpoint_SetRelayState_ChangesState()
+    {
+        DeviceEndpoint endpoint = new(
+            "Light",
+            EndpointKind.Switch,
+            "sonoff-01");
+
+        endpoint.SetRelayState(true);
+
+        Assert.True(endpoint.RelayState);
+    }
+
+    [Fact]
+    public void Sonoff_StatusMethods_UpdateState()
+    {
+        SonoffDevice device = new("node", "mac");
+
+        device.MarkOnline();
+        Assert.Equal(DeviceStatus.Online, device.Status);
+
+        device.MarkUpdating();
+        Assert.Equal(DeviceStatus.Updating, device.Status);
+
+        device.MarkOffline();
+        Assert.Equal(DeviceStatus.Offline, device.Status);
     }
 
     [Fact]
@@ -88,5 +129,37 @@ public sealed class DomainModelTests
             8);
 
         Assert.Equal(25, result);
+    }
+
+    [Fact]
+    public void MonthlyConsumption_RejectsInvalidMonth()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => EnergyReading.CalculateMonthlyWh(
+                [],
+                2026,
+                13));
+    }
+
+    [Fact]
+    public void MonthlyConsumption_IgnoresOtherMonths()
+    {
+        DateTimeOffset date =
+            new(2026, 7, 31, 0, 0, 0, TimeSpan.Zero);
+        EnergyReading reading = new(
+            "node",
+            "endpoint",
+            date,
+            220,
+            1,
+            220,
+            100);
+
+        decimal result = EnergyReading.CalculateMonthlyWh(
+            [reading],
+            2026,
+            8);
+
+        Assert.Equal(0, result);
     }
 }
