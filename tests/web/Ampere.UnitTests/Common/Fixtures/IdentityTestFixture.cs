@@ -64,6 +64,10 @@ public sealed class IdentityTestFixture : IDisposable
     public UserManager<User> UserManager =>
         provider.GetRequiredService<UserManager<User>>();
 
+    /// <summary>Gets the role manager.</summary>
+    public RoleManager<Role> RoleManager =>
+        provider.GetRequiredService<RoleManager<Role>>();
+
     /// <summary>Creates and stores a user.</summary>
     /// <param name="email">The user's email.</param>
     /// <param name="password">The user's password.</param>
