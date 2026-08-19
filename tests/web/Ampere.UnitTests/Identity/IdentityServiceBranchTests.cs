@@ -203,12 +203,7 @@ public sealed class IdentityServiceBranchTests
         using IdentityTestFixture fixture = new();
         User user = await fixture.CreateUserAsync(
             "enable-2fa@example.com");
-        await fixture.UserManager.ResetAuthenticatorKeyAsync(user);
-        string code = await fixture.UserManager
-            .GenerateTwoFactorTokenAsync(
-                user,
-                fixture.UserManager.Options.Tokens
-                    .AuthenticatorTokenProvider);
+        string code = await fixture.GenerateValidAuthenticatorCodeAsync(user);
 
         TwoFactorResponse? result = await fixture.Service
             .ConfigureTwoFactorAsync(
