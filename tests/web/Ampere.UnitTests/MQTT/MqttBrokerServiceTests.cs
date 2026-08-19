@@ -1,6 +1,7 @@
 using Ampere.Application.MQTT.Responses;
 using Ampere.Infrastructure.MQTT.Models;
 using Ampere.Infrastructure.MQTT.Services;
+using Ampere.UnitTests.Common.Fixtures;
 using Ampere.UnitTests.Common.Mocks;
 using MQTTnet;
 using MQTTnet.Server;
@@ -56,7 +57,7 @@ public sealed class MqttBrokerServiceTests
         await repository.AddAsync(
             new MqttBrokerConfigurationEntity
             {
-                Port = 0,
+                Port = MqttTestPort.Get(),
                 UseTls = true
             },
             CancellationToken.None);
@@ -80,7 +81,7 @@ public sealed class MqttBrokerServiceTests
             new MqttBrokerConfigurationEntity
             {
                 BindAddress = "127.0.0.1",
-                Port = 0
+                Port = MqttTestPort.Get()
             },
             CancellationToken.None);
         MqttBrokerRuntime runtime = new();
@@ -119,7 +120,7 @@ public sealed class MqttBrokerServiceTests
             new MqttBrokerConfigurationEntity
             {
                 BindAddress = "127.0.0.1",
-                Port = 0
+                Port = MqttTestPort.Get()
             },
             CancellationToken.None);
         MqttBrokerRuntime runtime = new();
