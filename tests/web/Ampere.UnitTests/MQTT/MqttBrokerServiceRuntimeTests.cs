@@ -1,3 +1,4 @@
+using Ampere.Application.MQTT.Responses;
 using Ampere.Infrastructure.MQTT.Models;
 using Ampere.Infrastructure.MQTT.Services;
 using Ampere.UnitTests.Common.Mocks;
@@ -24,9 +25,8 @@ public sealed class MqttBrokerServiceRuntimeTests
             new(repository, runtime);
 
         await service.StartAsync(CancellationToken.None);
-        IReadOnlyList<
-            Ampere.Application.MQTT.Responses.MqttClientResponse>
-            clients = await service.GetClientsAsync(
+        IReadOnlyList<MqttClientResponse> clients =
+            await service.GetClientsAsync(
                 CancellationToken.None);
 
         Assert.Empty(clients);
