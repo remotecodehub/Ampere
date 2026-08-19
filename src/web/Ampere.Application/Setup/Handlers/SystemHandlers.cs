@@ -17,22 +17,24 @@ public sealed class SystemHandlers(
         IdentityResultResponse>
 {
     /// <inheritdoc />
-    public Task<SetupStatusResponse> Handle(
+    public ValueTask<SetupStatusResponse> Handle(
         GetSetupStatusQuery request,
         CancellationToken cancellationToken)
     {
-        return service.GetSetupStatusAsync(
-            cancellationToken);
+        return new ValueTask<SetupStatusResponse>(
+            service.GetSetupStatusAsync(
+                cancellationToken));
     }
 
     /// <inheritdoc />
-    public Task<IdentityResultResponse> Handle(
+    public ValueTask<IdentityResultResponse> Handle(
         InitializeSetupCommand request,
         CancellationToken cancellationToken)
     {
-        return service.InitializeSetupAsync(
-            request.Email,
-            request.Password,
-            cancellationToken);
+        return new ValueTask<IdentityResultResponse>(
+            service.InitializeSetupAsync(
+                request.Email,
+                request.Password,
+                cancellationToken));
     }
 }
